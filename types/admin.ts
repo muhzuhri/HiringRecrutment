@@ -1,10 +1,10 @@
-import { CandidateProfile, ApplicationStatus, EducationItem, ExperienceItem } from "./candidate";
+import { CandidateProfile, ApplicationStatus, AssessmentItem } from "./candidate";
 
 export interface JobPosting {
   id: string;
   title: string;
   dept: string;
-  type: string;
+  type: string; // WFH | WFO | Hybrid | Full-time
   location: string;
   salary: string;
   status: "Active" | "Closed";
@@ -15,6 +15,7 @@ export interface JobPosting {
   deadline_date?: string;
   created_at?: string;
   applicant_count?: number;
+  time_to_hire?: string; // e.g. "12 Hari" or "Belum tersedia"
 }
 
 export interface InternalNote {
@@ -29,8 +30,9 @@ export interface InternalNote {
 export interface AuditLog {
   id: string;
   application_id: string;
-  old_status: ApplicationStatus;
-  new_status: ApplicationStatus;
+  old_status: string;
+  new_status: string;
+  stage_detail?: string;
   changed_by_name: string;
   reason?: string;
   created_at: string;
@@ -50,6 +52,7 @@ export interface CandidateApplicantCard {
   department: string;
   status: ApplicationStatus;
   current_stage_index: number;
+  is_qualified?: boolean;
   auto_tags: string[];
   match_score: number; // percentage e.g. 95%
   resume_url?: string;
@@ -70,14 +73,17 @@ export interface CandidateDetailedReview {
     location: string;
     status: ApplicationStatus;
     current_stage_index: number;
+    is_qualified?: boolean;
     hr_notes?: string;
     interview_date?: string;
     interview_link?: string;
+    hired_at?: string;
     auto_tags: string[];
     created_at: string;
     updated_at: string;
   };
   profile: CandidateProfile;
+  assessments: AssessmentItem[];
   internal_notes: InternalNote[];
   audit_logs: AuditLog[];
 }
@@ -87,12 +93,13 @@ export interface HRAnalyticsSummary {
   total_applicants: number;
   interviewing_count: number;
   hired_count: number;
-  avg_time_to_hire_days: number;
+  avg_time_to_hire_text: string; // e.g., "12 Hari" or "Belum tersedia"
   applicants_per_job: {
     job_id: string;
     job_title: string;
     department: string;
     count: number;
+    time_to_hire: string; // "14 Hari" or "Belum tersedia"
   }[];
   monthly_trend: {
     month: string;
@@ -100,3 +107,4 @@ export interface HRAnalyticsSummary {
     hires: number;
   }[];
 }
+

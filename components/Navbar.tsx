@@ -20,12 +20,12 @@ export default function Navbar() {
       <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 sm:h-20">
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-3 group">
-            <div className="w-10 h-10 rounded-xl bg-linear-to-tr from-emerald-600 to-teal-500 flex items-center justify-center text-white shadow-md shadow-emerald-950/50 group-hover:scale-105 transition-transform">
-              <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
-              </svg>
-            </div>
+          <Link href="/" className="flex items-center gap-3 group" id="navbar-logo-link">
+            <img
+              src="/img/logo.png"
+              alt="TalentHub Logo"
+              className="w-14 h-14 rounded-full object-cover shadow-md group-hover:scale-105 transition-transform"
+            />
             <span className="text-white font-extrabold text-xl tracking-tight" style={{ fontFamily: "var(--font-plus-jakarta)" }}>
               Talent<span className="text-emerald-400">Hub</span>
             </span>

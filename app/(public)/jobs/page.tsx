@@ -1,23 +1,28 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
-import { allJobs, departments, typeColors } from "@/data/jobs";
+import { departments, typeColors, Job } from "@/data/jobs";
+import { getJobsFromSupabase } from "@/app/actions/jobs";
+import { Loader2 } from "lucide-react";
 
 export const dynamic = "force-dynamic";
 
 export default function JobsPage() {
   const [search, setSearch] = useState("");
   const [activeDept, setActiveDept] = useState("Semua");
+  const [jobs, setJobs] = useState<Job[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const filtered = allJobs.filter((job) => {
-    const matchSearch =
-      job.title.toLowerCase().includes(search.toLowerCase()) ||
-      job.dept.toLowerCase().includes(search.toLowerCase()) ||
-      job.location.toLowerCase().includes(search.toLowerCase());
-    const matchDept = activeDept === "Semua" || job.dept === activeDept;
-    return matchSearch && matchDept;
-  });
+  useEffect(() => {
+    async function fetchJobs() {
+      setLoading(true);
+      const res = await getJobsFromSupabase(activeDept, search);
+      setJobs(res.jobs);
+      setLoading(false);
+    }
+    fetchJobs();
+  }, [activeDept, search]);
 
   return (
     <div className="bg-grid-pattern min-h-screen">
@@ -28,7 +33,7 @@ export default function JobsPage() {
           style={{ background: "radial-gradient(ellipse 70% 50% at 50% 0%, rgba(12,43,41,0.08) 0%, transparent 70%)" }}
         />
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
-          <div className="section-tag mb-5 inline-flex"><span>💼</span><span>Karier</span></div>
+          <div className="section-tag mb-5 inline-flex"><span>💼</span><span>Karier Internal</span></div>
           <h1
             className="text-4xl md:text-5xl font-extrabold mb-4"
             style={{ fontFamily: "var(--font-plus-jakarta)", color: "#1a1a2e", letterSpacing: "-0.02em" }}
@@ -36,7 +41,7 @@ export default function JobsPage() {
             Temukan Posisi yang <span style={{ color: "#0c2b29" }}>Tepat Untukmu</span>
           </h1>
           <p className="text-gray-500 text-lg">
-            {allJobs.length} posisi aktif tersedia • Updated setiap hari
+            Terhubung langsung dengan database Supabase • Lowongan aktif perusahaan
           </p>
         </div>
       </section>
@@ -80,14 +85,21 @@ export default function JobsPage() {
       {/* ===== JOB LISTING ===== */}
       <section className="pb-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="mb-6 text-sm text-gray-500">
-            Menampilkan <span className="font-semibold text-gray-800">{filtered.length}</span> lowongan
-            {activeDept !== "Semua" && (
-              <> di <span className="text-emerald-800 font-semibold">{activeDept}</span></>
+          <div className="mb-6 text-sm text-gray-500 flex items-center justify-between">
+            <span>
+              Menampilkan <span className="font-semibold text-gray-800">{jobs.length}</span> lowongan
+              {activeDept !== "Semua" && (
+                <> di <span className="text-emerald-800 font-semibold">{activeDept}</span></>
+              )}
+            </span>
+            {loading && (
+              <span className="text-xs text-emerald-700 flex items-center gap-1">
+                <Loader2 className="w-3.5 h-3.5 animate-spin" /> Memuat dari Supabase...
+              </span>
             )}
           </div>
 
-          {filtered.length === 0 ? (
+          {jobs.length === 0 ? (
             <div className="text-center py-20">
               <div className="text-5xl mb-4">🔍</div>
               <h3 className="text-xl font-semibold text-gray-700 mb-2">Tidak Ada Lowongan Ditemukan</h3>
@@ -101,7 +113,7 @@ export default function JobsPage() {
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
-              {filtered.map((job) => (
+              {jobs.map((job) => (
                 <Link key={job.id} href={`/jobs/${job.id}`} className="career-card p-6 block group bg-white">
                   <div className="flex items-start justify-between mb-4">
                     <div className="w-11 h-11 rounded-xl flex items-center justify-center text-lg shrink-0 bg-emerald-900/10 text-emerald-800 border border-emerald-800/10">

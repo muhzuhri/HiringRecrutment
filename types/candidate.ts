@@ -1,4 +1,22 @@
-export type ApplicationStatus = 'Applied' | 'In Review' | 'Interview' | 'Offered' | 'Rejected' | 'Hired';
+export type ApplicationStatus = 
+  | 'Diajukan' 
+  | 'Diproses' 
+  | 'Interview' 
+  | 'Diterima' 
+  | 'Ditolak' 
+  | 'Applied' 
+  | 'In Review' 
+  | 'Offered' 
+  | 'Rejected' 
+  | 'Hired';
+
+export type AssessmentType = 
+  | 'Psikotes' 
+  | 'Technical Test' 
+  | 'Aptitude Test' 
+  | 'Personality Test' 
+  | 'Interview HR' 
+  | 'Interview User';
 
 export interface EducationItem {
   id: string;
@@ -41,6 +59,19 @@ export interface CandidateProfile {
   updated_at?: string;
 }
 
+export interface AssessmentItem {
+  id: string;
+  application_id: string;
+  type: AssessmentType;
+  scheduled_at: string;
+  evaluator_id?: string;
+  evaluator_name: string;
+  score: number | null; // null indicates unscored/belum dinilai, 0 is an actual valid score of 0
+  notes?: string;
+  status: 'Scheduled' | 'Completed' | 'Cancelled';
+  created_at?: string;
+}
+
 export interface TimelineStage {
   stageIndex: number; // 1, 2, 3, 4
   title: string;
@@ -59,9 +90,11 @@ export interface JobApplication {
   salary: string;
   status: ApplicationStatus;
   current_stage_index: number; // 1 to 4
+  is_qualified?: boolean;
   hr_notes?: string;
   interview_date?: string;
   interview_link?: string;
+  hired_at?: string;
   created_at: string;
   updated_at: string;
 }
@@ -69,26 +102,27 @@ export interface JobApplication {
 export const STAGES_CONFIG: TimelineStage[] = [
   {
     stageIndex: 1,
-    title: "Tahap 1: Pendaftaran",
+    title: "Tahap 1: Diajukan",
     subtitle: "Lamaran Dikirim",
-    description: "Berkualifikasi dan dokumen profil berhasil dikirimkan ke sistem rekrutmen TalentHub."
+    description: "Kualifikasi dan dokumen profil berhasil dikirimkan ke sistem rekrutmen perusahaan."
   },
   {
     stageIndex: 2,
-    title: "Tahap 2: Seleksi Berkas",
-    subtitle: "Screening Portofolio & CV",
-    description: "Tim HR sedang meninjau pengalaman kerja, pendidikan, dan kesesuaian profil Anda."
+    title: "Tahap 2: Diproses",
+    subtitle: "Screening & Qualification",
+    description: "Tim HR sedang meninjau kualifikasi berkas dan portofolio Anda."
   },
   {
     stageIndex: 3,
-    title: "Tahap 3: Interview",
-    subtitle: "Wawancara HR & User Lead",
-    description: "Sesi wawancara kompetensi teknis dan budaya kerja bersama tim TalentHub."
+    title: "Tahap 3: Interview & Assessment",
+    subtitle: "Wawancara & Evaluasi Tes",
+    description: "Sesi penilaian asesmen dan wawancara bersama HR & User Lead."
   },
   {
     stageIndex: 4,
     title: "Tahap 4: Keputusan Akhir",
-    subtitle: "Offering & Final Verification",
-    description: "Pengumuman kelulusan akhir dan penerbitan Surat Penawaran Kerja (Offering Letter)."
+    subtitle: "Penawaran / Diterima",
+    description: "Pengumuman hasil akhir rekrutmen dan proses offering letter."
   }
 ];
+

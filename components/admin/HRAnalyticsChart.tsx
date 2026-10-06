@@ -133,10 +133,10 @@ export default function HRAnalyticsChart({ analytics }: HRAnalyticsChartProps) {
 
           <div className="bg-[#061f1d] border border-emerald-700/50 rounded-2xl p-5 text-center space-y-1">
             <p className="text-4xl font-extrabold text-emerald-300">
-              {analytics.avg_time_to_hire_days} <span className="text-lg font-bold text-white">Hari</span>
+              {analytics.avg_time_to_hire_text || "Belum tersedia"}
             </p>
             <p className="text-[11px] text-emerald-400 font-semibold">
-              ⚡ 18% Lebih cepat dibanding target KPI standar 18 hari.
+              ⚡ Rata-rata durasi rekrutmen hingga penerimaan kandidat.
             </p>
           </div>
         </div>

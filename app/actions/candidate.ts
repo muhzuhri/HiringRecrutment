@@ -3,58 +3,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
 import { CandidateProfile, JobApplication } from "@/types/candidate";
-import { allJobs } from "@/data/jobs";
-
-// Sample initial mock applications for demo/fallback
-const MOCK_APPLICATIONS: JobApplication[] = [
-  {
-    id: "app-101",
-    candidate_id: "demo-user",
-    job_id: "2",
-    job_title: "Frontend Engineer (React)",
-    department: "Engineering",
-    job_type: "Full-time",
-    location: "Remote",
-    salary: "Rp 18.000.000 – Rp 30.000.000 / bulan",
-    status: "Interview",
-    current_stage_index: 3,
-    hr_notes: "Selamat! Berkas CV & Portofolio Anda dinyatakan LULUS seleksi berkas. Kami mengundang Anda untuk sesi Technical & Cultural Fit Interview secara online pada hari Kamis, 25 September 2026 pukul 10.00 WIB. Mohon persiapkan presentasi singkat pengalaman Next.js Anda.",
-    interview_date: "2026-09-25T10:00:00Z",
-    interview_link: "https://meet.google.com/abc-xyz-talent",
-    created_at: "2026-09-15T09:30:00Z",
-    updated_at: "2026-09-22T14:15:00Z",
-  },
-  {
-    id: "app-102",
-    candidate_id: "demo-user",
-    job_id: "1",
-    job_title: "Senior Backend Engineer",
-    department: "Engineering",
-    job_type: "Full-time",
-    location: "Jakarta, Hybrid",
-    salary: "Rp 25.000.000 – Rp 40.000.000 / bulan",
-    status: "In Review",
-    current_stage_index: 2,
-    hr_notes: "Lamaran Anda sedang dalam tahap peninjauan mendalam oleh Lead Backend Architect kami. Pembaruan hasil seleksi akan dikirimkan maksimal 3 hari kerja.",
-    created_at: "2026-09-18T11:20:00Z",
-    updated_at: "2026-09-20T08:45:00Z",
-  },
-  {
-    id: "app-103",
-    candidate_id: "demo-user",
-    job_id: "9",
-    job_title: "Data Analyst",
-    department: "Data & Analytics",
-    job_type: "Full-time",
-    location: "Bandung, Hybrid",
-    salary: "Rp 15.000.000 – Rp 25.000.000 / bulan",
-    status: "Applied",
-    current_stage_index: 1,
-    hr_notes: "Lamaran telah diterima oleh sistem rekrutmen TalentHub. Terima kasih sudah mendaftar.",
-    created_at: "2026-09-21T16:00:00Z",
-    updated_at: "2026-09-21T16:00:00Z",
-  },
-];
 
 /**
  * Fetch candidate profile from Supabase profiles table, fallback to user metadata if empty.
@@ -78,45 +26,25 @@ export async function getCandidateProfile(): Promise<{ profile: CandidateProfile
       console.warn("Supabase profile fetch notice:", error.message);
     }
 
-    // Default fallback structure
-    const fullName = data?.full_name || user.user_metadata?.full_name || user.email?.split("@")[0] || "Kandidat TalentHub";
+    const fullName = data?.full_name || user.user_metadata?.full_name || user.email?.split("@")[0] || "";
     const profile: CandidateProfile = {
       id: user.id,
       email: user.email || "",
       full_name: fullName,
       phone: data?.phone || user.user_metadata?.phone || "",
       whatsapp: data?.whatsapp || user.user_metadata?.whatsapp || "",
-      linkedin_url: data?.linkedin_url || "https://linkedin.com/in/kandidat-talenthub",
-      portfolio_url: data?.portfolio_url || "https://github.com/kandidat-talenthub",
-      headline: data?.headline || "Software Engineer / Full-Stack Developer",
-      bio: data?.bio || "Pengembang aplikasi web berpengalaman yang berfokus pada ekosistem React, Next.js, TypeScript, dan Supabase.",
+      linkedin_url: data?.linkedin_url || "",
+      portfolio_url: data?.portfolio_url || "",
+      headline: data?.headline || "",
+      bio: data?.bio || "",
       avatar_url: data?.avatar_url || "",
       role: data?.role || "candidate",
-      education: data?.education && Array.isArray(data.education) && data.education.length > 0 ? data.education : [
-        {
-          id: "edu-1",
-          level: "S1",
-          school: "Universitas Indonesia",
-          major: "Teknik Informatika",
-          startYear: "2019",
-          endYear: "2023"
-        }
-      ],
-      skills: data?.skills && Array.isArray(data.skills) && data.skills.length > 0 ? data.skills : [
-        "React.js", "Next.js", "TypeScript", "Tailwind CSS", "Node.js", "Supabase", "PostgreSQL", "Git"
-      ],
-      experience: data?.experience && Array.isArray(data.experience) && data.experience.length > 0 ? data.experience : [
-        {
-          id: "exp-1",
-          company: "Nusantara Tech Solution",
-          position: "Frontend Web Developer",
-          period: "2023 – Sekarang",
-          description: "Mengembangkan aplikasi SaaS scalable berbasis Next.js App Router, mengoptimalkan performa UI dan integrasi REST & Supabase backend API."
-        }
-      ],
+      education: data?.education && Array.isArray(data.education) ? data.education : [],
+      skills: data?.skills && Array.isArray(data.skills) ? data.skills : [],
+      experience: data?.experience && Array.isArray(data.experience) ? data.experience : [],
       resume_url: data?.resume_url || "",
       resume_name: data?.resume_name || "",
-      profile_completed: data?.profile_completed ?? true,
+      profile_completed: data?.profile_completed ?? false,
       created_at: data?.created_at || new Date().toISOString(),
       updated_at: data?.updated_at || new Date().toISOString(),
     };
@@ -172,28 +100,20 @@ export async function updateCandidateProfile(formData: {
       .upsert(updatedData, { onConflict: "id" });
 
     if (error) {
-      console.warn("Supabase upsert profile notice:", error.message);
-      // Fallback: updating auth metadata if profiles table lacks permissions
-      await supabase.auth.updateUser({
-        data: {
-          full_name: formData.full_name,
-          phone: formData.phone,
-          whatsapp: formData.whatsapp,
-          headline: formData.headline,
-        }
-      });
+      console.error("Supabase upsert profile error:", error.message, error.code);
+      return { success: false, error: `Gagal menyimpan profil: ${error.message}` };
     }
 
     revalidatePath("/dashboard");
     revalidatePath("/dashboard/profile");
     return { success: true };
   } catch (err: any) {
-    return { success: false, error: err.message || "Gagal menyimpann profil" };
+    return { success: false, error: err.message || "Gagal menyimpan profil" };
   }
 }
 
 /**
- * Upload Resume PDF to Supabase Storage bucket 'resumes'
+ * CASE 1 Validation Rule: Upload Resume PDF with strict max 2 MB size limit
  */
 export async function uploadResumeFile(formData: FormData): Promise<{ success: boolean; resumeUrl?: string; resumeName?: string; error?: string }> {
   try {
@@ -209,19 +129,23 @@ export async function uploadResumeFile(formData: FormData): Promise<{ success: b
       return { success: false, error: "Pilih berkas PDF CV terlebih dahulu." };
     }
 
-    if (file.type !== "application/pdf" && !file.name.endsWith(".pdf")) {
+    // Must be PDF format
+    if (file.type !== "application/pdf" && !file.name.toLowerCase().endsWith(".pdf")) {
       return { success: false, error: "Format berkas harus berupa dokumen PDF (.pdf)." };
     }
 
-    // Limit to 10MB max
-    if (file.size > 10 * 1024 * 1024) {
-      return { success: false, error: "Ukuran berkas PDF tidak boleh melebihi 10 MB." };
+    // CASE 1 strict rule: Max size 2 MB (2 * 1024 * 1024 bytes)
+    const MAX_SIZE_BYTES = 2 * 1024 * 1024;
+    if (file.size > MAX_SIZE_BYTES) {
+      return { 
+        success: false, 
+        error: `Ukuran berkas CV melebihi batas maksimal 2 MB (Ukuran berkas Anda: ${(file.size / (1024 * 1024)).toFixed(2)} MB).` 
+      };
     }
 
-    const fileExt = "pdf";
     const fileName = `${user.id}/${Date.now()}_CV_${file.name.replace(/[^a-zA-Z0-9._-]/g, "_")}`;
 
-    // Upload to bucket 'resumes'
+    // Step 1: Upload to Supabase Storage
     const { data: uploadData, error: uploadError } = await supabase
       .storage
       .from("resumes")
@@ -230,20 +154,28 @@ export async function uploadResumeFile(formData: FormData): Promise<{ success: b
         upsert: true,
       });
 
-    let publicUrl = "";
-    if (!uploadError && uploadData) {
-      const { data: publicUrlData } = supabase
-        .storage
-        .from("resumes")
-        .getPublicUrl(fileName);
-      publicUrl = publicUrlData.publicUrl;
-    } else {
-      // Fallback URL for mock environment
-      publicUrl = `https://storage.talenthub.id/resumes/${user.id}/${file.name}`;
+    if (uploadError) {
+      console.error("Supabase Storage upload error:", uploadError.message);
+      return { 
+        success: false, 
+        error: `Gagal mengunggah berkas ke Storage: ${uploadError.message}. Pastikan bucket 'resumes' aktif di Supabase dan RLS Storage sudah dikonfigurasi.` 
+      };
     }
 
-    // Update profile with resume metadata
-    await supabase
+    // Step 2: Get the public URL of the uploaded file
+    const { data: publicUrlData } = supabase
+      .storage
+      .from("resumes")
+      .getPublicUrl(fileName);
+
+    const publicUrl = publicUrlData.publicUrl;
+
+    if (!publicUrl) {
+      return { success: false, error: "Gagal mendapatkan URL publik berkas. Pastikan bucket 'resumes' di Supabase diatur ke Public." };
+    }
+
+    // Step 3: Persist the URL to the profiles table in database
+    const { error: dbError } = await supabase
       .from("profiles")
       .upsert({
         id: user.id,
@@ -253,7 +185,16 @@ export async function uploadResumeFile(formData: FormData): Promise<{ success: b
         updated_at: new Date().toISOString(),
       }, { onConflict: "id" });
 
+    if (dbError) {
+      console.error("Supabase profile resume upsert error:", dbError.message, dbError.code);
+      return { 
+        success: false, 
+        error: `File terunggah ke Storage tapi gagal disimpan ke database: ${dbError.message}. Periksa RLS policy INSERT pada tabel 'profiles'.` 
+      };
+    }
+
     revalidatePath("/dashboard/profile");
+    revalidatePath("/dashboard");
     return {
       success: true,
       resumeUrl: publicUrl,
@@ -287,7 +228,7 @@ export async function deleteResumeFile(): Promise<{ success: boolean; error?: st
 }
 
 /**
- * Fetch candidate applications from Supabase `applications` table, falling back to mock dataset.
+ * CASE 3: Fetch Candidate Applications (Confidential internal HR notes & assessment test details hidden from candidate)
  */
 export async function getCandidateApplications(): Promise<{ applications: JobApplication[]; error?: string }> {
   try {
@@ -300,23 +241,22 @@ export async function getCandidateApplications(): Promise<{ applications: JobApp
 
     const { data, error } = await supabase
       .from("applications")
-      .select("*")
+      .select("id, candidate_id, job_id, job_title, department, job_type, location, salary, status, current_stage_index, interview_date, interview_link, created_at, updated_at")
       .eq("candidate_id", user.id)
       .order("created_at", { ascending: false });
 
-    if (error) {
-      console.warn("Supabase applications fetch notice:", error.message);
-      return { applications: [] };
+    if (!error && data) {
+      return { applications: data as JobApplication[] };
     }
 
-    return { applications: (data || []) as JobApplication[] };
+    return { applications: [] };
   } catch (err: any) {
     return { applications: [] };
   }
 }
 
 /**
- * Fetch a single application detail by ID with Timeline View info
+ * CASE 3: Fetch Single Application Detail for Candidate Self-Tracking (Internal notes & score breakdown hidden)
  */
 export async function getApplicationById(applicationId: string): Promise<{ application: JobApplication | null; error?: string }> {
   try {
@@ -329,7 +269,7 @@ export async function getApplicationById(applicationId: string): Promise<{ appli
 
     const { data, error } = await supabase
       .from("applications")
-      .select("*")
+      .select("id, candidate_id, job_id, job_title, department, job_type, location, salary, status, current_stage_index, interview_date, interview_link, created_at, updated_at")
       .eq("id", applicationId)
       .single();
 
@@ -337,38 +277,17 @@ export async function getApplicationById(applicationId: string): Promise<{ appli
       return { application: data as JobApplication };
     }
 
-    // Search in mock applications fallback
-    const found = MOCK_APPLICATIONS.find(a => a.id === applicationId);
-    if (found) {
-      return { application: { ...found, candidate_id: user.id } };
-    }
-
-    // Default mock if dynamic job id requested
-    const targetJob = allJobs.find(j => j.id === applicationId) || allJobs[0];
-    const createdApp: JobApplication = {
-      id: applicationId,
-      candidate_id: user.id,
-      job_id: targetJob.id,
-      job_title: targetJob.title,
-      department: targetJob.dept,
-      job_type: targetJob.type,
-      location: targetJob.location,
-      salary: targetJob.salary,
-      status: "In Review",
-      current_stage_index: 2,
-      hr_notes: "Lamaran Anda sudah berhasil diproses ke Tahap Seleksi Berkas. Rekruiter TalentHub akan melakukan konfirmasi kualifikasi Anda segera.",
-      created_at: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
-      updated_at: new Date().toISOString(),
-    };
-
-    return { application: createdApp };
+    return { application: null, error: "Lamaran tidak ditemukan" };
   } catch (err: any) {
     return { application: null, error: err.message };
   }
 }
 
 /**
- * Apply for a job instantly ("Lamar Cepat") using profile data & uploaded CV
+ * CASE 1: Apply for Job with strict server-side business rules:
+ * Rule A: Satu kandidat hanya boleh 1 lamaran aktif per lowongan (prevent duplicate submission).
+ * Rule B: Lowongan yang sudah ditutup atau melewati batas akhir (deadline) TIDAK BOLEH menerima lamaran baru!
+ * Rule C: Simpan status awal lamaran sebagai "Diajukan".
  */
 export async function applyForJob(jobId: string): Promise<{ success: boolean; applicationId?: string; message?: string; error?: string }> {
   try {
@@ -376,61 +295,110 @@ export async function applyForJob(jobId: string): Promise<{ success: boolean; ap
     const { data: { user } } = await supabase.auth.getUser();
 
     if (!user) {
-      return { success: false, error: "Silakan login terlebih dahulu untuk melamar pekerjaan." };
+      return { success: false, error: "Silakan login terlebih dahulu untuk menguji lamaran pekerjaan." };
     }
 
-    const targetJob = allJobs.find((j) => j.id === jobId);
-    if (!targetJob) {
-      return { success: false, error: "Posisi lowongan pekerjaan tidak ditemukan." };
-    }
-
-    // Check existing application in DB
-    const { data: existing } = await supabase
-      .from("applications")
-      .select("id")
-      .eq("candidate_id", user.id)
-      .eq("job_id", jobId)
+    // 1. Fetch target job posting from Supabase
+    const { data: targetJob } = await supabase
+      .from("jobs")
+      .select("*")
+      .eq("id", jobId)
       .single();
 
-    if (existing) {
+    if (!targetJob) {
+      return { success: false, error: "Lowongan pekerjaan tidak ditemukan." };
+    }
+
+    // CASE 1 Rule B Validation: Check if job is closed or deadline date has passed
+    if (targetJob.status === "Closed") {
       return {
         success: false,
-        error: `Anda sudah pernah melamar posisi "${targetJob.title}". Silakan cek status di menu My Applications.`
+        error: `Pendaftaran posisi "${targetJob.title}" telah DITUTUP oleh tim HR.`
       };
     }
 
-    const newAppId = `app-${Date.now()}`;
+    if (targetJob.deadline_date) {
+      const deadline = new Date(targetJob.deadline_date);
+      if (deadline < new Date()) {
+        return {
+          success: false,
+          error: `Batas akhir pendaftaran posisi "${targetJob.title}" telah berakhir pada ${new Date(targetJob.deadline_date).toLocaleDateString("id-ID")}.`
+        };
+      }
+    }
+
+    // CASE 1 Rule A Validation: Check for existing active application (duplicate check)
+    const { data: existingApp } = await supabase
+      .from("applications")
+      .select("id, status")
+      .eq("candidate_id", user.id)
+      .eq("job_id", jobId)
+      .maybeSingle();
+
+    if (existingApp) {
+      return {
+        success: false,
+        error: `Satu kandidat hanya boleh memiliki 1 lamaran aktif per lowongan! Anda telah mengajukan lamaran untuk posisi "${targetJob.title}".`
+      };
+    }
+
+    // Verify candidate profile has uploaded CV PDF
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("resume_url")
+      .eq("id", user.id)
+      .single();
+
+    // CASE 1 Rule C: Initial status saved as "Diajukan".
+    // Let Supabase generate the UUID — do NOT pass a custom string id.
     const newApplication = {
-      id: newAppId,
       candidate_id: user.id,
       job_id: targetJob.id,
       job_title: targetJob.title,
-      department: targetJob.dept,
-      job_type: targetJob.type,
-      location: targetJob.location,
-      salary: targetJob.salary,
-      status: "Applied" as const,
+      department: targetJob.dept || targetJob.department || "Internal Company",
+      job_type: targetJob.type || "Hybrid",
+      location: targetJob.location || "Jakarta",
+      salary: targetJob.salary || "Sesuai Standar Perusahaan",
+      status: "Diajukan" as const,
       current_stage_index: 1,
-      hr_notes: "Lamaran Cepat berhasil dikirimkan menggunakan Data Profil & CV Terstruktur Anda.",
+      is_qualified: false,
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
     };
 
-    const { error: insertError } = await supabase
+    const { data: insertedApp, error: insertError } = await supabase
       .from("applications")
-      .insert(newApplication);
+      .insert(newApplication)
+      .select("id")
+      .single();
 
-    if (insertError) {
-      console.warn("Supabase insert application notice:", insertError.message);
+    if (insertError || !insertedApp) {
+      console.error("Supabase insert application error:", insertError?.message, insertError?.code);
+      return {
+        success: false,
+        error: `Gagal menyimpan lamaran ke database: ${insertError?.message || "Unknown error"}. Periksa RLS INSERT policy pada tabel 'applications'.`,
+      };
     }
+
+    // Record initial Audit Trail using the real UUID returned by Supabase
+    await supabase.from("audit_logs").insert({
+      application_id: insertedApp.id,
+      old_status: "-",
+      new_status: "Diajukan",
+      stage_detail: "Pendaftaran Lamaran Baru",
+      changed_by_name: user.email || "Kandidat",
+      reason: "Kandidat berhasil mengajukan lamaran baru.",
+      created_at: new Date().toISOString(),
+    });
 
     revalidatePath("/dashboard");
     revalidatePath("/dashboard/jobs");
+    revalidatePath("/dashboard/applications");
 
     return {
       success: true,
-      applicationId: newAppId,
-      message: `Selamat! Lamaran Anda untuk posisi "${targetJob.title}" telah berhasil dikirim.`,
+      applicationId: insertedApp.id,
+      message: `Selamat! Lamaran Anda untuk posisi "${targetJob.title}" dengan status "Diajukan" telah berhasil dikirim.`,
     };
   } catch (err: any) {
     return { success: false, error: err.message || "Gagal mengirimkan lamaran." };

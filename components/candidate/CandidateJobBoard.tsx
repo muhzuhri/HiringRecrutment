@@ -10,9 +10,10 @@ import Link from "next/link";
 interface CandidateJobBoardProps {
   profile: CandidateProfile | null;
   existingApplications: JobApplication[];
+  jobsList?: Job[];
 }
 
-export default function CandidateJobBoard({ profile, existingApplications }: CandidateJobBoardProps) {
+export default function CandidateJobBoard({ profile, existingApplications, jobsList }: CandidateJobBoardProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedDept, setSelectedDept] = useState("Semua");
   const [selectedType, setSelectedType] = useState("Semua");
@@ -23,8 +24,10 @@ export default function CandidateJobBoard({ profile, existingApplications }: Can
   // Set of job IDs candidate has applied to
   const appliedJobIds = new Set(existingApplications.map((app) => app.job_id));
 
+  const sourceJobs = jobsList && jobsList.length > 0 ? jobsList : allJobs;
+
   // Filter logic
-  const filteredJobs = allJobs.filter((job) => {
+  const filteredJobs = sourceJobs.filter((job) => {
     const matchesSearch =
       job.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       job.description.toLowerCase().includes(searchQuery.toLowerCase()) ||

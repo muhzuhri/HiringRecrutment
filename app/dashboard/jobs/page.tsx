@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import { getCandidateProfile, getCandidateApplications } from "@/app/actions/candidate";
+import { getJobsFromSupabase } from "@/app/actions/jobs";
 import CandidateJobBoard from "@/components/candidate/CandidateJobBoard";
 
 export const metadata = {
@@ -19,15 +20,17 @@ export default async function JobBoardPage() {
     redirect("/login?redirect=/dashboard/jobs");
   }
 
-  const [{ profile }, { applications }] = await Promise.all([
+  const [{ profile }, { applications }, { jobs }] = await Promise.all([
     getCandidateProfile(),
     getCandidateApplications(),
+    getJobsFromSupabase(),
   ]);
 
   return (
     <CandidateJobBoard
       profile={profile}
       existingApplications={applications}
+      jobsList={jobs}
     />
   );
 }

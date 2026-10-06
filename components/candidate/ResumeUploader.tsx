@@ -82,7 +82,7 @@ export default function ResumeUploader({ currentResumeUrl, currentResumeName }: 
           </p>
         </div>
         <span className="text-[11px] font-bold px-2.5 py-1 rounded bg-emerald-950 text-emerald-300 border border-emerald-700/50">
-          Format: PDF (Max 10MB)
+          Format: PDF (Max 2MB)
         </span>
       </div>
 
@@ -162,7 +162,7 @@ export default function ResumeUploader({ currentResumeUrl, currentResumeName }: 
               <p className="text-xs text-slate-400 mt-1">
                 {file
                   ? `Ukuran berkas: ${(file.size / 1024 / 1024).toFixed(2)} MB`
-                  : "Mendukung format PDF dengan ukuran maksimum 10 MB"}
+                  : "Mendukung format PDF dengan ukuran maksimum 2 MB"}
               </p>
             </label>
           </div>

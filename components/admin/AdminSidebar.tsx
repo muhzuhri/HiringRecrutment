@@ -3,7 +3,7 @@
 import React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, Kanban, Briefcase, Users, ShieldCheck, LogOut, Sparkles } from "lucide-react";
+import { LayoutDashboard, Kanban, Briefcase, ShieldCheck, LogOut } from "lucide-react";
 import { signOutAction } from "@/app/actions/auth";
 
 export default function AdminSidebar() {
@@ -16,7 +16,7 @@ export default function AdminSidebar() {
   ];
 
   return (
-    <aside className="w-64 bg-[#0c2b29] border-r border-emerald-800/40 hidden md:flex flex-col justify-between p-5 text-slate-100 min-h-screen shrink-0">
+    <aside className="w-64 bg-[#0c2b29] border-r border-emerald-800/40 hidden md:flex flex-col justify-between p-5 text-slate-100 sticky top-0 h-screen shrink-0 overflow-y-auto custom-scrollbar z-30">
       <div className="space-y-6">
         {/* Brand Logo */}
         <Link href="/admin" className="flex items-center gap-3 px-2">
@@ -71,7 +71,7 @@ export default function AdminSidebar() {
         <form action={signOutAction}>
           <button
             type="submit"
-            className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-rose-950/60 hover:bg-rose-900/80 border border-rose-800/60 text-rose-200 text-xs font-bold transition-all"
+            className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-rose-950/60 hover:bg-rose-900/80 border border-rose-800/60 text-rose-200 text-xs font-bold transition-all cursor-pointer"
           >
             <LogOut className="w-4 h-4" />
             <span>Keluar Sistem</span>

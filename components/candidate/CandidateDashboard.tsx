@@ -17,9 +17,13 @@ export default function CandidateDashboard({ profile, userEmail, applications }:
 
   // Calculate statistics
   const totalApplied = applications.length;
-  const inReviewCount = applications.filter((a) => a.status === "In Review" || a.status === "Applied").length;
+  const inReviewCount = applications.filter((a) =>
+    ["In Review", "Applied", "Diajukan", "Diproses"].includes(a.status)
+  ).length;
   const interviewCount = applications.filter((a) => a.status === "Interview").length;
-  const offeredCount = applications.filter((a) => a.status === "Offered").length;
+  const offeredCount = applications.filter((a) =>
+    ["Offered", "Diterima", "Hired"].includes(a.status)
+  ).length;
 
   return (
     <div className="space-y-8">

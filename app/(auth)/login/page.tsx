@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { signInAction, type AuthActionResult } from "@/app/actions/auth";
 import { createClient } from "@/lib/supabase/client";
+import { Mail, Lock, Eye, EyeOff, ShieldCheck, ArrowRight, AlertCircle, CheckCircle2 } from "lucide-react";
 
 function LoginFormContent() {
   const router = useRouter();
@@ -78,12 +79,10 @@ function LoginFormContent() {
     <div className="bg-white/95 backdrop-blur-md rounded-2xl p-8 border border-emerald-900/10 shadow-xl shadow-emerald-950/5">
       {/* Notification Banners */}
       {state && !state.success && (
-        <div className="mb-6 p-4 rounded-xl bg-red-50 border border-red-200 text-red-700 text-sm flex items-start gap-3 animate-fade-in-up">
-          <svg className="w-5 h-5 text-red-500 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
+        <div className="mb-6 p-4 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-sm flex items-start gap-3 animate-fade-in-up">
+          <AlertCircle className="w-5 h-5 text-rose-500 shrink-0 mt-0.5" />
           <div>
-            <p className="font-semibold text-red-800">Gagal Masuk</p>
+            <p className="font-semibold text-rose-800">Gagal Masuk</p>
             <p className="mt-0.5">{state.message}</p>
           </div>
         </div>
@@ -91,9 +90,7 @@ function LoginFormContent() {
 
       {state && state.success && (
         <div className="mb-6 p-4 rounded-xl bg-emerald-50 border border-emerald-300 text-emerald-800 text-sm flex items-start gap-3 animate-fade-in-up">
-          <svg className="w-5 h-5 text-emerald-600 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
+          <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0 mt-0.5" />
           <div>
             <p className="font-semibold text-emerald-950">Autentikasi Berhasil!</p>
             <p className="mt-0.5">{state.message}</p>
@@ -107,19 +104,17 @@ function LoginFormContent() {
           <label htmlFor="login-email" className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
             Alamat Email
           </label>
-          <div className="relative">
+          <div className="relative flex items-center">
+            
             <input
               id="login-email"
               type="email"
               name="email"
               placeholder="nama@domain.com"
-              className="form-input pl-10 transition-all"
+              className="form-input pl-11 transition-all"
               required
               autoComplete="email"
             />
-            <svg className="w-5 h-5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-            </svg>
           </div>
         </div>
 
@@ -129,36 +124,25 @@ function LoginFormContent() {
             <label htmlFor="login-password" className="block text-xs font-bold uppercase tracking-wider text-slate-700">
               Kata Sandi
             </label>
-            <Link href="/forgot-password" className="text-xs text-emerald-800 font-bold hover:underline">
-              Lupa Password?
-            </Link>
           </div>
-          <div className="relative">
+          <div className="relative flex items-center">
+           
             <input
               id="login-password"
               type={showPassword ? "text" : "password"}
               name="password"
               placeholder="••••••••"
-              className="form-input pr-10 transition-all"
+              className="form-input pl-11 pr-11 transition-all"
               required
               autoComplete="current-password"
             />
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-emerald-700 p-1 rounded-md transition-colors"
+              className="absolute right-3 text-slate-400 hover:text-emerald-700 p-1 rounded-md transition-colors"
               aria-label="Toggle visibility"
             >
-              {showPassword ? (
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858-5.908a8.97 8.97 0 013.682-.763c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21M3 3l18 18" />
-                </svg>
-              ) : (
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                </svg>
-              )}
+              {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
             </button>
           </div>
         </div>
@@ -195,16 +179,11 @@ function LoginFormContent() {
           ) : (
             <span className="flex items-center justify-center gap-2">
               Masuk ke Akun
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
-              </svg>
+              <ArrowRight className="w-4 h-4" />
             </span>
           )}
         </button>
       </form>
-
-      {/* Divider */}
-      
 
       {/* Register Link */}
       <p className="text-center text-xs text-slate-600 mt-6 font-medium">
@@ -260,7 +239,7 @@ export default function LoginPage() {
           </p>
         </div>
 
-        {/* Suspense Wrapper for searchParams */}
+        {/* Suspense Wrapper */}
         <Suspense
           fallback={
             <div className="bg-white/95 rounded-2xl p-8 border border-slate-200 shadow-xl flex items-center justify-center py-16">
@@ -276,9 +255,7 @@ export default function LoginPage() {
 
         {/* Security Note */}
         <p className="text-center text-xs text-slate-500 mt-5 flex items-center justify-center gap-1.5 font-medium">
-          <svg className="w-3.5 h-3.5 text-emerald-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-          </svg>
+          <ShieldCheck className="w-4 h-4 text-emerald-700" />
           Sesi Otentikasi Terenkripsi SSL 256-bit
         </p>
       </div>

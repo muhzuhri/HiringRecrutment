@@ -3,17 +3,35 @@
 import React, { useState } from "react";
 import { updateCandidateProfile } from "@/app/actions/candidate";
 import { CandidateProfile, EducationItem, ExperienceItem } from "@/types/candidate";
-import { User, Phone, Globe, GraduationCap, Briefcase, Award, Plus, Trash2, Save, Loader2, CheckCircle2, AlertCircle } from "lucide-react";
+import { User, GraduationCap, Briefcase, Award, Plus, Trash2, Save, Loader2, CheckCircle2, AlertCircle, Calendar } from "lucide-react";
 
 interface ProfileFormProps {
   initialProfile: CandidateProfile;
 }
 
+const MONTHS = [
+  "Januari",
+  "Februari",
+  "Maret",
+  "April",
+  "Mei",
+  "Juni",
+  "Juli",
+  "Agustus",
+  "September",
+  "Oktober",
+  "November",
+  "Desember",
+];
+
+const CURRENT_YEAR = new Date().getFullYear();
+const YEARS = Array.from({ length: 45 }, (_, i) => (CURRENT_YEAR + 5 - i).toString());
+
 export default function ProfileForm({ initialProfile }: ProfileFormProps) {
   const [loading, setLoading] = useState(false);
   const [statusMsg, setStatusMsg] = useState<{ type: "success" | "error"; text: string } | null>(null);
 
-  // Form states
+  // Form states - pure candidate data from Supabase
   const [fullName, setFullName] = useState(initialProfile.full_name || "");
   const [phone, setPhone] = useState(initialProfile.phone || "");
   const [whatsapp, setWhatsapp] = useState(initialProfile.whatsapp || initialProfile.phone || "");
@@ -24,41 +42,74 @@ export default function ProfileForm({ initialProfile }: ProfileFormProps) {
 
   // Education state
   const [educationList, setEducationList] = useState<EducationItem[]>(
-    initialProfile.education && initialProfile.education.length > 0
-      ? initialProfile.education
-      : [
-          {
-            id: `edu-${Date.now()}`,
-            level: "S1",
-            school: "Universitas Indonesia",
-            major: "Teknik Informatika",
-            startYear: "2019",
-            endYear: "2023",
-          },
-        ]
+    initialProfile.education || []
   );
 
   // Skills state
   const [skillsList, setSkillsList] = useState<string[]>(
-    initialProfile.skills && initialProfile.skills.length > 0
-      ? initialProfile.skills
-      : ["React.js", "Next.js", "TypeScript", "Tailwind CSS", "Supabase", "SQL"]
+    initialProfile.skills || []
   );
   const [newSkillInput, setNewSkillInput] = useState("");
 
-  // Experience state
-  const [experienceList, setExperienceList] = useState<ExperienceItem[]>(
-    initialProfile.experience && initialProfile.experience.length > 0
-      ? initialProfile.experience
-      : [
-          {
-            id: `exp-${Date.now()}`,
-            company: "Tech Solution Indonesia",
-            position: "Frontend Web Engineer",
-            period: "2023 – Sekarang",
-            description: "Mengembangkan aplikasi web modern berbasis Next.js App Router dan Tailwind CSS.",
-          },
-        ]
+  // Helper parsing for experience items
+  const parseExpItem = (exp: ExperienceItem) => {
+    let startMonth = "Januari";
+    let startYear = "2022";
+    let endMonth = "Desember";
+    let endYear = "2024";
+    let isCurrent = false;
+
+    if (exp.period) {
+      const parts = exp.period.split("–").map((s) => s.trim());
+      if (parts[0]) {
+        const p = parts[0].split(" ");
+        if (p.length === 2 && MONTHS.includes(p[0])) {
+          startMonth = p[0];
+          startYear = p[1];
+        } else if (p.length === 1 && !isNaN(Number(p[0]))) {
+          startYear = p[0];
+        }
+      }
+      if (parts[1]) {
+        if (parts[1].toLowerCase().includes("sekarang") || parts[1].toLowerCase().includes("present")) {
+          isCurrent = true;
+        } else {
+          const p = parts[1].split(" ");
+          if (p.length === 2 && MONTHS.includes(p[0])) {
+            endMonth = p[0];
+            endYear = p[1];
+          } else if (p.length === 1 && !isNaN(Number(p[0]))) {
+            endYear = p[0];
+          }
+        }
+      }
+    }
+
+    return {
+      ...exp,
+      startMonth,
+      startYear,
+      endMonth,
+      endYear,
+      isCurrent,
+    };
+  };
+
+  // Experience state with interactive Month/Year picker fields
+  const [experienceStateList, setExperienceStateList] = useState<
+    Array<{
+      id: string;
+      company: string;
+      position: string;
+      description: string;
+      startMonth: string;
+      startYear: string;
+      endMonth: string;
+      endYear: string;
+      isCurrent: boolean;
+    }>
+  >(
+    (initialProfile.experience || []).map((exp) => parseExpItem(exp))
   );
 
   // Education Handlers
@@ -70,8 +121,8 @@ export default function ProfileForm({ initialProfile }: ProfileFormProps) {
         level: "S1",
         school: "",
         major: "",
-        startYear: "2020",
-        endYear: "2024",
+        startYear: CURRENT_YEAR.toString(),
+        endYear: (CURRENT_YEAR + 4).toString(),
       },
     ]);
   };
@@ -100,25 +151,29 @@ export default function ProfileForm({ initialProfile }: ProfileFormProps) {
 
   // Experience Handlers
   const handleAddExperience = () => {
-    setExperienceList([
-      ...experienceList,
+    setExperienceStateList([
+      ...experienceStateList,
       {
         id: `exp-${Date.now()}`,
         company: "",
         position: "",
-        period: "2022 – 2024",
         description: "",
+        startMonth: "Januari",
+        startYear: (CURRENT_YEAR - 2).toString(),
+        endMonth: "Desember",
+        endYear: CURRENT_YEAR.toString(),
+        isCurrent: true,
       },
     ]);
   };
 
   const handleRemoveExperience = (id: string) => {
-    setExperienceList(experienceList.filter((item) => item.id !== id));
+    setExperienceStateList(experienceStateList.filter((item) => item.id !== id));
   };
 
-  const handleExperienceChange = (id: string, field: keyof ExperienceItem, value: string) => {
-    setExperienceList(
-      experienceList.map((item) => (item.id === id ? { ...item, [field]: value } : item))
+  const handleExpFieldChange = (id: string, field: string, value: any) => {
+    setExperienceStateList(
+      experienceStateList.map((item) => (item.id === id ? { ...item, [field]: value } : item))
     );
   };
 
@@ -127,6 +182,21 @@ export default function ProfileForm({ initialProfile }: ProfileFormProps) {
     e.preventDefault();
     setLoading(true);
     setStatusMsg(null);
+
+    // Format experience list back into standardized items
+    const formattedExperience: ExperienceItem[] = experienceStateList.map((exp) => {
+      const periodStr = exp.isCurrent
+        ? `${exp.startMonth} ${exp.startYear} – Sekarang`
+        : `${exp.startMonth} ${exp.startYear} – ${exp.endMonth} ${exp.endYear}`;
+
+      return {
+        id: exp.id,
+        company: exp.company,
+        position: exp.position,
+        period: periodStr,
+        description: exp.description,
+      };
+    });
 
     const payload = {
       full_name: fullName,
@@ -138,7 +208,7 @@ export default function ProfileForm({ initialProfile }: ProfileFormProps) {
       bio,
       education: educationList,
       skills: skillsList,
-      experience: experienceList,
+      experience: formattedExperience,
     };
 
     const res = await updateCandidateProfile(payload);
@@ -147,12 +217,12 @@ export default function ProfileForm({ initialProfile }: ProfileFormProps) {
     if (res.success) {
       setStatusMsg({
         type: "success",
-        text: "Data profil terstruktur Anda berhasil diperbarui dan tersimpan di database Supabase!",
+        text: "Data profil terstruktur Anda telah tersimpan secara permanen di database Supabase!",
       });
     } else {
       setStatusMsg({
         type: "error",
-        text: res.error || "Gagal memperbarui profil. Periksa koneksi Anda.",
+        text: res.error || "Gagal memperbarui profil. Silakan coba lagi.",
       });
     }
   };
@@ -161,7 +231,7 @@ export default function ProfileForm({ initialProfile }: ProfileFormProps) {
     <form onSubmit={handleSubmit} className="space-y-8">
       {statusMsg && (
         <div
-          className={`p-4 rounded-xl border text-sm flex items-center gap-3 ${
+          className={`p-4 rounded-xl border text-sm flex items-center gap-3 animate-fade-in-up ${
             statusMsg.type === "success"
               ? "bg-emerald-950/90 border-emerald-500/50 text-emerald-200"
               : "bg-rose-950/90 border-rose-500/50 text-rose-200"
@@ -177,14 +247,14 @@ export default function ProfileForm({ initialProfile }: ProfileFormProps) {
       )}
 
       {/* 1. Informasi Kontak & Bio */}
-      <div className="bg-[#0c2b29] border border-emerald-800/40 rounded-2xl p-6 sm:p-8 space-y-6">
+      <div className="bg-[#0c2b29] border border-emerald-800/40 rounded-2xl p-6 sm:p-8 space-y-6 shadow-xl">
         <div className="flex items-center gap-3 border-b border-emerald-800/40 pb-4">
           <div className="w-10 h-10 rounded-xl bg-emerald-900/60 border border-emerald-700/50 flex items-center justify-center text-emerald-300">
             <User className="w-5 h-5" />
           </div>
           <div>
-            <h2 className="text-lg font-bold text-white">1. Informasi Kontak & Ringkasan Diri</h2>
-            <p className="text-xs text-emerald-200/70">Data ini digunakan untuk identitas utama Anda di TalentHub.</p>
+            <h2 className="text-lg font-bold text-white">1. Informasi Kontak Utama & Bio</h2>
+            <p className="text-xs text-emerald-200/70">Lengkapi informasi identitas diri Anda secara akurat.</p>
           </div>
         </div>
 
@@ -199,7 +269,7 @@ export default function ProfileForm({ initialProfile }: ProfileFormProps) {
               value={fullName}
               onChange={(e) => setFullName(e.target.value)}
               className="w-full px-4 py-2.5 rounded-xl bg-[#061f1d] border border-emerald-800/60 text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-colors"
-              placeholder="Contoh: Ahmad Rizky Supriadi"
+              placeholder="Contoh: Ahmad Rizky"
             />
           </div>
 
@@ -211,7 +281,7 @@ export default function ProfileForm({ initialProfile }: ProfileFormProps) {
               type="email"
               disabled
               value={initialProfile.email}
-              className="w-full px-4 py-2.5 rounded-xl bg-[#061f1d]/50 border border-emerald-900/40 text-slate-400 cursor-not-allowed"
+              className="w-full px-4 py-2.5 rounded-xl bg-[#061f1d]/50 border border-emerald-900/40 text-slate-400 cursor-not-allowed font-medium"
             />
           </div>
 
@@ -277,7 +347,7 @@ export default function ProfileForm({ initialProfile }: ProfileFormProps) {
               value={headline}
               onChange={(e) => setHeadline(e.target.value)}
               className="w-full px-4 py-2.5 rounded-xl bg-[#061f1d] border border-emerald-800/60 text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-colors"
-              placeholder="Contoh: Senior Full-Stack Engineer | Ex-Startup Tech Lead"
+              placeholder="Contoh: Frontend Engineer | Ex-Startup Software Developer"
             />
           </div>
 
@@ -290,14 +360,14 @@ export default function ProfileForm({ initialProfile }: ProfileFormProps) {
               value={bio}
               onChange={(e) => setBio(e.target.value)}
               className="w-full px-4 py-2.5 rounded-xl bg-[#061f1d] border border-emerald-800/60 text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-colors resize-none"
-              placeholder="Tuliskan gambaran singkat mengenai pengalaman, pencapaian utama, dan motivasi karier Anda..."
+              placeholder="Tuliskan ringkasan pengalaman, minat industri, dan kekuatan utama Anda..."
             />
           </div>
         </div>
       </div>
 
       {/* 2. Riwayat Pendidikan */}
-      <div className="bg-[#0c2b29] border border-emerald-800/40 rounded-2xl p-6 sm:p-8 space-y-6">
+      <div className="bg-[#0c2b29] border border-emerald-800/40 rounded-2xl p-6 sm:p-8 space-y-6 shadow-xl">
         <div className="flex items-center justify-between border-b border-emerald-800/40 pb-4">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-emerald-900/60 border border-emerald-700/50 flex items-center justify-center text-emerald-300">
@@ -305,7 +375,7 @@ export default function ProfileForm({ initialProfile }: ProfileFormProps) {
             </div>
             <div>
               <h2 className="text-lg font-bold text-white">2. Form Riwayat Pendidikan</h2>
-              <p className="text-xs text-emerald-200/70">Tambahkan riwayat pendidikan formal Anda secara lengkap.</p>
+              <p className="text-xs text-emerald-200/70">Tambahkan riwayat pendidikan formal Anda.</p>
             </div>
           </div>
 
@@ -319,18 +389,23 @@ export default function ProfileForm({ initialProfile }: ProfileFormProps) {
           </button>
         </div>
 
-        <div className="space-y-4">
-          {educationList.map((edu, idx) => (
-            <div
-              key={edu.id}
-              className="bg-[#061f1d] border border-emerald-800/50 rounded-xl p-4 sm:p-5 space-y-4 relative"
-            >
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-bold px-2.5 py-0.5 rounded bg-emerald-950 text-emerald-300 border border-emerald-800">
-                  Pendidikan #{idx + 1}
-                </span>
+        {educationList.length === 0 ? (
+          <div className="p-8 text-center bg-[#061f1d]/50 border border-dashed border-emerald-800/60 rounded-xl text-slate-400 text-xs space-y-2">
+            <p className="font-semibold text-slate-300">Belum Ada Riwayat Pendidikan</p>
+            <p>Klik tombol "+ Tambah Pendidikan" di atas untuk menambahkan institusi pendidikan Anda.</p>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            {educationList.map((edu, idx) => (
+              <div
+                key={edu.id}
+                className="bg-[#061f1d] border border-emerald-800/50 rounded-xl p-4 sm:p-5 space-y-4 relative"
+              >
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-bold px-2.5 py-0.5 rounded bg-emerald-950 text-emerald-300 border border-emerald-800">
+                    Pendidikan #{idx + 1}
+                  </span>
 
-                {educationList.length > 1 && (
                   <button
                     type="button"
                     onClick={() => handleRemoveEducation(edu.id)}
@@ -339,83 +414,87 @@ export default function ProfileForm({ initialProfile }: ProfileFormProps) {
                   >
                     <Trash2 className="w-4 h-4" />
                   </button>
-                )}
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-sm">
+                  <div>
+                    <label className="block text-xs font-medium text-emerald-300 mb-1">
+                      Jenjang Pendidikan *
+                    </label>
+                    <select
+                      value={edu.level}
+                      onChange={(e) => handleEducationChange(edu.id, "level", e.target.value as any)}
+                      className="w-full px-3 py-2 rounded-lg bg-[#0c2b29] border border-emerald-800/60 text-white focus:outline-none focus:border-emerald-500"
+                    >
+                      <option value="SMA">SMA / SMK / Sederajat</option>
+                      <option value="D3">Diploma 3 (D3)</option>
+                      <option value="S1">Sarjana (S1)</option>
+                      <option value="S2">Magister (S2)</option>
+                      <option value="S3">Doktor (S3)</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-medium text-emerald-300 mb-1">
+                      Nama Sekolah / Universitas *
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      value={edu.school}
+                      onChange={(e) => handleEducationChange(edu.id, "school", e.target.value)}
+                      className="w-full px-3 py-2 rounded-lg bg-[#0c2b29] border border-emerald-800/60 text-white focus:outline-none focus:border-emerald-500 placeholder-slate-500"
+                      placeholder="Contoh: Universitas Indonesia"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-medium text-emerald-300 mb-1">
+                      Jurusan / Program Studi *
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      value={edu.major}
+                      onChange={(e) => handleEducationChange(edu.id, "major", e.target.value)}
+                      className="w-full px-3 py-2 rounded-lg bg-[#0c2b29] border border-emerald-800/60 text-white focus:outline-none focus:border-emerald-500 placeholder-slate-500"
+                      placeholder="Teknik Informatika"
+                    />
+                  </div>
+
+                  {/* Year Selectors */}
+                  <div>
+                    <label className="block text-xs font-medium text-emerald-300 mb-1">
+                      Tahun Lulus *
+                    </label>
+                    <select
+                      value={edu.endYear}
+                      onChange={(e) => handleEducationChange(edu.id, "endYear", e.target.value)}
+                      className="w-full px-3 py-2 rounded-lg bg-[#0c2b29] border border-emerald-800/60 text-white focus:outline-none focus:border-emerald-500"
+                    >
+                      {YEARS.map((y) => (
+                        <option key={y} value={y}>
+                          {y}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
               </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-sm">
-                <div>
-                  <label className="block text-xs font-medium text-emerald-300 mb-1">
-                    Jenjang Pendidikan *
-                  </label>
-                  <select
-                    value={edu.level}
-                    onChange={(e) => handleEducationChange(edu.id, "level", e.target.value as any)}
-                    className="w-full px-3 py-2 rounded-lg bg-[#0c2b29] border border-emerald-800/60 text-white focus:outline-none focus:border-emerald-500"
-                  >
-                    <option value="SMA">SMA / SMK / Sederajat</option>
-                    <option value="D3">Diploma 3 (D3)</option>
-                    <option value="S1">Sarjana (S1)</option>
-                    <option value="S2">Magister (S2)</option>
-                    <option value="S3">Doktor (S3)</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-xs font-medium text-emerald-300 mb-1">
-                    Nama Universitas / Sekolah *
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    value={edu.school}
-                    onChange={(e) => handleEducationChange(edu.id, "school", e.target.value)}
-                    className="w-full px-3 py-2 rounded-lg bg-[#0c2b29] border border-emerald-800/60 text-white focus:outline-none focus:border-emerald-500 placeholder-slate-500"
-                    placeholder="Contoh: Universitas Indonesia"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-xs font-medium text-emerald-300 mb-1">
-                    Jurusan / Program Studi *
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    value={edu.major}
-                    onChange={(e) => handleEducationChange(edu.id, "major", e.target.value)}
-                    className="w-full px-3 py-2 rounded-lg bg-[#0c2b29] border border-emerald-800/60 text-white focus:outline-none focus:border-emerald-500 placeholder-slate-500"
-                    placeholder="Teknik Informatika"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-xs font-medium text-emerald-300 mb-1">
-                    Tahun Lulus *
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    value={edu.endYear}
-                    onChange={(e) => handleEducationChange(edu.id, "endYear", e.target.value)}
-                    className="w-full px-3 py-2 rounded-lg bg-[#0c2b29] border border-emerald-800/60 text-white focus:outline-none focus:border-emerald-500 placeholder-slate-500"
-                    placeholder="2023"
-                  />
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* 3. Sertifikasi & Keahlian (Skills) */}
-      <div className="bg-[#0c2b29] border border-emerald-800/40 rounded-2xl p-6 sm:p-8 space-y-6">
+      <div className="bg-[#0c2b29] border border-emerald-800/40 rounded-2xl p-6 sm:p-8 space-y-6 shadow-xl">
         <div className="flex items-center gap-3 border-b border-emerald-800/40 pb-4">
           <div className="w-10 h-10 rounded-xl bg-emerald-900/60 border border-emerald-700/50 flex items-center justify-center text-emerald-300">
             <Award className="w-5 h-5" />
           </div>
           <div>
-            <h2 className="text-lg font-bold text-white">3. Form Sertifikasi & Keahlian (Skills)</h2>
-            <p className="text-xs text-emerald-200/70">Daftar kemampuan teknis & manajerial yang Anda kuasai.</p>
+            <h2 className="text-lg font-bold text-white">3. Form Keahlian & Sertifikasi (Skills)</h2>
+            <p className="text-xs text-emerald-200/70">Daftar skill dan keahlian teknis yang Anda kuasai.</p>
           </div>
         </div>
 
@@ -432,7 +511,7 @@ export default function ProfileForm({ initialProfile }: ProfileFormProps) {
                 }
               }}
               className="flex-1 px-4 py-2.5 rounded-xl bg-[#061f1d] border border-emerald-800/60 text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500 text-sm"
-              placeholder="Ketik keahlian (contoh: Next.js, Golang, Figma, Docker) lalu tekan Tambah"
+              placeholder="Ketik keahlian (contoh: Next.js, React, Node.js, SQL) lalu tekan Tambah"
             />
             <button
               type="button"
@@ -445,28 +524,32 @@ export default function ProfileForm({ initialProfile }: ProfileFormProps) {
           </div>
 
           {/* Skill Pills */}
-          <div className="flex flex-wrap gap-2 pt-2">
-            {skillsList.map((skill) => (
-              <span
-                key={skill}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#061f1d] border border-emerald-700/50 text-emerald-200 text-xs font-semibold shadow-sm"
-              >
-                <span>{skill}</span>
-                <button
-                  type="button"
-                  onClick={() => handleRemoveSkill(skill)}
-                  className="text-slate-400 hover:text-rose-400 transition-colors ml-1"
+          {skillsList.length === 0 ? (
+            <p className="text-xs text-slate-400 italic">Belum ada skill ditambahkan.</p>
+          ) : (
+            <div className="flex flex-wrap gap-2 pt-2">
+              {skillsList.map((skill) => (
+                <span
+                  key={skill}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#061f1d] border border-emerald-700/50 text-emerald-200 text-xs font-semibold shadow-sm"
                 >
-                  ×
-                </button>
-              </span>
-            ))}
-          </div>
+                  <span>{skill}</span>
+                  <button
+                    type="button"
+                    onClick={() => handleRemoveSkill(skill)}
+                    className="text-slate-400 hover:text-rose-400 transition-colors ml-1 text-sm font-bold"
+                  >
+                    ×
+                  </button>
+                </span>
+              ))}
+            </div>
+          )}
         </div>
       </div>
 
-      {/* 4. Riwayat Pengalaman Kerja */}
-      <div className="bg-[#0c2b29] border border-emerald-800/40 rounded-2xl p-6 sm:p-8 space-y-6">
+      {/* 4. Riwayat Pengalaman Kerja (Interactive Month & Year Picker) */}
+      <div className="bg-[#0c2b29] border border-emerald-800/40 rounded-2xl p-6 sm:p-8 space-y-6 shadow-xl">
         <div className="flex items-center justify-between border-b border-emerald-800/40 pb-4">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-emerald-900/60 border border-emerald-700/50 flex items-center justify-center text-emerald-300">
@@ -474,7 +557,9 @@ export default function ProfileForm({ initialProfile }: ProfileFormProps) {
             </div>
             <div>
               <h2 className="text-lg font-bold text-white">4. Form Riwayat Pengalaman Kerja</h2>
-              <p className="text-xs text-emerald-200/70">Pengalaman kerja relevan sebelumnya yang pernah Anda jalani.</p>
+              <p className="text-xs text-emerald-200/70">
+                Pilih periode bulan dan tahun menggunakan dropdown interaktif di bawah.
+              </p>
             </div>
           </div>
 
@@ -488,18 +573,23 @@ export default function ProfileForm({ initialProfile }: ProfileFormProps) {
           </button>
         </div>
 
-        <div className="space-y-4">
-          {experienceList.map((exp, idx) => (
-            <div
-              key={exp.id}
-              className="bg-[#061f1d] border border-emerald-800/50 rounded-xl p-4 sm:p-5 space-y-4"
-            >
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-bold px-2.5 py-0.5 rounded bg-emerald-950 text-emerald-300 border border-emerald-800">
-                  Pengalaman #{idx + 1}
-                </span>
+        {experienceStateList.length === 0 ? (
+          <div className="p-8 text-center bg-[#061f1d]/50 border border-dashed border-emerald-800/60 rounded-xl text-slate-400 text-xs space-y-2">
+            <p className="font-semibold text-slate-300">Belum Ada Riwayat Pengalaman Kerja</p>
+            <p>Klik tombol "+ Tambah Pengalaman" untuk mengisi riwayat pekerjaan Anda.</p>
+          </div>
+        ) : (
+          <div className="space-y-6">
+            {experienceStateList.map((exp, idx) => (
+              <div
+                key={exp.id}
+                className="bg-[#061f1d] border border-emerald-800/50 rounded-xl p-5 space-y-4 relative"
+              >
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-bold px-2.5 py-0.5 rounded bg-emerald-950 text-emerald-300 border border-emerald-800">
+                    Pengalaman #{idx + 1}
+                  </span>
 
-                {experienceList.length > 1 && (
                   <button
                     type="button"
                     onClick={() => handleRemoveExperience(exp.id)}
@@ -508,68 +598,142 @@ export default function ProfileForm({ initialProfile }: ProfileFormProps) {
                   >
                     <Trash2 className="w-4 h-4" />
                   </button>
-                )}
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
+                  <div>
+                    <label className="block text-xs font-medium text-emerald-300 mb-1">
+                      Nama Perusahaan *
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      value={exp.company}
+                      onChange={(e) => handleExpFieldChange(exp.id, "company", e.target.value)}
+                      className="w-full px-3 py-2 rounded-lg bg-[#0c2b29] border border-emerald-800/60 text-white focus:outline-none focus:border-emerald-500 placeholder-slate-500"
+                      placeholder="Contoh: PT Nusantara Tech"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-medium text-emerald-300 mb-1">
+                      Posisi / Jabatan *
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      value={exp.position}
+                      onChange={(e) => handleExpFieldChange(exp.id, "position", e.target.value)}
+                      className="w-full px-3 py-2 rounded-lg bg-[#0c2b29] border border-emerald-800/60 text-white focus:outline-none focus:border-emerald-500 placeholder-slate-500"
+                      placeholder="Contoh: Frontend Web Developer"
+                    />
+                  </div>
+
+                  {/* Interactive Month & Year Picker */}
+                  <div className="sm:col-span-2 bg-[#0c2b29]/80 border border-emerald-800/60 rounded-xl p-4 space-y-3">
+                    <p className="text-xs font-semibold text-emerald-300 flex items-center gap-1.5">
+                      <Calendar className="w-3.5 h-3.5 text-emerald-400" />
+                      Periode Waktu Kerja (Bulan & Tahun Interaktif)
+                    </p>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      {/* Start Date Dropdowns */}
+                      <div>
+                        <label className="block text-[11px] text-slate-400 mb-1">Bulan & Tahun Mulai *</label>
+                        <div className="grid grid-cols-2 gap-2">
+                          <select
+                            value={exp.startMonth}
+                            onChange={(e) => handleExpFieldChange(exp.id, "startMonth", e.target.value)}
+                            className="px-2.5 py-1.5 rounded-lg bg-[#061f1d] border border-emerald-800/60 text-white text-xs focus:outline-none focus:border-emerald-500"
+                          >
+                            {MONTHS.map((m) => (
+                              <option key={m} value={m}>
+                                {m}
+                              </option>
+                            ))}
+                          </select>
+
+                          <select
+                            value={exp.startYear}
+                            onChange={(e) => handleExpFieldChange(exp.id, "startYear", e.target.value)}
+                            className="px-2.5 py-1.5 rounded-lg bg-[#061f1d] border border-emerald-800/60 text-white text-xs focus:outline-none focus:border-emerald-500"
+                          >
+                            {YEARS.map((y) => (
+                              <option key={y} value={y}>
+                                {y}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+                      </div>
+
+                      {/* End Date Dropdowns / Current Checkbox */}
+                      <div>
+                        <div className="flex items-center justify-between mb-1">
+                          <label className="block text-[11px] text-slate-400">Bulan & Tahun Selesai</label>
+                          <label className="flex items-center gap-1 text-[11px] text-emerald-300 cursor-pointer">
+                            <input
+                              type="checkbox"
+                              checked={exp.isCurrent}
+                              onChange={(e) => handleExpFieldChange(exp.id, "isCurrent", e.target.checked)}
+                              className="w-3.5 h-3.5 accent-emerald-600 rounded"
+                            />
+                            <span>Masih Bekerja (Saat Ini)</span>
+                          </label>
+                        </div>
+
+                        {!exp.isCurrent ? (
+                          <div className="grid grid-cols-2 gap-2">
+                            <select
+                              value={exp.endMonth}
+                              onChange={(e) => handleExpFieldChange(exp.id, "endMonth", e.target.value)}
+                              className="px-2.5 py-1.5 rounded-lg bg-[#061f1d] border border-emerald-800/60 text-white text-xs focus:outline-none focus:border-emerald-500"
+                            >
+                              {MONTHS.map((m) => (
+                                <option key={m} value={m}>
+                                  {m}
+                                </option>
+                              ))}
+                            </select>
+
+                            <select
+                              value={exp.endYear}
+                              onChange={(e) => handleExpFieldChange(exp.id, "endYear", e.target.value)}
+                              className="px-2.5 py-1.5 rounded-lg bg-[#061f1d] border border-emerald-800/60 text-white text-xs focus:outline-none focus:border-emerald-500"
+                            >
+                              {YEARS.map((y) => (
+                                <option key={y} value={y}>
+                                  {y}
+                                </option>
+                              ))}
+                            </select>
+                          </div>
+                        ) : (
+                          <div className="px-3 py-1.5 rounded-lg bg-emerald-950 border border-emerald-700/50 text-emerald-300 text-xs font-bold flex items-center justify-center">
+                            Present (Saat Ini)
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="sm:col-span-2">
+                    <label className="block text-xs font-medium text-emerald-300 mb-1">
+                      Deskripsi Tanggung Jawab & Pencapaian
+                    </label>
+                    <textarea
+                      rows={2}
+                      value={exp.description}
+                      onChange={(e) => handleExpFieldChange(exp.id, "description", e.target.value)}
+                      className="w-full px-3 py-2 rounded-lg bg-[#0c2b29] border border-emerald-800/60 text-white focus:outline-none focus:border-emerald-500 placeholder-slate-500 text-xs resize-none"
+                      placeholder="Jelaskan secara singkat tugas utama dan pencapaian Anda..."
+                    />
+                  </div>
+                </div>
               </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm">
-                <div>
-                  <label className="block text-xs font-medium text-emerald-300 mb-1">
-                    Nama Perusahaan *
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    value={exp.company}
-                    onChange={(e) => handleExperienceChange(exp.id, "company", e.target.value)}
-                    className="w-full px-3 py-2 rounded-lg bg-[#0c2b29] border border-emerald-800/60 text-white focus:outline-none focus:border-emerald-500 placeholder-slate-500"
-                    placeholder="PT Nusantara Tech"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-xs font-medium text-emerald-300 mb-1">
-                    Posisi / Jabatan *
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    value={exp.position}
-                    onChange={(e) => handleExperienceChange(exp.id, "position", e.target.value)}
-                    className="w-full px-3 py-2 rounded-lg bg-[#0c2b29] border border-emerald-800/60 text-white focus:outline-none focus:border-emerald-500 placeholder-slate-500"
-                    placeholder="Frontend Developer"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-xs font-medium text-emerald-300 mb-1">
-                    Tahun / Periode Kerja *
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    value={exp.period}
-                    onChange={(e) => handleExperienceChange(exp.id, "period", e.target.value)}
-                    className="w-full px-3 py-2 rounded-lg bg-[#0c2b29] border border-emerald-800/60 text-white focus:outline-none focus:border-emerald-500 placeholder-slate-500"
-                    placeholder="2022 – Sekarang"
-                  />
-                </div>
-
-                <div className="sm:col-span-3">
-                  <label className="block text-xs font-medium text-emerald-300 mb-1">
-                    Deskripsi Tanggung Jawab & Tanggung Jawab
-                  </label>
-                  <textarea
-                    rows={2}
-                    value={exp.description}
-                    onChange={(e) => handleExperienceChange(exp.id, "description", e.target.value)}
-                    className="w-full px-3 py-2 rounded-lg bg-[#0c2b29] border border-emerald-800/60 text-white focus:outline-none focus:border-emerald-500 placeholder-slate-500 text-xs resize-none"
-                    placeholder="Jelaskan secara singkat tanggung jawab utama dan teknologi yang Anda gunakan..."
-                  />
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Save Button */}
@@ -582,12 +746,12 @@ export default function ProfileForm({ initialProfile }: ProfileFormProps) {
           {loading ? (
             <>
               <Loader2 className="w-5 h-5 animate-spin" />
-              <span>Menyimpan Profil ke Supabase...</span>
+              <span>Menyimpan ke Database Supabase...</span>
             </>
           ) : (
             <>
               <Save className="w-5 h-5" />
-              <span>Simpan Seluruh Data Profil Kandidat</span>
+              <span>Simpan Seluruh Data Profil Terstruktur</span>
             </>
           )}
         </button>

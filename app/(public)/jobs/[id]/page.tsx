@@ -1,7 +1,8 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
-import { allJobs, typeColors } from "@/data/jobs";
+import { typeColors } from "@/data/jobs";
+import { getJobByIdFromSupabase } from "@/app/actions/jobs";
 
 interface Props {
   params: Promise<{ id: string }>;
@@ -9,7 +10,7 @@ interface Props {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { id } = await params;
-  const job = allJobs.find((j) => j.id === id);
+  const { job } = await getJobByIdFromSupabase(id);
   if (!job) return { title: "Lowongan Tidak Ditemukan" };
   return {
     title: job.title,
@@ -19,7 +20,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function JobDetailPage({ params }: Props) {
   const { id } = await params;
-  const job = allJobs.find((j) => j.id === id);
+  const { job } = await getJobByIdFromSupabase(id);
   if (!job) return notFound();
 
   return (
