@@ -3,7 +3,7 @@
 export const coreValues = [
   {
     icon: "🚀",
-    title: "Inovasi",
+    title: "Inovasiii",
     desc: "Kami mendorong pemikiran segar dan solusi kreatif untuk setiap tantangan.",
   },
   {
