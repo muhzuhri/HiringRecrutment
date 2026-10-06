@@ -1,26 +1,273 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
+/* ===== DESIGN SYSTEM - TalentHub Career Site ===== */
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-brand-50: #f0fdf4;
+  --color-brand-100: #dcfce7;
+  --color-brand-200: #bbf7d0;
+  --color-brand-300: #86efac;
+  --color-brand-400: #34d399;
+  --color-brand-500: #10b981;
+  --color-brand-600: #059669;
+  --color-brand-700: #047857;
+  --color-brand-800: #0c2b29;
+  --color-brand-900: #061f1d;
+  --color-brand-950: #021211;
+  --color-charcoal: #1a1a2e;
+  --color-off-white: #f8fafb;
+  --color-soft-gray: #f1f5f1;
+  --font-sans: "Inter", system-ui, sans-serif;
+  --font-display: "Plus Jakarta Sans", "Inter", sans-serif;
+  --shadow-card: 0 2px 24px 0 rgba(12, 43, 41, 0.07);
+  --shadow-card-hover: 0 8px 40px 0 rgba(12, 43, 41, 0.14);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* ===== ROOT VARIABLES ===== */
+:root {
+  --background: #f8fafb;
+  --foreground: #1a1a2e;
+}
+
+/* ===== BASE ===== */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: "Inter", system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
+
+/* ===== PAGE TRANSITION – buat perpindahan halaman lebih cepat ===== */
+/* Next.js 16 menggunakan View Transitions API */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 0.15s;
+}
+
+/* ===== GRID BACKGROUND – lebih tebal dan jelas ===== */
+.bg-grid-pattern {
+  background-color: #f8fafb;
+  background-image:
+    linear-gradient(rgba(12, 43, 41, 0.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(12, 43, 41, 0.08) 1px, transparent 1px);
+  background-size: 48px 48px;
+}
+
+/* Dot pattern variant */
+.bg-dot-pattern {
+  background-color: #f8fafb;
+  background-image: radial-gradient(rgba(12, 43, 41, 0.15) 1.5px, transparent 1.5px);
+  background-size: 32px 32px;
+}
+
+/* ===== GEOMETRIC DECORATIVE – static helper ===== */
+.geo-cube {
+  position: absolute;
+  border: 1.5px solid rgba(12, 43, 41, 0.15);
+  border-radius: 10px;
+  transform: rotate(20deg);
+  pointer-events: none;
+}
+
+/* ===== NAVBAR PILL MENU ===== */
+.nav-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.5rem 1.1rem;
+  border-radius: 9999px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.85);
+  transition: all 0.2s ease;
+  text-decoration: none;
+}
+
+.nav-pill:hover {
+  background: rgba(255, 255, 255, 0.18);
+  color: #ffffff;
+}
+
+.nav-pill.active {
+  background: rgba(255, 255, 255, 0.22);
+  color: #ffffff;
+  font-weight: 600;
+}
+
+/* ===== CARDS ===== */
+.career-card {
+  background: #ffffff;
+  border: 1px solid rgba(12, 43, 41, 0.12);
+  border-radius: 1rem;
+  box-shadow: var(--shadow-card);
+  transition: all 0.25s ease;
+}
+
+.career-card:hover {
+  box-shadow: var(--shadow-card-hover);
+  border-color: rgba(12, 43, 41, 0.25);
+  transform: translateY(-2px);
+}
+
+/* ===== BUTTONS ===== */
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.75rem;
+  background: #0c2b29;
+  color: #ffffff;
+  border-radius: 0.75rem;
+  font-weight: 600;
+  font-size: 0.9375rem;
+  transition: all 0.2s ease;
+  text-decoration: none;
+  border: none;
+  cursor: pointer;
+}
+
+.btn-primary:hover {
+  background: #061f1d;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(12, 43, 41, 0.35);
+}
+
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.75rem;
+  background: transparent;
+  color: #0c2b29;
+  border: 2px solid #0c2b29;
+  border-radius: 0.75rem;
+  font-weight: 600;
+  font-size: 0.9375rem;
+  transition: all 0.2s ease;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.btn-secondary:hover {
+  background: #0c2b29;
+  color: #ffffff;
+  transform: translateY(-1px);
+}
+
+/* ===== BADGE ===== */
+.job-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+/* ===== ACCORDION ===== */
+.accordion-item {
+  border: 1px solid rgba(12, 43, 41, 0.13);
+  border-radius: 0.75rem;
+  overflow: hidden;
+  transition: box-shadow 0.2s ease;
+}
+
+.accordion-item:hover {
+  box-shadow: var(--shadow-card);
+}
+
+/* ===== SECTION TAG ===== */
+.section-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.375rem 1rem;
+  background: rgba(12, 43, 41, 0.08);
+  color: #0c2b29;
+  border: 1px solid rgba(12, 43, 41, 0.15);
+  border-radius: 9999px;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+/* ===== FORM INPUTS ===== */
+.form-input {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 1.5px solid rgba(12, 43, 41, 0.2);
+  border-radius: 0.625rem;
+  font-size: 0.9375rem;
+  color: #1a1a2e;
+  background: #ffffff;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.form-input:focus {
+  border-color: #0c2b29;
+  box-shadow: 0 0 0 3px rgba(12, 43, 41, 0.1);
+}
+
+.form-input::placeholder {
+  color: #9ca3af;
+}
+
+/* ===== ANIMATIONS ===== */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px) rotate(20deg); }
+  50%       { transform: translateY(-14px) rotate(26deg); }
+}
+
+@keyframes float2 {
+  0%, 100% { transform: translateY(0px) rotate(-10deg); }
+  50%       { transform: translateY(-9px) rotate(-15deg); }
+}
+
+@keyframes pulse-ring {
+  0%   { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(21,128,61,0.25); }
+  70%  { transform: scale(1); box-shadow: 0 0 0 10px rgba(21,128,61,0); }
+  100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(21,128,61,0); }
+}
+
+.animate-fade-in-up  { animation: fadeInUp 0.65s ease both; }
+.animate-float       { animation: float 6s ease-in-out infinite; }
+.animate-float-2     { animation: float2 8s ease-in-out infinite; }
+
+.delay-100 { animation-delay: 0.1s; }
+.delay-200 { animation-delay: 0.2s; }
+.delay-300 { animation-delay: 0.3s; }
+.delay-400 { animation-delay: 0.4s; }
+
+/* ===== SCROLLBAR ===== */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: #f1f5f1; }
+::-webkit-scrollbar-thumb {
+  background: rgba(21, 128, 61, 0.35);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover { background: rgba(21, 128, 61, 0.6); }
