@@ -27,21 +27,102 @@ export async function getCandidateProfile(): Promise<{ profile: CandidateProfile
     }
 
     const fullName = data?.full_name || user.user_metadata?.full_name || user.email?.split("@")[0] || "";
+    let education = data?.education && Array.isArray(data.education) ? data.education : [];
+    let certifications = data?.certifications && Array.isArray(data.certifications) ? data.certifications : [];
+    let experience = data?.experience && Array.isArray(data.experience) ? data.experience : [];
+    let skills = data?.skills && Array.isArray(data.skills) ? data.skills : [];
+
+    // Fallback query to relational tables if profiles JSONB is empty
+    try {
+      if (education.length === 0) {
+        const { data: eduDb } = await supabase.from("educations").select("*").eq("user_id", user.id);
+        if (eduDb && eduDb.length > 0) {
+          education = eduDb.map((e: any) => ({
+            id: e.id,
+            level: e.level || "S1",
+            school: e.school || "",
+            major: e.major || "",
+            gpa: e.gpa || "",
+            startYear: e.start_year || "",
+            endYear: e.end_year || "",
+            mediaUrl: e.media_url || "",
+            mediaName: e.media_name || "",
+          }));
+        }
+      }
+
+      if (certifications.length === 0) {
+        const { data: certDb } = await supabase.from("certifications").select("*").eq("user_id", user.id);
+        if (certDb && certDb.length > 0) {
+          certifications = certDb.map((c: any) => ({
+            id: c.id,
+            title: c.title || c.cert_name || "",
+            certType: c.cert_type || "",
+            issuer: c.issuer || "",
+            issueMonth: c.issue_month || "Januari",
+            issueYear: c.issue_year || "",
+            expiryMonth: c.expiry_month || "",
+            expiryYear: c.expiry_year || "",
+            noExpiry: c.no_expiry ?? false,
+            credentialUrl: c.credential_url || "",
+            mediaUrl: c.media_url || "",
+            mediaName: c.media_name || "",
+          }));
+        }
+      }
+
+      if (experience.length === 0) {
+        const { data: expDb } = await supabase.from("experiences").select("*").eq("user_id", user.id);
+        if (expDb && expDb.length > 0) {
+          experience = expDb.map((ex: any) => ({
+            id: ex.id,
+            company: ex.company || "",
+            position: ex.position || "",
+            period: ex.period || "",
+            startMonth: ex.start_month || "Januari",
+            startYear: ex.start_year || "",
+            endMonth: ex.end_month || "Desember",
+            endYear: ex.end_year || "",
+            isCurrent: ex.is_current ?? false,
+            description: ex.description || "",
+            mediaUrl: ex.media_url || "",
+            mediaName: ex.media_name || "",
+          }));
+        }
+      }
+
+      if (skills.length === 0) {
+        const { data: skillDb } = await supabase.from("skills").select("name").eq("user_id", user.id);
+        if (skillDb && skillDb.length > 0) {
+          skills = skillDb.map((s: any) => s.name);
+        }
+      }
+    } catch (fallbackErr) {
+      console.log("Relational tables fallback notice:", fallbackErr);
+    }
+
     const profile: CandidateProfile = {
       id: user.id,
       email: user.email || "",
       full_name: fullName,
+      nik: data?.nik || "",
       phone: data?.phone || user.user_metadata?.phone || "",
       whatsapp: data?.whatsapp || user.user_metadata?.whatsapp || "",
+      address: data?.address || "",
       linkedin_url: data?.linkedin_url || "",
+      github_url: data?.github_url || "",
       portfolio_url: data?.portfolio_url || "",
       headline: data?.headline || "",
       bio: data?.bio || "",
       avatar_url: data?.avatar_url || "",
       role: data?.role || "candidate",
-      education: data?.education && Array.isArray(data.education) ? data.education : [],
-      skills: data?.skills && Array.isArray(data.skills) ? data.skills : [],
-      experience: data?.experience && Array.isArray(data.experience) ? data.experience : [],
+      education,
+      certifications,
+      skills,
+      hard_skills: data?.hard_skills || "",
+      soft_skills: data?.soft_skills || "",
+      languages: data?.languages || "",
+      experience,
       resume_url: data?.resume_url || "",
       resume_name: data?.resume_name || "",
       profile_completed: data?.profile_completed ?? false,
@@ -60,14 +141,21 @@ export async function getCandidateProfile(): Promise<{ profile: CandidateProfile
  */
 export async function updateCandidateProfile(formData: {
   full_name: string;
+  nik?: string;
   phone: string;
   whatsapp: string;
+  address?: string;
   linkedin_url: string;
+  github_url?: string;
   portfolio_url: string;
   headline: string;
   bio: string;
   education: any[];
+  certifications?: any[];
   skills: string[];
+  hard_skills?: string;
+  soft_skills?: string;
+  languages?: string;
   experience: any[];
 }): Promise<{ success: boolean; error?: string }> {
   try {
@@ -82,14 +170,21 @@ export async function updateCandidateProfile(formData: {
       id: user.id,
       email: user.email,
       full_name: formData.full_name,
+      nik: formData.nik || "",
       phone: formData.phone,
       whatsapp: formData.whatsapp,
+      address: formData.address || "",
       linkedin_url: formData.linkedin_url,
+      github_url: formData.github_url || "",
       portfolio_url: formData.portfolio_url,
       headline: formData.headline,
       bio: formData.bio,
       education: formData.education,
+      certifications: formData.certifications || [],
       skills: formData.skills,
+      hard_skills: formData.hard_skills || "",
+      soft_skills: formData.soft_skills || "",
+      languages: formData.languages || "",
       experience: formData.experience,
       profile_completed: true,
       updated_at: new Date().toISOString(),
@@ -104,11 +199,182 @@ export async function updateCandidateProfile(formData: {
       return { success: false, error: `Gagal menyimpan profil: ${error.message}` };
     }
 
+    // Optional Sync to Relational Tables if exists in Supabase
+    try {
+      // 1. Sync Educations table
+      await supabase.from("educations").delete().eq("user_id", user.id);
+      if (formData.education && formData.education.length > 0) {
+        const eduRows = formData.education.map((e) => ({
+          user_id: user.id,
+          level: e.level || "S1",
+          school: e.school || "",
+          major: e.major || "",
+          gpa: e.gpa || "",
+          start_year: e.startYear || "",
+          end_year: e.endYear || "",
+          media_url: e.mediaUrl || null,
+          media_name: e.mediaName || null,
+        }));
+        await supabase.from("educations").insert(eduRows);
+      }
+
+      // 2. Sync Certifications table
+      await supabase.from("certifications").delete().eq("user_id", user.id);
+      if (formData.certifications && formData.certifications.length > 0) {
+        const certRows = formData.certifications.map((c) => ({
+          user_id: user.id,
+          title: c.title || "",
+          cert_name: c.title || "",
+          cert_type: c.certType || "",
+          issuer: c.issuer || "",
+          issue_month: c.issueMonth || "",
+          issue_year: c.issueYear || "",
+          expiry_month: c.expiryMonth || "",
+          expiry_year: c.expiryYear || "",
+          no_expiry: c.noExpiry ?? false,
+          credential_url: c.credentialUrl || "",
+          media_url: c.mediaUrl || null,
+          media_name: c.mediaName || null,
+        }));
+        await supabase.from("certifications").insert(certRows);
+      }
+
+      // 3. Sync Experiences table
+      await supabase.from("experiences").delete().eq("user_id", user.id);
+      if (formData.experience && formData.experience.length > 0) {
+        const expRows = formData.experience.map((ex) => ({
+          user_id: user.id,
+          company: ex.company || "",
+          position: ex.position || "",
+          period: ex.period || "",
+          start_month: ex.startMonth || "",
+          start_year: ex.startYear || "",
+          end_month: ex.endMonth || "",
+          end_year: ex.endYear || "",
+          is_current: ex.isCurrent || false,
+          description: ex.description || "",
+          media_url: ex.mediaUrl || null,
+          media_name: ex.mediaName || null,
+        }));
+        await supabase.from("experiences").insert(expRows);
+      }
+
+      // 4. Sync Skills table
+      await supabase.from("skills").delete().eq("user_id", user.id);
+      if (formData.skills && formData.skills.length > 0) {
+        const skillRows = formData.skills.map((s) => ({
+          user_id: user.id,
+          name: s,
+        }));
+        await supabase.from("skills").insert(skillRows);
+      }
+    } catch (relErr) {
+      console.log("Relational tables sync note:", relErr);
+    }
+
     revalidatePath("/dashboard");
     revalidatePath("/dashboard/profile");
     return { success: true };
   } catch (err: any) {
     return { success: false, error: err.message || "Gagal menyimpan profil" };
+  }
+}
+
+/**
+ * Server Action: Upload Media Attachment (Images PNG/JPG/WEBP or PDF up to 2MB)
+ * for Education, Certification, and Experience sections.
+ */
+export async function uploadCandidateDocumentFile(
+  formData: FormData
+): Promise<{ success: boolean; fileUrl?: string; fileName?: string; error?: string }> {
+  try {
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+
+    if (!user) {
+      return { success: false, error: "Sesi Anda telah berakhir. Silakan login kembali." };
+    }
+
+    const file = formData.get("file") as File;
+    if (!file) {
+      return { success: false, error: "File tidak ditemukan dalam form data." };
+    }
+
+    // 1. Validation rule: Max 2MB (2 * 1024 * 1024 bytes)
+    const MAX_SIZE = 2 * 1024 * 1024;
+    if (file.size > MAX_SIZE) {
+      return {
+        success: false,
+        error: `Ukuran file (${(file.size / (1024 * 1024)).toFixed(2)} MB) melebihi batas maksimum 2 MB.`,
+      };
+    }
+
+    // 2. Validation rule: Only PNG, JPG, JPEG, WEBP, or PDF
+    const allowedTypes = [
+      "application/pdf",
+      "image/png",
+      "image/jpeg",
+      "image/jpg",
+      "image/webp",
+    ];
+    if (!allowedTypes.includes(file.type.toLowerCase())) {
+      return {
+        success: false,
+        error: "Format berkas harus berupa dokumen PDF atau Gambar (PNG, JPG, JPEG, WEBP).",
+      };
+    }
+
+    const sanitizeFileName = file.name.replace(/[^a-zA-Z0-9.-]/g, "_");
+    const timestamp = Date.now();
+    const filePath = `documents/${user.id}/${timestamp}_${sanitizeFileName}`;
+
+    // Ensure bucket candidate-documents exists
+    const bucketName = "candidate-documents";
+
+    // Upload to Supabase Storage
+    const { data: uploadData, error: uploadError } = await supabase.storage
+      .from(bucketName)
+      .upload(filePath, file, {
+        cacheControl: "3600",
+        upsert: true,
+      });
+
+    if (uploadError) {
+      // Fallback try bucket 'resumes' if 'candidate-documents' bucket isn't created yet
+      const { data: fallbackData, error: fallbackError } = await supabase.storage
+        .from("resumes")
+        .upload(filePath, file, {
+          cacheControl: "3600",
+          upsert: true,
+        });
+
+      if (fallbackError) {
+        console.error("Storage upload error:", uploadError.message);
+        return { success: false, error: `Gagal mengunggah berkas: ${uploadError.message}` };
+      }
+
+      const { data: publicUrlData } = supabase.storage
+        .from("resumes")
+        .getPublicUrl(fallbackData.path);
+
+      return {
+        success: true,
+        fileUrl: publicUrlData.publicUrl,
+        fileName: file.name,
+      };
+    }
+
+    const { data: publicUrlData } = supabase.storage
+      .from(bucketName)
+      .getPublicUrl(uploadData.path);
+
+    return {
+      success: true,
+      fileUrl: publicUrlData.publicUrl,
+      fileName: file.name,
+    };
+  } catch (err: any) {
+    return { success: false, error: err.message || "Gagal mengunggah dokumen" };
   }
 }
 

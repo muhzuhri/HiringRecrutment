@@ -19,20 +19,49 @@ export type AssessmentType =
   | 'Interview User';
 
 export interface EducationItem {
-  id: string;
-  level: 'SMA' | 'D3' | 'S1' | 'S2' | 'S3';
+  id?: string;
+  level: 'SMA/SMK' | 'D3' | 'S1' | 'S2' | 'S3' | string;
   school: string;
   major: string;
+  gpa?: string; // IPK / Nilai Final (misal 3.92 / 4.00)
+  coursework?: string; // Mata Kuliah Relevan
+  thesis?: string; // Judul Skripsi / Tugas Akhir
   startYear: string;
   endYear: string;
+  mediaUrl?: string; // Dokumen/Gambar Ijazah/Transkrip (max 2MB)
+  mediaName?: string;
+}
+
+export interface CertificationItem {
+  id?: string;
+  title: string; // Nama sertifikat / pelatihan
+  certType?: string; // Tipe Sertifikat
+  issuer: string; // Lembaga Penerbit
+  issueMonth?: string; // Bulan Perolehan
+  issueYear: string; // Tahun Perolehan
+  expiryMonth?: string; // Bulan Kadaluarsa
+  expiryYear?: string; // Tahun Kadaluarsa
+  noExpiry?: boolean; // Tidak Ada Kadaluarsa / Selamanya
+  credentialUrl?: string; // URL Kredensial / File Sertifikat
+  mediaUrl?: string; // Dokumen/Gambar Bukti Sertifikat (max 2MB)
+  mediaName?: string;
 }
 
 export interface ExperienceItem {
-  id: string;
-  company: string;
-  position: string;
-  period: string;
+  id?: string;
+  category?: 'work' | 'organization'; // Work Experience vs Pengabdian Masyarakat / Organisasi
+  company: string; // Nama Perusahaan / Instansi / Organisasi
+  position: string; // Posisi / Peran / Panitia
+  location?: string; // Lokasi (misal: Palembang, Sumatera Selatan)
+  startMonth?: string;
+  startYear?: string;
+  endMonth?: string;
+  endYear?: string;
+  isCurrent?: boolean;
+  period?: string;
   description: string;
+  mediaUrl?: string; // Dokumen/Gambar Surat Keterangan (max 2MB)
+  mediaName?: string;
 }
 
 export interface CandidateProfile {
@@ -41,16 +70,23 @@ export interface CandidateProfile {
   full_name: string;
   first_name?: string;
   last_name?: string;
+  nik?: string; // NIK / Nomor Identitas
   phone?: string;
   whatsapp?: string;
+  address?: string; // Alamat Domisili
   linkedin_url?: string;
-  portfolio_url?: string;
+  github_url?: string; // Tautan GitHub
+  portfolio_url?: string; // Portofolio web
   headline?: string;
-  bio?: string;
+  bio?: string; // Ringkasan Profil / About Me
   avatar_url?: string;
   role: 'candidate' | 'recruiter' | 'admin';
   education: EducationItem[];
-  skills: string[];
+  certifications?: CertificationItem[]; // Sertifikasi & Pelatihan
+  skills: string[]; // Key skills list
+  hard_skills?: string; // Hard skills text (misal: Data Analysis (SQL, Power BI), Web Dev)
+  soft_skills?: string; // Soft skills text (misal: Pemecahan Masalah, Kerja Tim)
+  languages?: string; // Bahasa (misal: Indonesia (fluent), English (intermediate))
   experience: ExperienceItem[];
   resume_url?: string;
   resume_name?: string;

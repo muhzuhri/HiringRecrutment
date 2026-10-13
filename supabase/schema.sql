@@ -1,6 +1,6 @@
 -- =====================================================================
 -- SUPABASE COMPLETE DATABASE SCHEMA & SEED DATA (IDEMPOTENT / SAFE RE-RUN)
--- SYSTEM: HIRING & RECRUITMENT SYSTEM (INTERNAL COMPANY)
+-- SYSTEM: END-TO-END RECRUITMENT TRACKING SYSTEM (MAGANGHUB STANDARD)
 -- 
 -- Petunjuk Penggunaan:
 -- 1. Buka Dashboard Supabase milik Anda (https://supabase.com/dashboard)
@@ -17,15 +17,19 @@ CREATE TABLE IF NOT EXISTS public.profiles (
   full_name TEXT,
   first_name TEXT,
   last_name TEXT,
+  nik TEXT, -- NIK / Nomor Identitas (Opsional)
   phone TEXT,
-  whatsapp TEXT,
+  whatsapp TEXT, -- Nomor WhatsApp Aktif
+  address TEXT, -- Alamat Domisili Lengkap
   linkedin_url TEXT,
-  portfolio_url TEXT,
+  github_url TEXT, -- Tautan Profil GitHub
+  portfolio_url TEXT, -- Portofolio web
   headline TEXT,
   bio TEXT,
   avatar_url TEXT,
   role TEXT DEFAULT 'candidate' CHECK (role IN ('candidate', 'recruiter', 'admin', 'interviewer')),
   education JSONB DEFAULT '[]'::jsonb,
+  certifications JSONB DEFAULT '[]'::jsonb, -- Sertifikasi & Pelatihan
   skills TEXT[] DEFAULT '{}'::text[],
   experience JSONB DEFAULT '[]'::jsonb,
   resume_url TEXT,
@@ -33,6 +37,68 @@ CREATE TABLE IF NOT EXISTS public.profiles (
   profile_completed BOOLEAN DEFAULT FALSE,
   created_at TIMESTAMPTZ DEFAULT timezone('utc'::text, now()) NOT NULL,
   updated_at TIMESTAMPTZ DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+-- Migrasi tambahan jika kolom belum ada pada tabel profiles yang sudah ada
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS nik TEXT;
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS address TEXT;
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS github_url TEXT;
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS certifications JSONB DEFAULT '[]'::jsonb;
+
+-- ---------------------------------------------------------------------
+-- 1B. TABEL RELASIONAL PENDIDIKAN (EDUCATIONS)
+-- ---------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS public.educations (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  user_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE NOT NULL,
+  level TEXT NOT NULL, -- SMA/SMK, D3, S1, S2, S3
+  school TEXT NOT NULL,
+  major TEXT NOT NULL,
+  gpa TEXT,
+  start_year TEXT NOT NULL,
+  end_year TEXT NOT NULL,
+  created_at TIMESTAMPTZ DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+-- ---------------------------------------------------------------------
+-- 1C. TABEL RELASIONAL SERTIFIKASI (CERTIFICATIONS)
+-- ---------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS public.certifications (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  user_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE NOT NULL,
+  title TEXT NOT NULL,
+  issuer TEXT NOT NULL,
+  issue_year TEXT NOT NULL,
+  credential_url TEXT,
+  created_at TIMESTAMPTZ DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+-- ---------------------------------------------------------------------
+-- 1D. TABEL RELASIONAL PENGALAMAN KERJA / MAGANG (EXPERIENCES)
+-- ---------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS public.experiences (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  user_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE NOT NULL,
+  company TEXT NOT NULL,
+  position TEXT NOT NULL,
+  period TEXT,
+  start_month TEXT,
+  start_year TEXT,
+  end_month TEXT,
+  end_year TEXT,
+  is_current BOOLEAN DEFAULT FALSE,
+  description TEXT,
+  created_at TIMESTAMPTZ DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+-- ---------------------------------------------------------------------
+-- 1E. TABEL RELASIONAL KEAHLIAN / SKILLS (SKILLS)
+-- ---------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS public.skills (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  user_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE NOT NULL,
+  name TEXT NOT NULL,
+  created_at TIMESTAMPTZ DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 
 -- ---------------------------------------------------------------------
@@ -128,6 +194,10 @@ CREATE TABLE IF NOT EXISTS public.audit_logs (
 -- =====================================================================
 
 ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.educations ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.certifications ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.experiences ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.skills ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.jobs ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.applications ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.assessments_and_interviews ENABLE ROW LEVEL SECURITY;
@@ -143,6 +213,19 @@ CREATE POLICY "Users update own profile" ON public.profiles FOR UPDATE USING (au
 
 DROP POLICY IF EXISTS "Admin/Recruiter read profiles" ON public.profiles;
 CREATE POLICY "Admin/Recruiter read profiles" ON public.profiles FOR SELECT USING (auth.role() = 'authenticated');
+
+-- Policies Relational Tables (Educations, Certifications, Experiences, Skills)
+DROP POLICY IF EXISTS "Users manage own educations" ON public.educations;
+CREATE POLICY "Users manage own educations" ON public.educations FOR ALL USING (auth.uid() = user_id OR auth.role() = 'authenticated');
+
+DROP POLICY IF EXISTS "Users manage own certifications" ON public.certifications;
+CREATE POLICY "Users manage own certifications" ON public.certifications FOR ALL USING (auth.uid() = user_id OR auth.role() = 'authenticated');
+
+DROP POLICY IF EXISTS "Users manage own experiences" ON public.experiences;
+CREATE POLICY "Users manage own experiences" ON public.experiences FOR ALL USING (auth.uid() = user_id OR auth.role() = 'authenticated');
+
+DROP POLICY IF EXISTS "Users manage own skills" ON public.skills;
+CREATE POLICY "Users manage own skills" ON public.skills FOR ALL USING (auth.uid() = user_id OR auth.role() = 'authenticated');
 
 -- Policies Jobs
 DROP POLICY IF EXISTS "Public & Candidates read active jobs" ON public.jobs;
@@ -161,7 +244,7 @@ CREATE POLICY "Candidates insert application" ON public.applications FOR INSERT 
 DROP POLICY IF EXISTS "Admin/HR manage applications" ON public.applications;
 CREATE POLICY "Admin/HR manage applications" ON public.applications FOR ALL USING (auth.role() = 'authenticated');
 
--- Policies Assessments (Penilai hanya dapat mengisi evaluasi kandidat yang ditugaskan CASE 2)
+-- Policies Assessments
 DROP POLICY IF EXISTS "Admin access all assessments" ON public.assessments_and_interviews;
 CREATE POLICY "Admin access all assessments" ON public.assessments_and_interviews FOR ALL USING (auth.role() = 'authenticated');
 
@@ -170,11 +253,11 @@ CREATE POLICY "Evaluator manage assigned assessment" ON public.assessments_and_i
   auth.uid() = evaluator_id OR auth.role() = 'authenticated'
 );
 
--- Policies Internal Notes (RAHASIA UNTUK HR - KANDIDAT TIDAK BISA BACA CASE 3)
+-- Policies Internal Notes
 DROP POLICY IF EXISTS "HR/Admin manage internal notes" ON public.internal_notes;
 CREATE POLICY "HR/Admin manage internal notes" ON public.internal_notes FOR ALL USING (auth.role() = 'authenticated');
 
--- Policies Audit Logs (Admin Only CASE 3)
+-- Policies Audit Logs
 DROP POLICY IF EXISTS "HR/Admin read audit logs" ON public.audit_logs;
 CREATE POLICY "HR/Admin read audit logs" ON public.audit_logs FOR ALL USING (auth.role() = 'authenticated');
 

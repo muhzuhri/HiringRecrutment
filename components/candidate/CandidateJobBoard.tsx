@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import { Job, allJobs, departments } from "@/data/jobs";
 import { CandidateProfile, JobApplication } from "@/types/candidate";
 import QuickApplyModal from "./QuickApplyModal";
-import { Search, Filter, Briefcase, MapPin, DollarSign, Clock, Zap, CheckCircle2, ArrowRight, Sparkles } from "lucide-react";
+import { Search, Filter, Briefcase, MapPin, DollarSign, Clock, Zap, CheckCircle2, ArrowRight, Sparkles, Eye } from "lucide-react";
 import Link from "next/link";
 
 interface CandidateJobBoardProps {
@@ -172,33 +172,56 @@ export default function CandidateJobBoard({ profile, existingApplications, jobsL
                 </div>
 
                 {/* Bottom Actions */}
-                <div className="pt-4 border-t border-emerald-800/40 flex items-center justify-between gap-3">
+                <div className="pt-4 border-t border-emerald-800/40">
                   {hasApplied ? (
-                    <div className="flex items-center justify-between w-full">
-                      <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-500/20 text-amber-300 border border-amber-500/40 text-xs font-bold">
-                        <CheckCircle2 className="w-4 h-4" /> Sudah Dilamar
-                      </span>
-                      {appliedRecord && (
+                    <div className="space-y-3 w-full">
+                      {/* Action buttons (Detail Lowongan & Lacak Progress) */}
+                      <div className="flex items-center justify-between gap-2">
                         <Link
-                          href={`/dashboard/applications/${appliedRecord.id}`}
-                          className="inline-flex items-center gap-1 text-xs font-bold text-emerald-300 hover:text-white transition-colors"
+                          href={`/dashboard/jobs/${job.id}`}
+                          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#061f1d] hover:bg-emerald-900/60 text-emerald-300 hover:text-white border border-emerald-800/80 font-bold text-xs transition-colors"
                         >
-                          <span>Lacak Progress</span>
-                          <ArrowRight className="w-3.5 h-3.5" />
+                          <Eye className="w-3.5 h-3.5" />
+                          <span>Detail Lowongan</span>
                         </Link>
-                      )}
+                        {appliedRecord && (
+                          <Link
+                            href={`/dashboard/applications/${appliedRecord.id}`}
+                            className="inline-flex items-center gap-1 text-xs font-bold text-emerald-400 hover:text-white transition-colors"
+                          >
+                            <span>Lacak Progress</span>
+                            <ArrowRight className="w-3.5 h-3.5" />
+                          </Link>
+                        )}
+                      </div>
+
+                      {/* Status Sudah Dilamar ditaruh paling bawah sekali */}
+                      <div className="pt-2 border-t border-emerald-800/30">
+                        <span className="w-full flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl bg-amber-500/20 text-amber-300 border border-amber-500/40 text-xs font-bold shadow-inner">
+                          <CheckCircle2 className="w-4 h-4 text-amber-400" />
+                          <span>Sudah Dilamar oleh Kandidat</span>
+                        </span>
+                      </div>
                     </div>
                   ) : (
-                    <>
+                    <div className="grid grid-cols-2 gap-2.5 w-full">
+                      <Link
+                        href={`/jobs/${job.id}`}
+                        className="py-2.5 px-3 bg-[#061f1d] hover:bg-emerald-900/60 text-emerald-300 hover:text-white border border-emerald-800/80 font-bold text-xs sm:text-sm rounded-xl transition-all flex items-center justify-center gap-1.5"
+                      >
+                        <Eye className="w-4 h-4" />
+                        <span>Detail Lowongan</span>
+                      </Link>
+
                       <button
                         type="button"
                         onClick={() => setSelectedJobForModal(job)}
-                        className="flex-1 py-2.5 px-4 bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-xs sm:text-sm rounded-xl transition-all shadow-md shadow-emerald-950/60 flex items-center justify-center gap-2"
+                        className="py-2.5 px-3 bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-xs sm:text-sm rounded-xl transition-all shadow-md shadow-emerald-950/60 flex items-center justify-center gap-1.5"
                       >
                         <Zap className="w-4 h-4 text-amber-300" />
                         <span>Lamar Cepat</span>
                       </button>
-                    </>
+                    </div>
                   )}
                 </div>
               </div>

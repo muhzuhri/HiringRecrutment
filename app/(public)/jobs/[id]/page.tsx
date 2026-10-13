@@ -35,12 +35,11 @@ export default async function JobDetailPage({ params }: Props) {
           <span style={{ color: "#15803d" }} className="font-medium">{job.title}</span>
         </nav>
 
-        <div className="grid lg:grid-cols-3 gap-8">
-          {/* ===== Main Content ===== */}
-          <div className="lg:col-span-2 space-y-6">
-            {/* Job header */}
-            <div className="career-card p-8 bg-white">
-              <div className="flex items-start gap-4 mb-6">
+        <div className="max-w-4xl mx-auto space-y-6">
+          {/* Job header */}
+          <div className="career-card p-8 bg-white">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 mb-6">
+              <div className="flex items-start gap-4">
                 <div className="w-14 h-14 rounded-2xl flex items-center justify-center text-2xl shrink-0" style={{ background: "rgba(21,128,61,0.08)" }}>
                   💼
                 </div>
@@ -58,28 +57,36 @@ export default async function JobDetailPage({ params }: Props) {
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-4 pt-4 border-t border-gray-100">
-                {[
-                  { icon: "📍", label: "Lokasi", value: job.location },
-                  { icon: "💰", label: "Kisaran Gaji", value: job.salary },
-                  { icon: "📅", label: "Diposting", value: job.posted },
-                  { icon: "⏰", label: "Deadline", value: job.deadline },
-                ].map((info) => (
-                  <div key={info.label}>
-                    <div className="text-xs text-gray-400 mb-0.5">{info.icon} {info.label}</div>
-                    <div className="text-sm font-semibold text-gray-700">{info.value}</div>
-                  </div>
-                ))}
+              <div className="flex flex-wrap items-center gap-3 shrink-0">
+                <Link href="/login?redirect=/dashboard/jobs" className="btn-primary text-sm px-6 py-2.5">
+                  Lamar Posisi Ini
+                </Link>
               </div>
             </div>
 
-            {/* Description */}
-            <div className="career-card p-8 bg-white">
-              <h2 className="text-lg font-bold mb-4" style={{ color: "#1a1a2e" }}>Deskripsi Pekerjaan</h2>
-              <p className="text-gray-600 leading-relaxed text-sm">{job.description}</p>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-4 border-t border-gray-100">
+              {[
+                { icon: "📍", label: "Lokasi", value: job.location },
+                { icon: "💰", label: "Kisaran Gaji", value: job.salary },
+                { icon: "📅", label: "Diposting", value: job.posted },
+                { icon: "⏰", label: "Deadline", value: job.deadline },
+              ].map((info) => (
+                <div key={info.label}>
+                  <div className="text-xs text-gray-400 mb-0.5">{info.icon} {info.label}</div>
+                  <div className="text-sm font-semibold text-gray-700">{info.value}</div>
+                </div>
+              ))}
             </div>
+          </div>
 
-            {/* Responsibilities */}
+          {/* Description */}
+          <div className="career-card p-8 bg-white">
+            <h2 className="text-lg font-bold mb-4" style={{ color: "#1a1a2e" }}>Deskripsi Pekerjaan</h2>
+            <p className="text-gray-600 leading-relaxed text-sm whitespace-pre-line">{job.description}</p>
+          </div>
+
+          {/* Responsibilities */}
+          {job.responsibilities && job.responsibilities.length > 0 && (
             <div className="career-card p-8 bg-white">
               <h2 className="text-lg font-bold mb-4" style={{ color: "#1a1a2e" }}>Tanggung Jawab</h2>
               <ul className="space-y-3">
@@ -95,8 +102,10 @@ export default async function JobDetailPage({ params }: Props) {
                 ))}
               </ul>
             </div>
+          )}
 
-            {/* Qualifications */}
+          {/* Qualifications */}
+          {job.qualifications && job.qualifications.length > 0 && (
             <div className="career-card p-8 bg-white">
               <h2 className="text-lg font-bold mb-4" style={{ color: "#1a1a2e" }}>Persyaratan Kualifikasi</h2>
               <ul className="space-y-3 mb-6">
@@ -112,7 +121,7 @@ export default async function JobDetailPage({ params }: Props) {
 
               {job.niceToHave && job.niceToHave.length > 0 && (
                 <>
-                  <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3">Nice to Have</h3>
+                  <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3">Nilai Tambah (Nice to Have)</h3>
                   <ul className="space-y-2">
                     {job.niceToHave.map((item) => (
                       <li key={item} className="flex items-start gap-3 text-sm text-gray-500">
@@ -126,42 +135,19 @@ export default async function JobDetailPage({ params }: Props) {
                 </>
               )}
             </div>
-          </div>
+          )}
 
-          {/* ===== Sidebar ===== */}
-          <div className="lg:col-span-1 space-y-6">
-            <div className="career-card p-6 bg-white sticky top-24">
-              <h3 className="font-bold text-lg mb-2" style={{ color: "#1a1a2e" }}>Tertarik dengan posisi ini?</h3>
-              <p className="text-sm text-gray-500 mb-5 leading-relaxed">
-                Daftarkan akunmu dan lamar posisi ini sekarang. Proses mudah, cepat, dan transparan.
-              </p>
-              <Link href="/register" id={`apply-btn-${job.id}`} className="btn-primary w-full text-center mb-3">
-                Lamar Sekarang
-              </Link>
-              <Link href="/login" className="btn-secondary w-full text-center text-sm">
-                Sudah punya akun? Masuk
-              </Link>
-              <div className="mt-5 p-3 rounded-xl bg-green-50 text-xs text-green-700 text-center font-medium">
-                ⏰ Deadline: <strong>{job.deadline}</strong>
-              </div>
-            </div>
-
-            <div className="career-card p-5 bg-white">
-              <h4 className="text-sm font-semibold text-gray-600 mb-3">Bagikan Lowongan</h4>
-              <div className="flex gap-2">
-                {["LinkedIn", "WhatsApp", "Copy Link"].map((s) => (
-                  <button key={s} className="flex-1 py-2 text-xs font-medium text-gray-600 border border-gray-200 rounded-lg hover:border-green-400 hover:text-green-700 transition-colors">
-                    {s}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            <Link href="/jobs" className="flex items-center gap-2 text-sm text-gray-500 hover:text-green-700 transition-colors">
+          {/* Bottom Link Back */}
+          <div className="pt-4 flex items-center justify-between">
+            <Link href="/jobs" className="flex items-center gap-2 text-sm text-gray-500 hover:text-green-700 transition-colors font-medium">
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
               </svg>
               Kembali ke semua lowongan
+            </Link>
+
+            <Link href="/register" className="btn-primary text-sm">
+              Lamar Sekarang
             </Link>
           </div>
         </div>
