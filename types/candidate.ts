@@ -80,7 +80,7 @@ export interface CandidateProfile {
   headline?: string;
   bio?: string; // Ringkasan Profil / About Me
   avatar_url?: string;
-  role: 'candidate' | 'recruiter' | 'admin';
+  role: 'candidate' | 'recruiter' | 'admin' | 'interviewer';
   education: EducationItem[];
   certifications?: CertificationItem[]; // Sertifikasi & Pelatihan
   skills: string[]; // Key skills list
@@ -108,6 +108,16 @@ export interface AssessmentItem {
   created_at?: string;
 }
 
+export interface CandidateAuditLog {
+  id: string;
+  application_id?: string;
+  old_status: string;
+  new_status: string;
+  stage_detail?: string;
+  reason?: string;
+  created_at: string;
+}
+
 export interface TimelineStage {
   stageIndex: number; // 1, 2, 3, 4
   title: string;
@@ -125,12 +135,17 @@ export interface JobApplication {
   location: string;
   salary: string;
   status: ApplicationStatus;
-  current_stage_index: number; // 1 to 4
+  display_status?: string;
+  current_stage_index: number; // 1 to 6
   is_qualified?: boolean;
   hr_notes?: string;
   interview_date?: string;
   interview_link?: string;
   hired_at?: string;
+  assessments?: AssessmentItem[];
+  latest_schedule?: string | null;
+  latest_stage_type?: string | null;
+  latest_evaluator?: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -139,26 +154,38 @@ export const STAGES_CONFIG: TimelineStage[] = [
   {
     stageIndex: 1,
     title: "Tahap 1: Diajukan",
-    subtitle: "Lamaran Dikirim",
+    subtitle: "Lamaran Terkirim",
     description: "Kualifikasi dan dokumen profil berhasil dikirimkan ke sistem rekrutmen perusahaan."
   },
   {
     stageIndex: 2,
-    title: "Tahap 2: Diproses",
-    subtitle: "Screening & Qualification",
-    description: "Tim HR sedang meninjau kualifikasi berkas dan portofolio Anda."
+    title: "Tahap 2: Screening HR",
+    subtitle: "Pemeriksaan CV & Kualifikasi",
+    description: "Tim HR sedang meninjau kelayakan berkas CV, pengalaman, dan skill pelamar."
   },
   {
     stageIndex: 3,
-    title: "Tahap 3: Interview & Assessment",
-    subtitle: "Wawancara & Evaluasi Tes",
-    description: "Sesi penilaian asesmen dan wawancara bersama HR & User Lead."
+    title: "Tahap 3: Assessment / Tes",
+    subtitle: "Ujian Teknis / Psikotes",
+    description: "Pelaksanaan tes kemampuan teknis, psikotes, atau kepribadian yang dinilai oleh tim assessor."
   },
   {
     stageIndex: 4,
-    title: "Tahap 4: Keputusan Akhir",
+    title: "Tahap 4: Interview HR",
+    subtitle: "Wawancara dengan HR",
+    description: "Sesi wawancara mendalam bersama tim HR & Talent Acquisition mengenai kepribadian & culture fit."
+  },
+  {
+    stageIndex: 5,
+    title: "Tahap 5: Interview User",
+    subtitle: "Wawancara Calon Atasan",
+    description: "Sesi wawancara kompetensi teknis langsung dengan User / Engineering Lead."
+  },
+  {
+    stageIndex: 6,
+    title: "Tahap 6: Keputusan Akhir",
     subtitle: "Penawaran / Diterima",
-    description: "Pengumuman hasil akhir rekrutmen dan proses offering letter."
+    description: "Penyusunan hasil seluruh nilai dan pengumuman penetapan akhir rekrutmen."
   }
 ];
 

@@ -44,6 +44,9 @@ ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS nik TEXT;
 ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS address TEXT;
 ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS github_url TEXT;
 ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS certifications JSONB DEFAULT '[]'::jsonb;
+ALTER TABLE public.profiles DROP CONSTRAINT IF EXISTS profiles_role_check;
+ALTER TABLE public.profiles ADD CONSTRAINT profiles_role_check 
+  CHECK (role IN ('candidate', 'recruiter', 'admin', 'interviewer'));
 
 -- ---------------------------------------------------------------------
 -- 1B. TABEL RELASIONAL PENDIDIKAN (EDUCATIONS)
@@ -189,6 +192,20 @@ CREATE TABLE IF NOT EXISTS public.audit_logs (
   created_at TIMESTAMPTZ DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 
+-- ---------------------------------------------------------------------
+-- 7. TABEL NOTIFICATIONS (Sistem Notifikasi Kandidat & HR - CASE 1 & BAB 6)
+-- ---------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS public.notifications (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL,
+  title TEXT NOT NULL,
+  message TEXT NOT NULL,
+  type TEXT DEFAULT 'info' CHECK (type IN ('info', 'success', 'warning', 'application_update')),
+  is_read BOOLEAN DEFAULT FALSE,
+  link TEXT,
+  created_at TIMESTAMPTZ DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
 -- =====================================================================
 -- ROW LEVEL SECURITY (RLS) & IDEMPOTENT RESTRICTION POLICIES
 -- =====================================================================
@@ -203,6 +220,7 @@ ALTER TABLE public.applications ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.assessments_and_interviews ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.internal_notes ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.audit_logs ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.notifications ENABLE ROW LEVEL SECURITY;
 
 -- Policies Profiles
 DROP POLICY IF EXISTS "Users read own profile" ON public.profiles;
@@ -260,6 +278,16 @@ CREATE POLICY "HR/Admin manage internal notes" ON public.internal_notes FOR ALL 
 -- Policies Audit Logs
 DROP POLICY IF EXISTS "HR/Admin read audit logs" ON public.audit_logs;
 CREATE POLICY "HR/Admin read audit logs" ON public.audit_logs FOR ALL USING (auth.role() = 'authenticated');
+
+-- Policies Notifications
+DROP POLICY IF EXISTS "Users read own notifications" ON public.notifications;
+CREATE POLICY "Users read own notifications" ON public.notifications FOR SELECT USING (auth.uid() = user_id);
+
+DROP POLICY IF EXISTS "Users update own notifications" ON public.notifications;
+CREATE POLICY "Users update own notifications" ON public.notifications FOR UPDATE USING (auth.uid() = user_id);
+
+DROP POLICY IF EXISTS "Authenticated insert notifications" ON public.notifications;
+CREATE POLICY "Authenticated insert notifications" ON public.notifications FOR INSERT WITH CHECK (auth.role() = 'authenticated');
 
 -- =====================================================================
 -- STORAGE BUCKET UNTUK RESUME PDF (MAX 2MB VALIDATED IN SERVER ACTIONS)

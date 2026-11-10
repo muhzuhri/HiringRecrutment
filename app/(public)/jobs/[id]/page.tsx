@@ -1,8 +1,9 @@
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import type { Metadata } from "next";
 import { typeColors } from "@/data/jobs";
 import { getJobByIdFromSupabase } from "@/app/actions/jobs";
+import { createClient } from "@/lib/supabase/server";
 
 interface Props {
   params: Promise<{ id: string }>;
@@ -20,6 +21,17 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function JobDetailPage({ params }: Props) {
   const { id } = await params;
+
+  // Jika kandidat sudah login, tetap pertahankan di portal kandidat (/dashboard/jobs/[id])
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (user) {
+    redirect(`/dashboard/jobs/${id}`);
+  }
+
   const { job } = await getJobByIdFromSupabase(id);
   if (!job) return notFound();
 

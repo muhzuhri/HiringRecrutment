@@ -2,7 +2,7 @@
 
 import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
-import { CandidateProfile, JobApplication } from "@/types/candidate";
+import { CandidateProfile, JobApplication, CandidateAuditLog } from "@/types/candidate";
 
 /**
  * Fetch candidate profile from Supabase profiles table, fallback to user metadata if empty.
@@ -512,7 +512,148 @@ export async function getCandidateApplications(): Promise<{ applications: JobApp
       .order("created_at", { ascending: false });
 
     if (!error && data) {
-      return { applications: data as JobApplication[] };
+      const appIds = data.map((a) => a.id);
+      let assessmentsMap: Record<string, any[]> = {};
+      let auditLogsMap: Record<string, any[]> = {};
+
+      if (appIds.length > 0) {
+        // Query scheduled assessments/interviews with correct schema: id, application_id, type, scheduled_at, evaluator_name, score, notes, status
+        try {
+          const { data: assessData } = await supabase
+            .from("assessments_and_interviews")
+            .select("id, application_id, type, scheduled_at, evaluator_name, score, notes, status, created_at")
+            .in("application_id", appIds)
+            .order("scheduled_at", { ascending: false });
+
+          if (assessData) {
+            assessData.forEach((item: any) => {
+              if (!assessmentsMap[item.application_id]) {
+                assessmentsMap[item.application_id] = [];
+              }
+              assessmentsMap[item.application_id].push(item);
+            });
+          }
+        } catch (assessErr) {
+          console.warn("assessments query notice:", assessErr);
+        }
+
+        // Query audit logs to detect any scheduled events
+        try {
+          const { data: logsData } = await supabase
+            .from("audit_logs")
+            .select("id, application_id, old_status, new_status, stage_detail, reason, created_at")
+            .in("application_id", appIds)
+            .order("created_at", { ascending: false });
+
+          if (logsData) {
+            logsData.forEach((l: any) => {
+              if (l.application_id) {
+                if (!auditLogsMap[l.application_id]) {
+                  auditLogsMap[l.application_id] = [];
+                }
+                auditLogsMap[l.application_id].push(l);
+              }
+            });
+          }
+        } catch {}
+      }
+
+      const formatted = data.map((app) => {
+        const appAssessments = assessmentsMap[app.id] || [];
+        const appLogs = auditLogsMap[app.id] || [];
+        const latestAssess = appAssessments[0];
+
+        // Check if test was scheduled in audit log
+        const hasTestInLogs = appLogs.some(
+          (l) =>
+            l.stage_detail?.toLowerCase().includes("tes") ||
+            l.stage_detail?.toLowerCase().includes("assessment") ||
+            l.reason?.toLowerCase().includes("technical test") ||
+            l.reason?.toLowerCase().includes("psikotes")
+        );
+
+        const hasUserInLogs = appLogs.some((l) => l.stage_detail?.toLowerCase().includes("user"));
+
+        // Synchronize display_status with Progress Tracking stages:
+        // Stage 1: Diajukan
+        // Stage 2: Screening HR
+        // Stage 3: Assessment / Tes
+        // Stage 4: Interview HR
+        // Stage 5: Interview User
+        // Stage 6: Diterima (Hired)
+        // Ditolak
+        let displayStatus = app.status;
+        const isRejected = app.status === "Ditolak" || app.status === "Rejected";
+        const isAccepted = ["Diterima", "Offered", "Hired"].includes(app.status);
+
+        if (isRejected) {
+          displayStatus = "Ditolak";
+        } else if (isAccepted) {
+          displayStatus = "Diterima";
+        } else if (latestAssess) {
+          if (latestAssess.type === "Interview User") {
+            displayStatus = "Interview User";
+          } else if (latestAssess.type === "Interview HR") {
+            displayStatus = "Interview HR";
+          } else if (
+            ["Technical Test", "Psikotes", "Aptitude Test", "Personality Test"].includes(latestAssess.type)
+          ) {
+            displayStatus = "Assessment / Tes";
+          }
+        } else if (app.status === "Interview") {
+          displayStatus = hasUserInLogs ? "Interview User" : "Interview HR";
+        } else if (app.status === "Diproses" || app.status === "In Review") {
+          displayStatus = hasTestInLogs ? "Assessment / Tes" : "Screening HR";
+        } else {
+          displayStatus = "Diajukan";
+        }
+
+        // Parse scheduled date: from latest assessment or application.interview_date or audit log reason
+        let scheduledAt = latestAssess?.scheduled_at || app.interview_date || null;
+        let evaluator = latestAssess?.evaluator_name || null;
+        let testType = latestAssess?.type || null;
+
+        // Fallback: parse from audit log if assessments table was bypass-inserted
+        if (!scheduledAt && hasTestInLogs) {
+          const testLog = appLogs.find(
+            (l) =>
+              l.stage_detail?.toLowerCase().includes("tes") ||
+              l.reason?.toLowerCase().includes("technical test") ||
+              l.reason?.toLowerCase().includes("psikotes")
+          );
+          if (testLog) {
+            testType = testLog.stage_detail?.replace("Penjadwalan ", "") || "Technical Test";
+            // Check if reason contains date: e.g. "Jadwal Technical Test ditetapkan pada 11/11/2026, 17.00.00"
+            if (testLog.reason) {
+              const match = testLog.reason.match(/pada\s+([\d/]+,\s*[\d.:]+)/i);
+              if (match && match[1]) {
+                const parts = match[1].replace(/\./g, ":");
+                try {
+                  const d = new Date(parts);
+                  if (!isNaN(d.getTime())) {
+                    scheduledAt = d.toISOString();
+                  }
+                } catch {}
+              }
+              const evalMatch = testLog.reason.match(/Penilai:\s*([^,.\n]+)/i);
+              if (evalMatch && evalMatch[1]) {
+                evaluator = evalMatch[1].trim();
+              }
+            }
+          }
+        }
+
+        return {
+          ...app,
+          display_status: displayStatus,
+          assessments: appAssessments,
+          latest_schedule: scheduledAt,
+          latest_stage_type: testType,
+          latest_evaluator: evaluator,
+        };
+      });
+
+      return { applications: formatted as JobApplication[] };
     }
 
     return { applications: [] };
@@ -524,7 +665,12 @@ export async function getCandidateApplications(): Promise<{ applications: JobApp
 /**
  * CASE 3: Fetch Single Application Detail for Candidate Self-Tracking (Internal notes & score breakdown hidden)
  */
-export async function getApplicationById(applicationId: string): Promise<{ application: JobApplication | null; error?: string }> {
+export async function getApplicationById(applicationId: string): Promise<{
+  application: JobApplication | null;
+  assessments?: any[];
+  auditLogs?: CandidateAuditLog[];
+  error?: string;
+}> {
   try {
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
@@ -535,12 +681,80 @@ export async function getApplicationById(applicationId: string): Promise<{ appli
 
     const { data, error } = await supabase
       .from("applications")
-      .select("id, candidate_id, job_id, job_title, department, job_type, location, salary, status, current_stage_index, interview_date, interview_link, created_at, updated_at")
+      .select("id, candidate_id, job_id, job_title, department, job_type, location, salary, status, current_stage_index, hr_notes, interview_date, interview_link, created_at, updated_at")
       .eq("id", applicationId)
       .single();
 
     if (!error && data) {
-      return { application: data as JobApplication };
+      // 1. Fetch assessments
+      const { data: assessData } = await supabase
+        .from("assessments_and_interviews")
+        .select("id, application_id, type, scheduled_at, evaluator_name, score, notes, status, created_at")
+        .eq("application_id", applicationId)
+        .order("scheduled_at", { ascending: false });
+
+      // 2. Fetch audit logs (still kept on server for stage deduction, but hidden in UI)
+      const { data: logs } = await supabase
+        .from("audit_logs")
+        .select("id, old_status, new_status, stage_detail, reason, created_at")
+        .eq("application_id", applicationId)
+        .order("created_at", { ascending: false });
+
+      const latestAssess = assessData?.[0];
+      const appLogs = logs || [];
+
+      // Check logs for fallback test schedule
+      const hasTestInLogs = appLogs.some(
+        (l) =>
+          l.stage_detail?.toLowerCase().includes("tes") ||
+          l.stage_detail?.toLowerCase().includes("assessment") ||
+          l.reason?.toLowerCase().includes("technical test") ||
+          l.reason?.toLowerCase().includes("psikotes")
+      );
+
+      let scheduledAt = latestAssess?.scheduled_at || data.interview_date || null;
+      let evaluator = latestAssess?.evaluator_name || null;
+      let testType = latestAssess?.type || null;
+
+      if (!scheduledAt && hasTestInLogs) {
+        const testLog = appLogs.find(
+          (l) =>
+            l.stage_detail?.toLowerCase().includes("tes") ||
+            l.reason?.toLowerCase().includes("technical test") ||
+            l.reason?.toLowerCase().includes("psikotes")
+        );
+        if (testLog) {
+          testType = testLog.stage_detail?.replace("Penjadwalan ", "") || "Technical Test";
+          if (testLog.reason) {
+            const match = testLog.reason.match(/pada\s+([\d/]+,\s*[\d.:]+)/i);
+            if (match && match[1]) {
+              const parts = match[1].replace(/\./g, ":");
+              try {
+                const d = new Date(parts);
+                if (!isNaN(d.getTime())) {
+                  scheduledAt = d.toISOString();
+                }
+              } catch {}
+            }
+            const evalMatch = testLog.reason.match(/Penilai:\s*([^,.\n]+)/i);
+            if (evalMatch && evalMatch[1]) {
+              evaluator = evalMatch[1].trim();
+            }
+          }
+        }
+      }
+
+      return {
+        application: {
+          ...data,
+          assessments: assessData || [],
+          latest_schedule: scheduledAt,
+          latest_stage_type: testType,
+          latest_evaluator: evaluator,
+        } as JobApplication,
+        assessments: assessData || [],
+        auditLogs: (logs || []) as CandidateAuditLog[],
+      };
     }
 
     return { application: null, error: "Lamaran tidak ditemukan" };

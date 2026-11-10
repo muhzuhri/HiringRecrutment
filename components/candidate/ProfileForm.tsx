@@ -422,53 +422,53 @@ export default function ProfileForm({ initialProfile }: ProfileFormProps) {
     <div className="space-y-6">
       
       {/* 1. Header Profile Banner & Completeness Indicator */}
-      <div className="bg-[#0c2b29] border border-emerald-800/50 rounded-2xl p-6 sm:p-8 shadow-xl relative overflow-hidden">
+      <div className="bg-white dark:bg-[#0c2b29] border border-slate-200 dark:border-emerald-800/50 rounded-2xl p-6 sm:p-8 shadow-sm dark:shadow-xl relative overflow-hidden transition-colors">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 relative z-10">
           
           <div className="flex items-start sm:items-center gap-4">
-            <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-gradient-to-br from-emerald-600 to-teal-800 border-2 border-emerald-500/50 flex items-center justify-center font-extrabold text-white text-2xl sm:text-3xl shadow-lg shrink-0">
+            <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-slate-900 dark:bg-gradient-to-br dark:from-emerald-600 dark:to-teal-800 border-2 border-slate-300 dark:border-emerald-500/50 flex items-center justify-center font-extrabold text-white text-2xl sm:text-3xl shadow-sm shrink-0">
               {fullName ? fullName.charAt(0).toUpperCase() : "K"}
             </div>
 
             <div className="space-y-1">
               <div className="flex items-center gap-2 flex-wrap">
-                <span className="px-3 py-1 rounded-full bg-emerald-950 text-emerald-300 border border-emerald-700/50 text-xs font-semibold flex items-center gap-1.5">
-                  <Sparkles className="w-3.5 h-3.5 text-emerald-400" />
+                <span className="px-3 py-1 rounded-full bg-slate-100 dark:bg-emerald-950 text-slate-700 dark:text-emerald-300 border border-slate-200 dark:border-emerald-700/50 text-xs font-semibold flex items-center gap-1.5">
+                  <Sparkles className="w-3.5 h-3.5 text-slate-700 dark:text-emerald-400" />
                   Standard Portal MagangHub
                 </span>
-                <span className="px-3 py-1 rounded-full bg-teal-950 text-teal-300 border border-teal-700/50 text-xs font-semibold">
+                <span className="px-3 py-1 rounded-full bg-slate-100 dark:bg-teal-950 text-slate-700 dark:text-teal-300 border border-slate-200 dark:border-teal-700/50 text-xs font-semibold">
                   Role: Kandidat
                 </span>
               </div>
 
-              <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
+              <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">
                 {fullName || "Profil Kandidat"}
               </h1>
 
-              <p className="text-emerald-200/80 text-xs sm:text-sm">
+              <p className="text-slate-500 dark:text-emerald-200/80 text-xs sm:text-sm">
                 {headline || "Lengkapi profil terstruktur Anda untuk memperbesar peluang lolos seleksi HR."}
               </p>
             </div>
           </div>
 
           {/* Completeness Bar Card */}
-          <div className="bg-[#061f1d] border border-emerald-800/60 rounded-xl p-4 sm:p-5 w-full md:w-72 shrink-0 space-y-2.5 shadow-inner">
+          <div className="bg-slate-50 dark:bg-[#061f1d] border border-slate-200 dark:border-emerald-800/60 rounded-xl p-4 sm:p-5 w-full md:w-72 shrink-0 space-y-2.5 shadow-xs">
             <div className="flex justify-between items-center text-xs font-bold">
-              <span className="text-slate-200 flex items-center gap-1.5">
-                <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+              <span className="text-slate-700 dark:text-slate-200 flex items-center gap-1.5">
+                <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
                 Kelengkapan Profil
               </span>
-              <span className="text-emerald-400 font-extrabold text-sm">{completenessScore}%</span>
+              <span className="text-slate-900 dark:text-emerald-400 font-extrabold text-sm">{completenessScore}%</span>
             </div>
 
-            <div className="w-full h-2.5 bg-emerald-950 rounded-full overflow-hidden border border-emerald-900">
+            <div className="w-full h-2.5 bg-slate-200 dark:bg-emerald-950 rounded-full overflow-hidden border border-slate-300 dark:border-emerald-900">
               <div
-                className="h-full bg-gradient-to-r from-emerald-500 to-teal-400 rounded-full transition-all duration-500"
+                className="h-full bg-slate-900 dark:bg-gradient-to-r dark:from-emerald-500 dark:to-teal-400 rounded-full transition-all duration-500"
                 style={{ width: `${completenessScore}%` }}
               />
             </div>
 
-            <p className="text-[11px] text-emerald-300/80 leading-snug">
+            <p className="text-[11px] text-slate-500 dark:text-emerald-300/80 leading-snug">
               {completenessScore >= 80
                 ? "Profil Anda sangat lengkap dan siap diajukan ke lowongan!"
                 : "Lengkapi seluruh tab di bawah untuk mencapai 100% kelengkapan."}
@@ -483,21 +483,21 @@ export default function ProfileForm({ initialProfile }: ProfileFormProps) {
         <div
           className={`p-4 rounded-xl border text-xs sm:text-sm flex items-center gap-3 animate-fade-in-up ${
             statusMsg.type === "success"
-              ? "bg-emerald-950/90 border-emerald-500/60 text-emerald-200"
-              : "bg-rose-950/90 border-rose-500/60 text-rose-200"
+              ? "bg-emerald-50 border-emerald-300 text-emerald-800 dark:bg-emerald-950/90 dark:border-emerald-500/60 dark:text-emerald-200"
+              : "bg-rose-50 border-rose-300 text-rose-800 dark:bg-rose-950/90 dark:border-rose-500/60 dark:text-rose-200"
           }`}
         >
           {statusMsg.type === "success" ? (
-            <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0" />
+            <CheckCircle2 className="w-5 h-5 text-emerald-600 dark:text-emerald-400 shrink-0" />
           ) : (
-            <AlertCircle className="w-5 h-5 text-rose-400 shrink-0" />
+            <AlertCircle className="w-5 h-5 text-rose-600 dark:text-rose-400 shrink-0" />
           )}
           <span className="font-medium">{statusMsg.text}</span>
         </div>
       )}
 
       {/* 3. Section Navigation Tabs */}
-      <div className="flex items-center gap-2 border-b border-emerald-800/40 pb-2 overflow-x-auto">
+      <div className="flex items-center gap-2 border-b border-slate-200 dark:border-emerald-800/40 pb-2 overflow-x-auto">
         {[
           { id: "personal", label: "Pribadi & Kontak", icon: User },
           { id: "education", label: `Pendidikan (${educationList.length})`, icon: GraduationCap },
@@ -516,11 +516,11 @@ export default function ProfileForm({ initialProfile }: ProfileFormProps) {
               onClick={() => setActiveTab(tab.id as any)}
               className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition-all whitespace-nowrap ${
                 isActive
-                  ? "bg-emerald-600 text-white shadow-md shadow-emerald-950/50"
-                  : "bg-[#0c2b29] text-slate-300 hover:text-white border border-emerald-900/40"
+                  ? "bg-slate-900 dark:bg-emerald-600 text-white shadow-sm"
+                  : "bg-white dark:bg-[#0c2b29] text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white border border-slate-200 dark:border-emerald-900/40"
               }`}
             >
-              <Icon className={`w-4 h-4 ${isActive ? "text-white" : "text-emerald-400"}`} />
+              <Icon className={`w-4 h-4 ${isActive ? "text-white" : "text-slate-500 dark:text-emerald-400"}`} />
               <span>{tab.label}</span>
             </button>
           );
@@ -532,9 +532,9 @@ export default function ProfileForm({ initialProfile }: ProfileFormProps) {
         
         {/* TAB 1: INFORMASI PRIBADI & KONTAK */}
         {activeTab === "personal" && (
-          <div className="bg-[#0c2b29] border border-emerald-800/40 rounded-2xl p-6 sm:p-8 space-y-6 shadow-xl">
-            <div className="flex items-center gap-3 border-b border-emerald-800/40 pb-4">
-              <div className="w-10 h-10 rounded-xl bg-emerald-900/60 border border-emerald-700/50 flex items-center justify-center text-emerald-300">
+          <div className="bg-white dark:bg-[#0c2b29] border border-slate-200 dark:border-emerald-800/40 rounded-2xl p-6 sm:p-8 space-y-6 shadow-sm dark:shadow-xl transition-colors">
+            <div className="flex items-center gap-3 border-b border-slate-200 dark:border-emerald-800/40 pb-4">
+              <div className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-emerald-900/60 border border-slate-200 dark:border-emerald-700/50 flex items-center justify-center text-slate-700 dark:text-emerald-300">
                 <User className="w-5 h-5" />
               </div>
               <div>

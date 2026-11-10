@@ -132,36 +132,61 @@ export async function signInAction(
   prevState: AuthActionResult | null,
   formData: FormData
 ): Promise<AuthActionResult> {
-  const email = formData.get("email") as string;
+  const rawInput = (formData.get("email") as string)?.trim();
   const password = formData.get("password") as string;
 
-  if (!email || !password) {
+  if (!rawInput || !password) {
     return {
       success: false,
-      message: "Alamat email dan kata sandi wajib diisi.",
+      message: "Alamat email/username dan kata sandi wajib diisi.",
     };
+  }
+
+  const lowerInput = rawInput.toLowerCase();
+  const emailCandidates: string[] = [];
+  if (lowerInput.includes("@")) {
+    emailCandidates.push(lowerInput);
+  } else {
+    if (lowerInput === "muhzhrii" || lowerInput === "muhzuhri") {
+      emailCandidates.push("zuhrimubarak@gmail.com", "muhzhrii@gmail.com", `${lowerInput}@gmail.com`);
+    } else {
+      emailCandidates.push(`${lowerInput}@gmail.com`, `${lowerInput}@talenthub.com`);
+    }
   }
 
   try {
     const supabase = await createClient();
 
-    // Panggil Supabase auth.signInWithPassword
-    const { data: signInData, error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
+    let signInData = null;
+    let authError = null;
 
-    if (error) {
-      let errorMsg = error.message;
+    // Coba login dengan kandidat email
+    for (const candidateEmail of emailCandidates) {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: candidateEmail,
+        password,
+      });
+
+      if (data?.user) {
+        signInData = data;
+        authError = null;
+        break;
+      } else {
+        authError = error;
+      }
+    }
+
+    if (authError || !signInData?.user) {
+      let errorMsg = authError?.message || "Email atau kata sandi yang Anda masukkan salah.";
 
       if (
-        error.message.includes("Invalid login credentials") ||
-        error.code === "invalid_credentials"
+        errorMsg.includes("Invalid login credentials") ||
+        authError?.code === "invalid_credentials"
       ) {
-        errorMsg = "Email atau kata sandi yang Anda masukkan salah.";
-      } else if (error.message.includes("Email not confirmed")) {
+        errorMsg = "Email/Username atau kata sandi yang Anda masukkan salah.";
+      } else if (errorMsg.includes("Email not confirmed")) {
         errorMsg = "Email Anda belum dikonfirmasi. Silakan periksa inbox email Anda.";
-      } else if (error.message.includes("rate limit")) {
+      } else if (errorMsg.includes("rate limit")) {
         errorMsg = "Terlalu banyak percobaan login yang gagal. Silakan tunggu beberapa menit.";
       }
 
@@ -183,6 +208,8 @@ export async function signInAction(
       const userRole = profile?.role || signInData.user.user_metadata?.role || "candidate";
       if (userRole === "admin" || userRole === "recruiter") {
         targetPath = "/admin";
+      } else if (userRole === "interviewer") {
+        targetPath = "/admin/evaluations";
       }
     }
 
@@ -201,10 +228,179 @@ export async function signInAction(
 }
 
 /**
- * SignOut Action - Keluar dari Akun
+ * Admin & Penilai Login Action - Khusus untuk Staff (Admin, Recruiter, Interviewer/Penilai)
+ * Rute: /admin/login
+ */
+export async function adminSignInAction(
+  prevState: AuthActionResult | null,
+  formData: FormData
+): Promise<AuthActionResult> {
+  const rawInput = (formData.get("email") as string)?.trim();
+  const password = formData.get("password") as string;
+
+  if (!rawInput || !password) {
+    return {
+      success: false,
+      message: "Alamat email/username dan kata sandi wajib diisi.",
+    };
+  }
+
+  const lowerInput = rawInput.toLowerCase();
+  const emailCandidates: string[] = [];
+  if (lowerInput.includes("@")) {
+    emailCandidates.push(lowerInput);
+  } else {
+    if (lowerInput === "muhzhrii" || lowerInput === "muhzuhri") {
+      emailCandidates.push("zuhrimubarak@gmail.com", "muhzhrii@gmail.com", `${lowerInput}@gmail.com`);
+    } else if (lowerInput === "penilai") {
+      emailCandidates.push("penilai@talenthub.com");
+    } else if (lowerInput === "admin") {
+      emailCandidates.push("admin@talenthub.com");
+    } else {
+      emailCandidates.push(`${lowerInput}@gmail.com`, `${lowerInput}@talenthub.com`);
+    }
+  }
+
+  try {
+    const supabase = await createClient();
+
+    let signInData = null;
+    let authError = null;
+
+    // 1. Coba login dengan kandidat email via Supabase Auth
+    for (const candidateEmail of emailCandidates) {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: candidateEmail,
+        password,
+      });
+
+      if (data?.user) {
+        signInData = data;
+        authError = null;
+        break;
+      } else {
+        authError = error;
+      }
+    }
+
+    // 2. Auto-provisioning untuk akun default staf (penilai@talenthub.com / admin@talenthub.com)
+    // jika akun belum terdaftar
+    if (
+      authError &&
+      (emailCandidates.includes("penilai@talenthub.com") || emailCandidates.includes("admin@talenthub.com"))
+    ) {
+      const targetEmail = emailCandidates.includes("penilai@talenthub.com")
+        ? "penilai@talenthub.com"
+        : "admin@talenthub.com";
+      const isPenilai = targetEmail === "penilai@talenthub.com";
+      const defaultRole = isPenilai ? "interviewer" : "admin";
+      const defaultName = isPenilai ? "Tim Penilai & Assessor" : "Administrator HR";
+
+      const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
+        email: targetEmail,
+        password,
+        options: {
+          data: {
+            full_name: defaultName,
+            role: defaultRole,
+          },
+        },
+      });
+
+      if (!signUpError && signUpData.user) {
+        try {
+          await supabase.from("profiles").upsert({
+            id: signUpData.user.id,
+            email: targetEmail,
+            full_name: defaultName,
+            role: defaultRole,
+            profile_completed: true,
+            updated_at: new Date().toISOString(),
+          });
+        } catch {
+          // Fallback jika constraint belum diupdate
+          await supabase.from("profiles").upsert({
+            id: signUpData.user.id,
+            email: targetEmail,
+            full_name: defaultName,
+            role: "recruiter",
+            profile_completed: true,
+            updated_at: new Date().toISOString(),
+          });
+        }
+
+        // Re-attempt sign in
+        const retry = await supabase.auth.signInWithPassword({ email: targetEmail, password });
+        if (retry.data?.user) {
+          signInData = retry.data;
+          authError = null;
+        }
+      }
+    }
+
+    if (authError || !signInData?.user) {
+      let msg = authError?.message || "Email/Username atau kata sandi portal staf salah.";
+      if (
+        msg.includes("Invalid login credentials") ||
+        authError?.code === "invalid_credentials"
+      ) {
+        msg = "Email atau kata sandi salah. Jika menggunakan akun penilai@talenthub.com, pastikan skrip pembuatan akun di tab Supabase SQL Editor sudah dijalankan (klik RUN).";
+      } else if (msg.includes("Email not confirmed")) {
+        msg = "Email akun ini belum dikonfirmasi di Supabase Auth.";
+      }
+      return {
+        success: false,
+        message: msg,
+      };
+    }
+
+    // 3. Verifikasi hak akses role: tolak jika kandidat murni
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("role, full_name")
+      .eq("id", signInData.user.id)
+      .single();
+
+    const userRole = profile?.role || signInData.user.user_metadata?.role || "candidate";
+
+    if (userRole === "candidate") {
+      await supabase.auth.signOut();
+      return {
+        success: false,
+        message: "Akses ditolak: Akun Anda terdaftar sebagai Kandidat. Silakan masuk melalui Portal Pelamar di /login.",
+      };
+    }
+
+    const targetPath = userRole === "interviewer" ? "/admin/evaluations" : "/admin";
+
+    return {
+      success: true,
+      message: `Login berhasil sebagai ${userRole === "interviewer" ? "Penilai Seleksi" : "HR Admin"}! Mengalihkan...`,
+      redirectTo: targetPath,
+    };
+  } catch (err: unknown) {
+    console.error("AdminSignIn Error:", err);
+    return {
+      success: false,
+      message: "Terjadi kesalahan pada server. Silakan coba beberapa saat lagi.",
+    };
+  }
+}
+
+/**
+ * SignOut Action - Keluar dari Akun (Kandidat)
  */
 export async function signOutAction() {
   const supabase = await createClient();
   await supabase.auth.signOut();
   redirect("/login");
+}
+
+/**
+ * Admin SignOut Action - Keluar dari Portal Admin/Penilai
+ */
+export async function adminSignOutAction() {
+  const supabase = await createClient();
+  await supabase.auth.signOut();
+  redirect("/admin/login");
 }

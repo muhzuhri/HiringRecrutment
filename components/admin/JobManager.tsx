@@ -273,16 +273,16 @@ export default function JobManager({ initialJobs }: JobManagerProps) {
       )}
 
       {/* Header Banner & Publish Action Button */}
-      <div className="bg-[#0c2b29] border border-emerald-800/50 rounded-2xl p-6 sm:p-8 shadow-xl flex flex-col sm:flex-row sm:items-center justify-between gap-6">
+      <div className="bg-white dark:bg-[#0c2b29] border border-slate-200 dark:border-emerald-800/50 rounded-2xl p-5 sm:p-6 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4 transition-colors">
         <div className="space-y-1">
-          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-950 border border-emerald-700/50 text-xs font-semibold text-emerald-300">
-            <Briefcase className="w-3.5 h-3.5 text-emerald-400" />
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100 dark:bg-emerald-950 border border-slate-300 dark:border-emerald-700/50 text-xs font-semibold text-slate-700 dark:text-emerald-300">
+            <Briefcase className="w-3.5 h-3.5 text-slate-700 dark:text-emerald-400" />
             Manajemen Lowongan Pekerjaan
           </span>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
+          <h1 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight">
             Daftar & Kontrol Lowongan Perusahaan
           </h1>
-          <p className="text-xs sm:text-sm text-emerald-200/80">
+          <p className="text-xs text-slate-500 dark:text-emerald-200/80">
             Kelola posisi lowongan, perbarui kriteria (Edit), atur status pendaftaran (Buka/Tutup), dan hapus lowongan yang tidak aktif dengan integrasi Supabase.
           </p>
         </div>
@@ -293,29 +293,29 @@ export default function JobManager({ initialJobs }: JobManagerProps) {
             resetForm();
             setShowCreateModal(true);
           }}
-          className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-xs sm:text-sm transition-all shadow-lg shadow-emerald-950/60 shrink-0 cursor-pointer"
+          className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl bg-slate-900 dark:bg-emerald-600 hover:bg-slate-800 dark:hover:bg-emerald-500 text-white font-bold text-xs transition-all shadow-sm shrink-0 cursor-pointer"
         >
-          <Plus className="w-5 h-5" />
+          <Plus className="w-4 h-4" />
           <span>Buat Lowongan Baru</span>
         </button>
       </div>
 
       {/* Job Postings Master Table */}
-      <div className="bg-[#0c2b29] border border-emerald-800/40 rounded-2xl p-6 shadow-xl space-y-4">
+      <div className="bg-white dark:bg-[#0c2b29] border border-slate-200 dark:border-emerald-800/40 rounded-2xl p-4 sm:p-5 shadow-sm space-y-4 transition-colors">
         <div className="overflow-x-auto">
-          <table className="w-full text-left text-xs sm:text-sm text-slate-300">
-            <thead className="bg-[#061f1d] text-emerald-300 uppercase font-bold text-[11px] border-b border-emerald-800">
+          <table className="w-full text-left text-xs text-slate-700 dark:text-slate-300">
+            <thead className="bg-slate-100 dark:bg-[#061f1d] text-slate-700 dark:text-emerald-300 uppercase font-bold text-[10px] border-b border-slate-200 dark:border-emerald-800">
               <tr>
-                <th className="p-4">Posisi Lowongan</th>
-                <th className="p-4">Divisi & Tipe Kerja</th>
-                <th className="p-4">Batas Akhir (Deadline)</th>
-                <th className="p-4">Total Pelamar</th>
-                <th className="p-4">Time-to-Hire</th>
-                <th className="p-4">Status</th>
-                <th className="p-4 text-center">Menu Aksi HR</th>
+                <th className="px-4 py-3">Posisi Lowongan</th>
+                <th className="px-3 py-3">Divisi & Tipe Kerja</th>
+                <th className="px-3 py-3">Batas Akhir</th>
+                <th className="px-3 py-3">Total Pelamar</th>
+                <th className="px-3 py-3">Time-to-Hire</th>
+                <th className="px-3 py-3">Status</th>
+                <th className="px-4 py-3 text-center">Menu Aksi HR</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-emerald-900/60">
+            <tbody className="divide-y divide-slate-200 dark:divide-emerald-900/60">
               {jobs.length === 0 ? (
                 <tr>
                   <td colSpan={7} className="p-8 text-center text-slate-400 text-xs">
@@ -328,118 +328,118 @@ export default function JobManager({ initialJobs }: JobManagerProps) {
                   const isActive = job.status === "Active" && !isExpired;
 
                   return (
-                    <tr key={job.id} className="hover:bg-[#061f1d]/60 transition-colors group">
-                      <td className="p-4 font-bold text-white">
-                        <p className="text-sm text-emerald-100 group-hover:text-emerald-300 transition-colors">
+                    <tr key={job.id} className="hover:bg-slate-50 dark:hover:bg-[#061f1d]/60 transition-colors group">
+                      <td className="px-4 py-3 font-bold text-slate-800 dark:text-white">
+                        <p className="text-xs sm:text-sm font-bold text-slate-900 dark:text-emerald-100 group-hover:text-emerald-600 dark:group-hover:text-emerald-300 transition-colors">
                           {job.title}
                         </p>
-                        <p className="text-[11px] text-emerald-300/70 font-normal flex items-center gap-1 mt-0.5">
-                          <MapPin className="w-3 h-3 text-emerald-400" />
+                        <p className="text-[10px] text-slate-500 dark:text-emerald-300/70 font-normal flex items-center gap-1 mt-0.5">
+                          <MapPin className="w-3 h-3 text-slate-400 dark:text-emerald-400" />
                           {job.location}
                         </p>
                       </td>
-                      <td className="p-4">
+                      <td className="px-3 py-3">
                         <div className="flex items-center gap-1.5 flex-wrap">
-                          <span className="px-2.5 py-0.5 rounded bg-emerald-950 text-emerald-300 border border-emerald-800 font-semibold text-xs">
+                          <span className="px-2 py-0.5 rounded bg-slate-100 dark:bg-emerald-950 text-slate-700 dark:text-emerald-300 border border-slate-200 dark:border-emerald-800 font-semibold text-[10px]">
                             {job.dept}
                           </span>
-                          <span className="px-2 py-0.5 rounded bg-emerald-900/50 text-emerald-200 border border-emerald-700/50 text-xs font-medium">
+                          <span className="px-2 py-0.5 rounded bg-slate-100 dark:bg-emerald-900/50 text-slate-600 dark:text-emerald-200 border border-slate-200 dark:border-emerald-700/50 text-[10px] font-medium">
                             {job.type}
                           </span>
                         </div>
                       </td>
-                      <td className="p-4 text-xs">
+                      <td className="px-3 py-3 text-xs">
                         {job.deadline_date ? (
-                          <span className={`inline-flex items-center gap-1 font-semibold ${isExpired ? "text-rose-400" : "text-emerald-300"}`}>
-                            <Calendar className="w-3.5 h-3.5" />
+                          <span className={`inline-flex items-center gap-1 font-semibold text-[11px] ${isExpired ? "text-rose-600 dark:text-rose-400" : "text-slate-700 dark:text-emerald-300"}`}>
+                            <Calendar className="w-3 h-3 text-slate-400" />
                             {new Date(job.deadline_date).toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "numeric" })}
                             {isExpired && (
-                              <span className="text-[10px] px-1.5 py-0.2 rounded bg-rose-950 text-rose-300 border border-rose-800 font-bold ml-1">
+                              <span className="text-[9px] px-1.5 py-0.2 rounded bg-rose-50 dark:bg-rose-950 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-800 font-bold ml-1">
                                 Expired
                               </span>
                             )}
                           </span>
                         ) : (
-                          <span className="text-slate-500">-</span>
+                          <span className="text-slate-400">-</span>
                         )}
                       </td>
-                      <td className="p-4 font-extrabold text-white">
+                      <td className="px-3 py-3 font-extrabold text-slate-800 dark:text-white text-xs">
                         <span className="inline-flex items-center gap-1">
-                          <Users className="w-3.5 h-3.5 text-emerald-400" />
+                          <Users className="w-3.5 h-3.5 text-slate-400 dark:text-emerald-400" />
                           {job.applicant_count ?? 0} Pelamar
                         </span>
                       </td>
-                      <td className="p-4">
+                      <td className="px-3 py-3">
                         <span
-                          className={`px-2.5 py-1 rounded-md text-xs font-bold ${
+                          className={`px-2 py-0.5 rounded-md text-[10px] font-bold ${
                             job.time_to_hire && job.time_to_hire !== "Belum tersedia"
-                              ? "bg-emerald-950 text-emerald-300 border border-emerald-700"
-                              : "bg-slate-900 text-slate-400 border border-slate-800"
+                              ? "bg-slate-100 dark:bg-emerald-950 text-slate-800 dark:text-emerald-300 border border-slate-300 dark:border-emerald-700"
+                              : "bg-slate-50 dark:bg-slate-900 text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-slate-800"
                           }`}
                         >
-                          <Clock className="w-3 h-3 inline mr-1" />
+                          <Clock className="w-3 h-3 inline mr-1 text-slate-400" />
                           {job.time_to_hire || "Belum tersedia"}
                         </span>
                       </td>
-                      <td className="p-4">
+                      <td className="px-3 py-3">
                         {isActive ? (
-                          <span className="px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 font-bold text-xs inline-flex items-center gap-1">
-                            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                          <span className="px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-500/40 font-bold text-[10px] inline-flex items-center gap-1">
+                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
                             Aktif
                           </span>
                         ) : (
-                          <span className="px-2.5 py-1 rounded-full bg-slate-800 text-slate-400 border border-slate-700 font-bold text-xs inline-flex items-center gap-1">
-                            <span className="w-2 h-2 rounded-full bg-slate-500" />
+                          <span className="px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700 font-bold text-[10px] inline-flex items-center gap-1">
+                            <span className="w-1.5 h-1.5 rounded-full bg-slate-400" />
                             Ditutup
                           </span>
                         )}
                       </td>
 
                       {/* 4 Action Buttons Toolbar */}
-                      <td className="p-4 text-center">
-                        <div className="flex items-center justify-center gap-1.5">
+                      <td className="px-4 py-3 text-center">
+                        <div className="flex items-center justify-center gap-1">
                           {/* A. Lihat Detail */}
                           <button
                             type="button"
                             onClick={() => setViewingJob(job)}
-                            className="p-2 rounded-lg bg-emerald-950 hover:bg-emerald-900 text-emerald-300 border border-emerald-800 text-xs transition-colors"
+                            className="p-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-emerald-950 dark:hover:bg-emerald-900 text-slate-700 dark:text-emerald-300 border border-slate-300 dark:border-emerald-800 text-xs transition-colors cursor-pointer"
                             title="Lihat Detail Lowongan"
                           >
-                            <Eye className="w-4 h-4" />
+                            <Eye className="w-3.5 h-3.5" />
                           </button>
 
                           {/* B. Edit Lowongan */}
                           <button
                             type="button"
                             onClick={() => handleOpenEdit(job)}
-                            className="p-2 rounded-lg bg-blue-950 hover:bg-blue-900 text-blue-300 border border-blue-800 text-xs transition-colors"
+                            className="p-1.5 rounded-lg bg-blue-50 hover:bg-blue-100 dark:bg-blue-950 dark:hover:bg-blue-900 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800 text-xs transition-colors cursor-pointer"
                             title="Edit Data Lowongan"
                           >
-                            <Edit3 className="w-4 h-4" />
+                            <Edit3 className="w-3.5 h-3.5" />
                           </button>
 
                           {/* C. Toggle Buka / Tutup */}
                           <button
                             type="button"
                             onClick={() => handleToggleStatus(job)}
-                            className={`p-2 rounded-lg text-xs font-bold transition-colors ${
+                            className={`p-1.5 rounded-lg text-xs font-bold transition-colors cursor-pointer ${
                               job.status === "Active"
-                                ? "bg-amber-950 hover:bg-amber-900 text-amber-300 border border-amber-800"
-                                : "bg-emerald-950 hover:bg-emerald-900 text-emerald-300 border border-emerald-800"
+                                ? "bg-amber-50 hover:bg-amber-100 dark:bg-amber-950 dark:hover:bg-amber-900 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-800"
+                                : "bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-950 dark:hover:bg-emerald-900 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800"
                             }`}
                             title={job.status === "Active" ? "Tutup Lowongan Pekerjaan" : "Buka Kembali Lowongan"}
                           >
-                            {job.status === "Active" ? <Lock className="w-4 h-4" /> : <Unlock className="w-4 h-4" />}
+                            {job.status === "Active" ? <Lock className="w-3.5 h-3.5" /> : <Unlock className="w-3.5 h-3.5" />}
                           </button>
 
                           {/* D. Hapus Lowongan */}
                           <button
                             type="button"
                             onClick={() => setDeletingJobId(job.id)}
-                            className="p-2 rounded-lg bg-rose-950 hover:bg-rose-900 text-rose-300 border border-rose-800 text-xs transition-colors"
+                            className="p-1.5 rounded-lg bg-rose-50 hover:bg-rose-100 dark:bg-rose-950 dark:hover:bg-rose-900 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-800 text-xs transition-colors cursor-pointer"
                             title="Hapus Lowongan Permanen"
                           >
-                            <Trash2 className="w-4 h-4" />
+                            <Trash2 className="w-3.5 h-3.5" />
                           </button>
                         </div>
                       </td>

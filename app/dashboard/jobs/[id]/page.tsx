@@ -48,7 +48,7 @@ export default async function CandidateJobDetailPage({ params }: Props) {
       <div>
         <Link
           href="/dashboard/jobs"
-          className="inline-flex items-center gap-2 text-xs sm:text-sm font-bold text-emerald-400 hover:text-emerald-300 transition-colors bg-[#0c2b29] px-4 py-2 rounded-xl border border-emerald-800/60"
+          className="inline-flex items-center gap-2 text-xs sm:text-sm font-bold text-slate-700 hover:text-slate-900 dark:text-emerald-300 dark:hover:text-white transition-colors bg-white dark:bg-[#0c2b29] px-4 py-2 rounded-xl border border-slate-200 dark:border-emerald-800/60 shadow-sm"
         >
           <ArrowLeft className="w-4 h-4" />
           <span>Kembali ke Papan Lowongan</span>

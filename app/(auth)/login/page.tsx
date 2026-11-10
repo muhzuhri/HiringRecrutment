@@ -33,6 +33,14 @@ function LoginFormContent() {
     }
   }, [searchParams]);
 
+  // Instant redirect listener when login succeeds
+  useEffect(() => {
+    if (state?.success && state.redirectTo) {
+      const redirectPath = searchParams.get("redirect") || state.redirectTo;
+      window.location.href = redirectPath;
+    }
+  }, [state, searchParams]);
+
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
@@ -42,9 +50,7 @@ function LoginFormContent() {
       setState(result);
       if (result.success && result.redirectTo) {
         const redirectPath = searchParams.get("redirect") || result.redirectTo;
-        setTimeout(() => {
-          router.push(redirectPath);
-        }, 1000);
+        window.location.href = redirectPath;
       }
     });
   };
@@ -102,18 +108,20 @@ function LoginFormContent() {
         {/* Email Field */}
         <div>
           <label htmlFor="login-email" className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
-            Alamat Email
+            Alamat Email atau Username
           </label>
           <div className="relative flex items-center">
             
             <input
               id="login-email"
-              type="email"
+              type="text"
               name="email"
-              placeholder="nama@domain.com"
+              autoCapitalize="none"
+              autoCorrect="off"
+              placeholder="nama@domain.com atau username"
               className="form-input pl-11 transition-all"
               required
-              autoComplete="email"
+              autoComplete="username"
             />
           </div>
         </div>
@@ -192,6 +200,17 @@ function LoginFormContent() {
           Daftar Sekarang
         </Link>
       </p>
+
+      {/* Staff Login Link */}
+      <div className="mt-5 pt-4 border-t border-slate-200/80 text-center">
+        <Link
+          href="/admin/login"
+          className="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-900 bg-emerald-50 hover:bg-emerald-100 border border-emerald-300 px-3.5 py-2 rounded-xl transition-colors"
+        >
+          <ShieldCheck className="w-3.5 h-3.5 text-emerald-700" />
+          <span>Masuk sebagai Tim HR / Penilai Seleksi</span>
+        </Link>
+      </div>
     </div>
   );
 }

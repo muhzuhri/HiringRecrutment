@@ -31,7 +31,7 @@ export default async function CandidateScreeningPage({
       <div>
         <Link
           href="/admin/kanban"
-          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#0c2b29] hover:bg-emerald-950 border border-emerald-800/60 text-emerald-300 text-xs font-bold transition-all"
+          className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white dark:bg-[#0c2b29] hover:bg-slate-100 dark:hover:bg-emerald-950 border border-slate-200 dark:border-emerald-800/60 text-slate-700 dark:text-emerald-300 text-xs font-bold transition-all shadow-sm"
         >
           <ArrowLeft className="w-4 h-4" />
           <span>Kembali ke Papan Kanban Rekrutmen</span>

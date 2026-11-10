@@ -5,13 +5,17 @@ import Link from "next/link";
 import FloatingCubes from "@/components/FloatingCubes";
 import LogoIntroAnimation from "@/components/LogoIntroAnimation";
 import { stats, whyJoinBenefits, whyJoinList, alumniCompanies } from "@/data/home";
-import { allJobs } from "@/data/jobs";
+import { Job, typeColors } from "@/data/jobs";
 
-const featuredJobs = allJobs.slice(0, 6);
+interface HomePageClientProps {
+  jobs?: Job[];
+}
 
-export default function HomePageClient() {
+export default function HomePageClient({ jobs = [] }: HomePageClientProps) {
   const [introPlaying, setIntroPlaying] = useState(true);
   const [contentVisible, setContentVisible] = useState(false);
+
+  const featuredJobs = jobs.slice(0, 6);
 
   const handleIntroComplete = useCallback(() => {
     setIntroPlaying(false);
@@ -174,54 +178,66 @@ export default function HomePageClient() {
               </p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {featuredJobs.map((job) => (
-                <Link key={job.id} href={`/jobs/${job.id}`} className="career-card p-6 block group">
-                  <div className="flex items-start justify-between mb-4">
-                    <div className="w-12 h-12 rounded-xl flex items-center justify-center text-xl bg-emerald-900/10 text-emerald-800 border border-emerald-800/10">
-                      💼
+            {featuredJobs.length === 0 ? (
+              <div className="bg-white rounded-2xl p-10 text-center border border-gray-200/60 max-w-lg mx-auto space-y-3">
+                <div className="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-800 flex items-center justify-center mx-auto text-xl">
+                  💼
+                </div>
+                <h3 className="font-bold text-gray-900 text-base">Belum Ada Lowongan Aktif</h3>
+                <p className="text-gray-500 text-xs">
+                  Saat ini belum ada lowongan pekerjaan yang dipublikasikan oleh tim HR. Silakan periksa kembali nanti.
+                </p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {featuredJobs.map((job) => (
+                  <Link key={job.id} href={`/jobs/${job.id}`} className="career-card p-6 block group">
+                    <div className="flex items-start justify-between mb-4">
+                      <div className="w-12 h-12 rounded-xl flex items-center justify-center text-xl bg-emerald-900/10 text-emerald-800 border border-emerald-800/10">
+                        💼
+                      </div>
+                      <span
+                        className={`job-badge ${
+                          job.type === "Full-time"
+                            ? "bg-emerald-50 text-emerald-800 border border-emerald-200"
+                            : job.type === "Contract"
+                            ? "bg-amber-50 text-amber-800 border border-amber-200"
+                            : "bg-sky-50 text-sky-800 border border-sky-200"
+                        }`}
+                      >
+                        {job.type}
+                      </span>
                     </div>
-                    <span
-                      className={`job-badge ${
-                        job.type === "Full-time"
-                          ? "bg-emerald-50 text-emerald-800 border border-emerald-200"
-                          : job.type === "Contract"
-                          ? "bg-amber-50 text-amber-800 border border-amber-200"
-                          : "bg-sky-50 text-sky-800 border border-sky-200"
-                      }`}
+                    <h3
+                      className="font-bold text-lg mb-2 group-hover:text-emerald-800 transition-colors"
+                      style={{ color: "#1a1a2e" }}
                     >
-                      {job.type}
-                    </span>
-                  </div>
-                  <h3
-                    className="font-bold text-lg mb-2 group-hover:text-emerald-800 transition-colors"
-                    style={{ color: "#1a1a2e" }}
-                  >
-                    {job.title}
-                  </h3>
-                  <div className="flex flex-wrap gap-2 mb-4">
-                    <span className={`job-badge ${job.deptColor}`}>{job.dept}</span>
-                  </div>
-                  <div className="flex items-center gap-1.5 text-sm text-gray-500">
-                    <svg className="w-4 h-4 text-emerald-700 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                    </svg>
-                    {job.location}
-                  </div>
-                  <div className="mt-4 pt-4 border-t border-gray-100 flex items-center text-emerald-800 text-sm font-semibold">
-                    Lihat Detail
-                    <svg className="w-4 h-4 ml-1.5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                    </svg>
-                  </div>
-                </Link>
-              ))}
-            </div>
+                      {job.title}
+                    </h3>
+                    <div className="flex flex-wrap gap-2 mb-4">
+                      <span className={`job-badge ${job.deptColor}`}>{job.dept}</span>
+                    </div>
+                    <div className="flex items-center gap-1.5 text-sm text-gray-500">
+                      <svg className="w-4 h-4 text-emerald-700 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                      </svg>
+                      {job.location}
+                    </div>
+                    <div className="mt-4 pt-4 border-t border-gray-100 flex items-center text-emerald-800 text-sm font-semibold">
+                      Lihat Detail
+                      <svg className="w-4 h-4 ml-1.5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                      </svg>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            )}
 
             <div className="text-center mt-10">
               <Link href="/jobs" className="btn-primary px-10">
-                Lihat Semua {allJobs.length} Lowongan
+                Lihat Semua Lowongan
               </Link>
             </div>
           </div>

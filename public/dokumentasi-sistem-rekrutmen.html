@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dokumentasi Sistem Rekrutmen & Pelacakan Lamaran - TalentHub</title>
+  <style>
+    /* Reset & Base Fonts */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      color: #1e293b;
+      background-color: #f8fafc;
+      line-height: 1.6;
+      font-size: 13.5px;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Print Controls Bar */
+    .print-bar {
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      background: #061f1d;
+      color: #f1f5f9;
+      padding: 12px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      border-bottom: 2px solid #059669;
+    }
+
+    .print-btn {
+      background: #059669;
+      color: #fff;
+      font-weight: 700;
+      font-size: 13px;
+      padding: 8px 18px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: background 0.2s;
+    }
+
+    .print-btn:hover {
+      background: #10b981;
+    }
+
+    /* Container Document */
+    .doc-container {
+      max-width: 900px;
+      margin: 30px auto;
+      background: #ffffff;
+      padding: 50px 60px;
+      border-radius: 12px;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.06);
+      border: 1px solid #e2e8f0;
+    }
+
+    /* Cover Page */
+    .cover-page {
+      text-align: center;
+      padding: 40px 0 60px 0;
+      border-bottom: 3px double #cbd5e1;
+      margin-bottom: 40px;
+    }
+
+    .brand-badge {
+      display: inline-block;
+      background: #ecfdf5;
+      color: #047857;
+      border: 1px solid #a7f3d0;
+      font-weight: 800;
+      font-size: 11px;
+      padding: 4px 14px;
+      border-radius: 9999px;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      margin-bottom: 16px;
+    }
+
+    .doc-title {
+      font-size: 28px;
+      font-weight: 900;
+      color: #064e3b;
+      line-height: 1.25;
+      margin-bottom: 12px;
+    }
+
+    .doc-subtitle {
+      font-size: 15px;
+      color: #475569;
+      max-width: 700px;
+      margin: 0 auto 24px auto;
+      line-height: 1.5;
+    }
+
+    .meta-box {
+      display: inline-flex;
+      background: #f1f5f9;
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      padding: 12px 24px;
+      gap: 30px;
+      text-align: left;
+      font-size: 12px;
+    }
+
+    .meta-item strong {
+      display: block;
+      color: #0f172a;
+      font-size: 12px;
+    }
+
+    .meta-item span {
+      color: #64748b;
+    }
+
+    /* Typography & Headers */
+    h2 {
+      font-size: 20px;
+      font-weight: 800;
+      color: #064e3b;
+      margin-top: 36px;
+      margin-bottom: 14px;
+      padding-bottom: 8px;
+      border-bottom: 2px solid #e2e8f0;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    h3 {
+      font-size: 16px;
+      font-weight: 700;
+      color: #0f172a;
+      margin-top: 24px;
+      margin-bottom: 10px;
+    }
+
+    p {
+      margin-bottom: 12px;
+      color: #334155;
+    }
+
+    /* Flow Diagrams */
+    .flow-diagram {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      padding: 16px;
+      margin: 16px 0 24px 0;
+    }
+
+    .flow-step {
+      background: #ffffff;
+      border: 1.5px solid #059669;
+      color: #064e3b;
+      padding: 8px 14px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 700;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    .flow-step.active {
+      background: #059669;
+      color: #ffffff;
+    }
+
+    .flow-arrow {
+      color: #94a3b8;
+      font-weight: 900;
+      font-size: 14px;
+    }
+
+    /* Tables */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 16px 0 24px 0;
+      font-size: 12.5px;
+    }
+
+    th {
+      background: #064e3b;
+      color: #ffffff;
+      font-weight: 700;
+      text-align: left;
+      padding: 10px 14px;
+      border: 1px solid #064e3b;
+    }
+
+    td {
+      padding: 10px 14px;
+      border: 1px solid #e2e8f0;
+      color: #334155;
+      vertical-align: top;
+    }
+
+    tr:nth-child(even) {
+      background: #f8fafc;
+    }
+
+    /* Cards & Grids */
+    .actor-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin: 20px 0;
+    }
+
+    .actor-card {
+      background: #ffffff;
+      border: 1px solid #cbd5e1;
+      border-top: 4px solid #059669;
+      border-radius: 10px;
+      padding: 16px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.04);
+    }
+
+    .actor-card.admin {
+      border-top-color: #0d9488;
+    }
+
+    .actor-card.penilai {
+      border-top-color: #d97706;
+    }
+
+    .actor-title {
+      font-size: 14px;
+      font-weight: 800;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .actor-title.kandidat { color: #047857; }
+    .actor-title.admin { color: #0f766e; }
+    .actor-title.penilai { color: #b45309; }
+
+    .actor-role {
+      font-size: 10.5px;
+      color: #64748b;
+      font-weight: 600;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+      display: block;
+    }
+
+    .feature-list {
+      list-style-type: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .feature-list li {
+      position: relative;
+      padding-left: 18px;
+      margin-bottom: 8px;
+      font-size: 12px;
+      color: #334155;
+      line-height: 1.4;
+    }
+
+    .feature-list li::before {
+      content: "✓";
+      position: absolute;
+      left: 0;
+      color: #059669;
+      font-weight: 800;
+    }
+
+    /* Badges & Highlights */
+    .badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+    .badge-success { background: #dcfce7; color: #15803d; }
+    .badge-info { background: #e0f2fe; color: #0369a1; }
+    .badge-warning { background: #fef3c7; color: #b45309; }
+    .badge-danger { background: #fee2e2; color: #b91c1c; }
+
+    .callout {
+      background: #ecfdf5;
+      border-left: 4px solid #059669;
+      padding: 14px 18px;
+      border-radius: 0 8px 8px 0;
+      margin: 18px 0;
+      font-size: 12.5px;
+      color: #065f46;
+    }
+
+    .callout strong {
+      display: block;
+      margin-bottom: 4px;
+      color: #064e3b;
+    }
+
+    /* Footer Document */
+    .doc-footer {
+      margin-top: 50px;
+      padding-top: 20px;
+      border-top: 1px solid #e2e8f0;
+      display: flex;
+      justify-content: space-between;
+      color: #64748b;
+      font-size: 11px;
+    }
+
+    /* Print Specific Media Query */
+    @media print {
+      body {
+        background: #ffffff;
+        color: #000000;
+      }
+      .print-bar {
+        display: none !important;
+      }
+      .doc-container {
+        max-width: 100%;
+        margin: 0;
+        padding: 0;
+        border: none;
+        box-shadow: none;
+      }
+      .page-break {
+        page-break-before: always;
+      }
+      h2 {
+        page-break-after: avoid;
+      }
+      table, .actor-card {
+        page-break-inside: avoid;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Sticky Print Action Bar -->
+  <div class="print-bar">
+    <div>
+      <strong>TalentHub | Dokumentasi Resmi Sistem Informasi Hiring & Recruitment</strong>
+      <span style="font-size: 11px; color: #a7f3d0; margin-left: 12px;">Mode Cetak Dokumen PDF</span>
+    </div>
+    <button class="print-btn" onclick="window.print()">
+      <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+        <path d="M2.5 8a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1z"/>
+        <path d="M5 1a2 2 0 0 0-2 2v2H2a2 2 0 0 0-2 2v3a2 2 0 0 0 2 2h1v1a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2v-1h1a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-1V3a2 2 0 0 0-2-2H5zM4 3a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2H4V3zm1 5a2 2 0 0 0-2 2v1H2a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1h-1v-1a2 2 0 0 0-2-2H5zm7 2v3a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-3a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1z"/>
+      </svg>
+      Cetak / Simpan sebagai PDF (Ctrl + P)
+    </button>
+  </div>
+
+  <div class="doc-container">
+
+    <!-- Cover Header -->
+    <header class="cover-page">
+      <div class="brand-badge">Dokumentasi Arsitektur & Alur Kerja</div>
+      <h1 class="doc-title">SISTEM INFORMASI HIRING & RECRUITMENT TRACKING</h1>
+      <p class="doc-subtitle">
+        Panduan Komprehensif Alur Bisnis 3 Kasus (Case 1, Case 2, Case 3), Pemetaan Matriks Fitur Aktor (Kandidat, HR Admin, Penilai), serta Spesifikasi Use Case (UC-01 s/d UC-12).
+      </p>
+
+      <div class="meta-box">
+        <div class="meta-item">
+          <strong>Perusahaan / Platform</strong>
+          <span>TalentHub Internal Recruitment</span>
+        </div>
+        <div class="meta-item">
+          <strong>Basis Data & Autentikasi</strong>
+          <span>Supabase PostgreSQL + RLS Policy</span>
+        </div>
+        <div class="meta-item">
+          <strong>Standar Data</strong>
+          <span>100% Real Supabase Data (Zero Mock)</span>
+        </div>
+        <div class="meta-item">
+          <strong>Tanggal Rilis</strong>
+          <span>November 2026</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- BAB 1: IKHTISAR SISTEM -->
+    <section>
+      <h2>1. Ikhtisar & Alur Kerja 3 Kasus Utama</h2>
+      <p>
+        Sistem Informasi Hiring & Recruitment TalentHub dirancang untuk mengelola rekrutmen internal perusahaan secara terpusat, transparan, dan terukur. Sistem mengintegrasikan tiga pilar proses bisnis rekrutmen:
+      </p>
+
+      <table>
+        <thead>
+          <tr>
+            <th style="width: 18%;">Kasus</th>
+            <th style="width: 32%;">Fokus & Tujuan</th>
+            <th style="width: 50%;">Implementasi pada Sistem</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Case 1</strong><br><span class="badge badge-info">Pondasi Data</span></td>
+            <td><strong>Smart Job Posting & Application</strong><br>Publikasi lowongan terstruktur dan pengajuan berkas lamaran yang valid oleh kandidat.</td>
+            <td>
+              • Form posting lowongan oleh HR (Divisi, Tipe WFH/WFO/Hybrid, Gaji, Skill, Deadline).<br>
+              • Pencarian & filter cerdas untuk kandidat.<br>
+              • Form apply dengan validasi berkas CV PDF maksimal 2 MB.<br>
+              • Pencegahan duplikasi lamaran (1 kandidat = 1 lamaran aktif per posisi).<br>
+              • Sistem notifikasi instan ke dashboard HR dan konfirmasi otomatis ke kandidat.
+            </td>
+          </tr>
+          <tr>
+            <td><strong>Case 2</strong><br><span class="badge badge-warning">Proses Seleksi</span></td>
+            <td><strong>Assessment & Multi-stage Interview</strong><br>Pengelolaan tes seleksi dan wawancara berjenjang oleh tim penilai & user.</td>
+            <td>
+              • Screening kesesuaian profil kandidat oleh HR (Lolos = <em>Qualified</em>).<br>
+              • Penjadwalan tes bertingkat (Psikotes, Technical Test, Aptitude, Personality).<br>
+              • Portal khusus Penilai (Interviewer/Assessor) untuk input nilai skala 0–100 dan catatan evaluasi kualitatif.<br>
+              • Pemisahan nilai tes dengan wawancara HR dan wawancara User (calon atasan).<br>
+              • Kompilasi hasil evaluasi menyeluruh sebelum penentuan status akhir.
+            </td>
+          </tr>
+          <tr>
+            <td><strong>Case 3</strong><br><span class="badge badge-success">Tracking & Audit</span></td>
+            <td><strong>End-to-End Tracking & Analitik</strong><br>Visibilitas penuh progres seleksi bagi HR dan transparansi mandiri bagi kandidat.</td>
+            <td>
+              • Papan Kanban interaktif 4 Kolom: <em>Diajukan → Diproses → Interview → Diterima / Ditolak</em>.<br>
+              • Analitik HR otomatis: Total Pelamar, Pelamar per Lowongan, dan <em>Time-to-Hire</em> rata-rata.<br>
+              • Catatan internal rahasia antar tim HR (<em>Internal Notes</em>).<br>
+              • <em>Audit Trail Log</em> kronologis mencatat siapa yang mengubah status, waktu perubahan, dan alasan.<br>
+              • Halaman pelacakan mandiri (<em>Self-tracking timeline</em>) bagi pelamar.
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3>Diagram Alur Alir Rekrutmen End-to-End</h3>
+      <div class="flow-diagram">
+        <div class="flow-step">HR Publikasi Lowongan</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step">Kandidat Cari & Filter</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step">Apply + Unggah PDF CV (2MB)</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step active">Status: Diajukan</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step">HR Screening CV</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step active">Status: Diproses (Qualified)</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step">Penjadwalan Tes & Interview</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step">Penilai Input Skor (0-100)</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step active">Status: Interview (HR & User)</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step">Review Hasil & Rekomendasi</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step active">Keputusan: Diterima / Ditolak</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step">Audit Trail & Analitik Tercatat</div>
+      </div>
+    </section>
+
+    <!-- BAB 2: MATRIKS PERAN & FITUR AKTOR -->
+    <div class="page-break"></div>
+    <section>
+      <h2>2. Matriks Peran & Fitur Tiap Aktor</h2>
+      <p>
+        Sistem membagi hak akses ke dalam 3 aktor utama dengan antarmuka yang terpisah demi menjaga privasi data seleksi dan efisiensi kerja:
+      </p>
+
+      <div class="actor-grid">
+        <!-- Aktor 1: Kandidat -->
+        <div class="actor-card">
+          <div class="actor-title kandidat">
+            <span>👤 Kandidat (Pelamar)</span>
+          </div>
+          <span class="actor-role">Role: Candidate (Portal Pelamar)</span>
+          <p style="font-size: 11.5px; color: #64748b; margin-bottom: 12px;">
+            Akses melalui URL: <code>/login</code> & <code>/dashboard</code>
+          </p>
+          <ul class="feature-list">
+            <li><strong>Registrasi & Login Akun:</strong> Verifikasi email Supabase Auth.</li>
+            <li><strong>Manajemen Profil & CV:</strong> Melengkapi biodata diri, riwayat pendidikan, pengalaman kerja, sertifikasi, dan keahlian teknis.</li>
+            <li><strong>Eksplorasi Lowongan (UC-02):</strong> Mencari dan memfilter lowongan internal berdasarkan kata kunci, lokasi, divisi, tipe WFH/WFO, dan skill.</li>
+            <li><strong>Kirim Lamaran & CV (UC-03):</strong> Melamar pekerjaan dengan validasi berkas PDF maksimal 2 MB dan pencegahan duplikasi.</li>
+            <li><strong>Konfirmasi Instan:</strong> Menerima nomor ID lamaran unik dan bukti pengajuan.</li>
+            <li><strong>Pelacakan Mandiri (UC-12):</strong> Melihat linimasa riwayat status lamaran secara <em>real-time</em> (Diajukan → Diproses → Interview → Diterima/Ditolak).</li>
+            <li><strong>Akses Jadwal Seleksi:</strong> Melihat jadwal tes teknis atau jadwal interview yang ditetapkan HR.</li>
+          </ul>
+        </div>
+
+        <!-- Aktor 2: HR Recruiter / Admin -->
+        <div class="actor-card admin">
+          <div class="actor-title admin">
+            <span>🛡️ HR Recruiter / Admin</span>
+          </div>
+          <span class="actor-role">Role: Admin & Recruiter (Portal Staf)</span>
+          <p style="font-size: 11.5px; color: #64748b; margin-bottom: 12px;">
+            Akses melalui URL: <code>/admin/login</code> & <code>/admin</code>
+          </p>
+          <ul class="feature-list">
+            <li><strong>Kelola Lowongan (UC-01):</strong> Menambah lowongan baru, mengubah deskripsi/kualifikasi, serta membuka/menutup status publikasi lowongan.</li>
+            <li><strong>Tinjau Lamaran (UC-04):</strong> Melihat daftar seluruh pelamar yang masuk secara lengkap per lowongan.</li>
+            <li><strong>Screening Pelamar (UC-05):</strong> Memeriksa kesesuaian berkas CV dengan syarat posisi; menetapkan kandidat lolos (<em>Qualified</em>) atau ditolak.</li>
+            <li><strong>Jadwalkan Seleksi (UC-06):</strong> Menentukan jenis tes (Psikotes, Technical, Aptitude), tanggal jadwal, dan menunjuk Penilai yang bertugas.</li>
+            <li><strong>Papan Kanban Rekrutmen:</strong> Menggeser kartu kandidat lintas tahap seleksi secara dinamis.</li>
+            <li><strong>Pembaruan Status & Audit (UC-10):</strong> Mengubah status akhir disertai catatan alasan perubahan yang tercatat di <em>Audit Trail</em>.</li>
+            <li><strong>Catatan Internal Rahasia:</strong> Kolaborasi antar tim HR untuk mencatat diskusi rahasia terkait kandidat.</li>
+            <li><strong>Dashboard Analitik (UC-11):</strong> Melihat grafik jumlah pelamar per divisi dan metrik rata-rata durasi rekrutmen (<em>Time-to-Hire</em>).</li>
+          </ul>
+        </div>
+
+        <!-- Aktor 3: Penilai (Assessor / Interviewer) -->
+        <div class="actor-card penilai">
+          <div class="actor-title penilai">
+            <span>📝 Penilai / Assessor</span>
+          </div>
+          <span class="actor-role">Role: Interviewer (Portal Staf)</span>
+          <p style="font-size: 11.5px; color: #64748b; margin-bottom: 12px;">
+            Akses melalui URL: <code>/admin/login</code> & <code>/admin/evaluations</code>
+          </p>
+          <ul class="feature-list">
+            <li><strong>Portal Khusus Evaluasi:</strong> Antarmuka terfokus khusus untuk penilai tanpa terdistraksi menu administratif HR.</li>
+            <li><strong>Akses Kandidat Tertugaskan:</strong> Melihat daftar kandidat yang dijadwalkan untuk tes teknis atau sesi wawancara.</li>
+            <li><strong>Input Nilai Tes (UC-07):</strong> Memasukkan skor tes objektif (skala 0–100) untuk Technical Test, Psikotes, Aptitude, atau Personality Test.</li>
+            <li><strong>Pembeda Nilai 0 vs Belum Dinilai:</strong> Sistem secara presisi membedakan tes yang belum dikerjakan (NULL) dengan nilai nol murni (0).</li>
+            <li><strong>Input Catatan Evaluasi:</strong> Memberikan catatan observasi kualitatif mengenai kelebihan dan kelemahan kandidat.</li>
+            <li><strong>Penilaian Interview HR & User (UC-08):</strong> Calon atasan (User) dan tim asesor mengisi catatan kecocokan budaya (<em>culture fit</em>) dan kompetensi teknis.</li>
+            <li><strong>Kirim Rekomendasi Seleksi:</strong> Menyerahkan skor dan evaluasi akhir ke dashboard HR untuk bahan rapat keputusan final (UC-09).</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- BAB 3: SPESIFIKASI DETAIL USE CASE (UC-01 s/d UC-12) -->
+    <div class="page-break"></div>
+    <section>
+      <h2>3. Rincian Use Case Sistem (UC-01 s/d UC-12)</h2>
+      <p>
+        Berdasarkan model diagram use case sistem rekrutmen internal, berikut adalah rincian operasional ke-12 use case:
+      </p>
+
+      <table>
+        <thead>
+          <tr>
+            <th style="width: 10%;">Kode</th>
+            <th style="width: 20%;">Nama Use Case</th>
+            <th style="width: 14%;">Aktor Utama</th>
+            <th style="width: 38%;">Deskripsi Alur Operasional</th>
+            <th style="width: 18%;">Output & Dampak Sistem</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>UC-01</strong></td>
+            <td>Kelola Lowongan</td>
+            <td><span class="badge badge-info">HR Recruiter</span></td>
+            <td>HR mengisi judul posisi, divisi, jenis kerja (WFH/WFO/Hybrid), rentang gaji, kualifikasi skill, batas akhir lamaran, dan deskripsi tugas. Lowongan dapat disunting atau ditutup sewaktu-waktu.</td>
+            <td>Data tersimpan di tabel <code>jobs</code>; langsung tampil pada pencarian kandidat jika status <em>Active</em>.</td>
+          </tr>
+          <tr>
+            <td><strong>UC-02</strong></td>
+            <td>Cari & Filter Lowongan</td>
+            <td><span class="badge badge-success">Kandidat</span></td>
+            <td>Kandidat mencari lowongan melalui filter kata kunci nama posisi, lokasi domisili, divisi kerja, tipe fleksibilitas (WFH/WFO/Hybrid), dan spesifikasi keahlian.</td>
+            <td>Daftar lowongan tersaring secara dinamis tanpa me-reload seluruh halaman.</td>
+          </tr>
+          <tr>
+            <td><strong>UC-03</strong></td>
+            <td>Kirim Lamaran & CV</td>
+            <td><span class="badge badge-success">Kandidat</span></td>
+            <td>Kandidat membaca detail posisi, meninjau biodata profil, mengunggah berkas CV terbaru bertipe PDF maksimal 2 MB, lalu menekan tombol <em>Kirim Lamaran</em>.</td>
+            <td>Data tercatat di tabel <code>applications</code> dengan status awal <code>Diajukan</code>. Terbit bukti konfirmasi ID lamaran.</td>
+          </tr>
+          <tr>
+            <td><strong>UC-04</strong></td>
+            <td>Tinjau Lamaran Masuk</td>
+            <td><span class="badge badge-info">HR Recruiter</span></td>
+            <td>HR membuka halaman lamaran per lowongan untuk melihat jumlah pendaftar, waktu pengajuan, dan mengunduh berkas CV pelamar.</td>
+            <td>Daftar kandidat tersaji urut waktu; status belum diproses terlihat jelas.</td>
+          </tr>
+          <tr>
+            <td><strong>UC-05</strong></td>
+            <td>Screening Lamaran</td>
+            <td><span class="badge badge-info">HR Recruiter</span></td>
+            <td>HR mencocokkan kualifikasi CV dengan syarat posisi. Jika memenuhi kriteria, status diubah menjadi <em>Diproses (Qualified Candidate)</em>; jika tidak memenuhi, diberi keputusan <em>Ditolak</em>.</td>
+            <td>Status aplikasi terbarui; log audit trail mencatat waktu dan pelaku screening.</td>
+          </tr>
+          <tr>
+            <td><strong>UC-06</strong></td>
+            <td>Jadwalkan Seleksi</td>
+            <td><span class="badge badge-info">HR Recruiter</span></td>
+            <td>HR memilih jenis tes seleksi (Psikotes, Technical Test, Interview HR, Interview User), menentukan tanggal & jam pelaksanaan, serta menetapkan Penilai yang bertugas.</td>
+            <td>Tersimpan di tabel <code>assessments_and_interviews</code>; muncul di dashboard Penilai dan jadwal kandidat.</td>
+          </tr>
+          <tr>
+            <td><strong>UC-07</strong></td>
+            <td>Input Nilai Tes</td>
+            <td><span class="badge badge-warning">Penilai</span></td>
+            <td>Penilai membuka portal seleksi, menguji kandidat yang ditugaskan, dan memasukkan nilai angka skala 0–100 beserta catatan kekuatan/kelemahan teknis kandidat.</td>
+            <td>Kolom <code>score</code> dan <code>notes</code> pada tabel assessment terisi; status tes menjadi <em>Completed</em>.</td>
+          </tr>
+          <tr>
+            <td><strong>UC-08</strong></td>
+            <td>Nilai Interview</td>
+            <td><span class="badge badge-warning">Penilai / User</span></td>
+            <td>Interviewer HR dan calon atasan (User) melakukan sesi wawancara, menilai aspek kompetensi komunikasi, kepemimpinan, atau pemecahan masalah, lalu mencatat hasil evaluasi.</td>
+            <td>Hasil interview HR dan interview User tersimpan secara terpisah untuk menjaga objektivitas penilaian.</td>
+          </tr>
+          <tr>
+            <td><strong>UC-09</strong></td>
+            <td>Kompilasi Interview Result</td>
+            <td><span class="badge badge-info">HR Recruiter</span></td>
+            <td>HR meninjau ringkasan seluruh komponen nilai (Technical Test, Psikotes, HR Interview, User Interview) serta catatan evaluasi para penilai sebagai dasar pengambilan keputusan akhir.</td>
+            <td>Rangkuman skor rata-rata dan rekomendasi tampil pada panel detail kandidat.</td>
+          </tr>
+          <tr>
+            <td><strong>UC-10</strong></td>
+            <td>Perbarui Status Akhir</td>
+            <td><span class="badge badge-info">HR Recruiter</span></td>
+            <td>HR menetapkan keputusan akhir kandidat menjadi <em>Diterima (Hired)</em> atau <em>Ditolak</em>. Waktu penerimaan (<code>hired_at</code>) dicatat untuk perhitungan analitik durasi rekrutmen.</td>
+            <td>Kartu berpindah di Kanban; log audit mencatat alasan; notifikasi hasil terkirim ke akun kandidat.</td>
+          </tr>
+          <tr>
+            <td><strong>UC-11</strong></td>
+            <td>Dashboard Analitik HR</td>
+            <td><span class="badge badge-info">HR Recruiter</span></td>
+            <td>HR memantau metrik performa: jumlah pelamar per lowongan, rasio konversi seleksi, dan rata-rata waktu proses rekrutmen dari pendaftaran hingga diterima (<em>Time-to-Hire</em>).</td>
+            <td>Kalkulasi analitik otomatis dihitung dari data riil Supabase tanpa data mock.</td>
+          </tr>
+          <tr>
+            <td><strong>UC-12</strong></td>
+            <td>Lacak Lamaran (Self-Tracking)</td>
+            <td><span class="badge badge-success">Kandidat</span></td>
+            <td>Kandidat membuka menu riwayat lamarannya, melihat linimasa tahapan (Diajukan → Diproses → Interview → Hasil Akhir), serta membaca ringkasan instruksi tindak lanjut dari HR.</td>
+            <td>Kandidat memperoleh kepastian status tanpa perlu mengirim email konfirmasi manual.</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- BAB 4: ARSITEKTUR KEAMANAN & BASIS DATA -->
+    <div class="page-break"></div>
+    <section>
+      <h2>4. Arsitektur Basis Data, Validasi & Keamanan (Supabase)</h2>
+      <p>
+        Sistem dibangun di atas prinsip <strong>100% Data Riil (Zero Dummy Data)</strong> dengan perlindungan tingkat baris (<em>Row Level Security</em>) PostgreSQL:
+      </p>
+
+      <div class="callout">
+        <strong>Prinsip Penanganan Data Bersih:</strong>
+        Jika suatu tabel lowongan atau lamaran belum memiliki data, antarmuka akan menampilkan <em>Clean Zero-State</em> yang profesional, bukan menampilkan data tiruan (dummy). Semua kalkulasi metrik analitik dihitung langsung dari tanggal dan relasi data Supabase nyata.
+      </div>
+
+      <table>
+        <thead>
+          <tr>
+            <th style="width: 22%;">Nama Tabel</th>
+            <th style="width: 48%;">Struktur Kolom Utama</th>
+            <th style="width: 30%;">Aturan Keamanan (RLS Policy)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>public.profiles</code></td>
+            <td><code>id (FK auth.users)</code>, <code>email</code>, <code>full_name</code>, <code>role ('candidate'|'admin'|'recruiter'|'interviewer')</code>, <code>headline</code>, <code>skills</code>, <code>resume_url</code></td>
+            <td>Pengguna hanya dapat mengubah profil pribadi; Admin & Penilai dapat membaca profil kandidat terkait seleksi.</td>
+          </tr>
+          <tr>
+            <td><code>public.jobs</code></td>
+            <td><code>id</code>, <code>title</code>, <code>dept</code>, <code>type (WFH/WFO/Hybrid)</code>, <code>location</code>, <code>salary</code>, <code>required_skills</code>, <code>status ('Active'|'Closed')</code>, <code>deadline_date</code></td>
+            <td>Publik & Kandidat dapat membaca lowongan berstatus <em>Active</em>; Hanya HR Admin yang memiliki izin menambah, menyunting, dan menutup lowongan.</td>
+          </tr>
+          <tr>
+            <td><code>public.applications</code></td>
+            <td><code>id</code>, <code>candidate_id</code>, <code>job_id</code>, <code>status ('Diajukan'|'Diproses'|'Interview'|'Diterima'|'Ditolak')</code>, <code>stage_detail</code>, <code>resume_url</code>, <code>hired_at</code></td>
+            <td>Kandidat hanya dapat melihat lamaran milik sendiri; HR Admin mengelola seluruh lamaran; Satu kandidat dibatasi 1 lamaran aktif per posisi (<em>Unique Constraint</em>).</td>
+          </tr>
+          <tr>
+            <td><code>public.assessments_and_interviews</code></td>
+            <td><code>id</code>, <code>application_id</code>, <code>type (Psikotes|Technical|HR|User)</code>, <code>scheduled_at</code>, <code>evaluator_id</code>, <code>score (NUMERIC 0-100)</code>, <code>notes</code>, <code>status</code></td>
+            <td>Penilai hanya dapat mengisi nilai pada jadwal seleksi yang ditugaskan kepadanya; HR Admin dapat melihat rekapitulasi seluruh nilai.</td>
+          </tr>
+          <tr>
+            <td><code>public.audit_logs</code></td>
+            <td><code>id</code>, <code>application_id</code>, <code>old_status</code>, <code>new_status</code>, <code>stage_detail</code>, <code>changed_by_name</code>, <code>reason</code>, <code>created_at</code></td>
+            <td>Catatan audit bersifat <em>append-only</em> (tidak dapat diubah/dihapus) untuk menjamin akuntabilitas setiap perubahan status seleksi.</td>
+          </tr>
+          <tr>
+            <td><code>public.internal_notes</code></td>
+            <td><code>id</code>, <code>application_id</code>, <code>author_id</code>, <code>author_name</code>, <code>note_text</code>, <code>created_at</code></td>
+            <td>Bersifat rahasia; hanya dapat dibaca dan dibuat oleh HR Admin / Recruiter, tidak dapat diakses oleh Kandidat.</td>
+          </tr>
+          <tr>
+            <td><code>storage.buckets ('resumes')</code></td>
+            <td>Berkas CV PDF kandidat</td>
+            <td>Divalidasi ketat di sisi server (Server Actions): Hanya menerima ekstensi <code>.pdf</code> dengan ukuran berkas maksimal <strong>2 MB</strong>.</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3>Pemetaan Rute URL Aplikasi</h3>
+      <table>
+        <thead>
+          <tr>
+            <th style="width: 25%;">Area / Hak Akses</th>
+            <th style="width: 35%;">Alamat URL (Path)</th>
+            <th style="width: 40%;">Deskripsi Fungsi Halaman</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Portal Pelamar (Publik)</strong></td>
+            <td><code>/</code> & <code>/jobs</code></td>
+            <td>Halaman beranda penelusuran lowongan pekerjaan aktif dan filter kualifikasi.</td>
+          </tr>
+          <tr>
+            <td><strong>Autentikasi Pelamar</strong></td>
+            <td><code>/login</code> & <code>/register</code></td>
+            <td>Pendaftaran akun pelamar baru dan masuk ke portal kandidat.</td>
+          </tr>
+          <tr>
+            <td><strong>Dashboard Pelamar</strong></td>
+            <td><code>/dashboard</code> & <code>/dashboard/applications/[id]</code></td>
+            <td>Manajemen CV pribadi serta pelacakan linimasa status lamaran (Case 3 Self-Tracking).</td>
+          </tr>
+          <tr>
+            <td><strong>Autentikasi Khusus Staf</strong></td>
+            <td><code>/admin/login</code></td>
+            <td>Gerbang masuk terproteksi khusus tim HR Admin, Recruiter, dan Penilai (Interviewer).</td>
+          </tr>
+          <tr>
+            <td><strong>Dashboard HR Admin</strong></td>
+            <td><code>/admin</code> & <code>/admin/kanban</code></td>
+            <td>Ringkasan analitik rekrutmen, time-to-hire, serta papan visual Kanban pelamar.</td>
+          </tr>
+          <tr>
+            <td><strong>Portal Penilai</strong></td>
+            <td><code>/admin/evaluations</code></td>
+            <td>Halaman khusus penilai untuk penginputan skor tes (0–100) dan catatan evaluasi interview.</td>
+          </tr>
+          <tr>
+            <td><strong>Manajemen Lowongan</strong></td>
+            <td><code>/admin/jobs</code></td>
+            <td>Formulir pembuatan lowongan baru dan pengaturan status lowongan buka/tutup.</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- Footer Document -->
+    <footer class="doc-footer">
+      <div>
+        <strong>TalentHub Hiring & Recruitment Tracking System</strong> • Dokumen Spesifikasi Proses Bisnis & Panduan Peran Aktor
+      </div>
+      <div>
+        Dicetak secara otomatis • Versi Rilis Produksi 2026
+      </div>
+    </footer>
+
+  </div>
+
+</body>
+</html>
+
