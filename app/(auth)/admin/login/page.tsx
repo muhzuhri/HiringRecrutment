@@ -59,10 +59,19 @@ export default function AdminLoginPage() {
       <div className="max-w-md w-full space-y-6 relative z-10">
         {/* Brand Header */}
         <div className="text-center space-y-3">
+          <div className="flex justify-center mb-1">
+            <div className="h-14 w-14 rounded-2xl overflow-hidden bg-white p-1.5 border border-emerald-700/60 shadow-xl flex items-center justify-center">
+              <img
+                src="/nexora-logo.jpg"
+                alt="Nexora Digital Logo"
+                className="h-full w-full object-contain"
+              />
+            </div>
+          </div>
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#0c2b29] border border-emerald-700/60 shadow-lg">
-            <ShieldCheck className="w-4 h-4 text-emerald-400" />
-            <span className="text-xs font-bold text-emerald-300 uppercase tracking-wider">
-              Portal Staf & Penilai Terproteksi
+            <ShieldCheck className="w-4 h-4 text-teal-400" />
+            <span className="text-xs font-bold text-teal-300 uppercase tracking-wider">
+              Nexora Digital · Portal Staf
             </span>
           </div>
 
@@ -70,8 +79,8 @@ export default function AdminLoginPage() {
             Masuk Portal HR & Penilai
           </h1>
 
-          <p className="text-xs sm:text-sm text-emerald-200/80 max-w-sm mx-auto leading-relaxed">
-            Khusus Recruiter, HR Admin, dan <strong>Penilai / Assessor (UC-07 & UC-08)</strong> untuk evaluasi seleksi internal.
+          <p className="text-xs sm:text-sm text-slate-300 max-w-sm mx-auto leading-relaxed">
+            Khusus Recruiter, HR Admin, dan Tim Penilai untuk evaluasi seleksi internal.
           </p>
         </div>
 

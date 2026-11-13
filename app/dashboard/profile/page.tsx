@@ -4,7 +4,7 @@ import { getCandidateProfile } from "@/app/actions/candidate";
 import ProfileForm from "@/components/candidate/ProfileForm";
 
 export const metadata = {
-  title: "Profil Kandidat Komprehensif (Standar MagangHub) | TalentHub",
+  title: "Profil Saya | Nexora Digital",
   description: "Lengkapi data profil diri, riwayat pendidikan, sertifikasi, keahlian, pengalaman kerja, dan berkas CV PDF.",
 };
 

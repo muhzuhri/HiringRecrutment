@@ -316,7 +316,7 @@ export default function RegisterPage() {
                 <Link href="/privacy" className="text-emerald-800 font-bold hover:underline">
                   Kebijakan Privasi
                 </Link>{" "}
-                TalentHub.
+                Nexora Digital.
               </label>
             </div>
 

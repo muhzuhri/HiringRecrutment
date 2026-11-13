@@ -147,7 +147,7 @@ export async function getKanbanApplicants(jobIdFilter?: string): Promise<{ appli
     const [profilesRes, assessmentsRes] = await Promise.all([
       supabase
         .from("profiles")
-        .select("id, full_name, email, phone, education, resume_url, resume_name")
+        .select("id, full_name, email, phone, education, resume_url, resume_name, avatar_url, nik, ktp_url, ktp_name, address, headline, bio, skills, experience")
         .in("id", candidateIds),
       supabase
         .from("assessments_and_interviews")
@@ -225,6 +225,15 @@ export async function getKanbanApplicants(jobIdFilter?: string): Promise<{ appli
         candidate_name: prof?.full_name || `Kandidat #${item.id.slice(0, 5)}`,
         candidate_email: prof?.email || "pelamar@example.com",
         candidate_phone: prof?.phone || "-",
+        candidate_nik: prof?.nik || undefined,
+        candidate_ktp_url: prof?.ktp_url || undefined,
+        candidate_ktp_name: prof?.ktp_name || undefined,
+        candidate_avatar_url: prof?.avatar_url || undefined,
+        candidate_address: prof?.address || undefined,
+        candidate_headline: prof?.headline || undefined,
+        candidate_bio: prof?.bio || undefined,
+        candidate_skills: prof?.skills || [],
+        candidate_experience: prof?.experience || [],
         candidate_education_level: firstEdu.level || "S1",
         candidate_university: firstEdu.school || "Perguruan Tinggi",
         candidate_major: firstEdu.major || "-",
@@ -390,11 +399,18 @@ export async function scheduleAssessmentOrInterview(data: {
   type: AssessmentType;
   scheduled_at: string;
   evaluator_name: string;
+  location?: string;
+  notes?: string;
 }): Promise<{ success: boolean; error?: string }> {
   try {
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
     const authorName = user?.user_metadata?.full_name || user?.email || "Admin HR";
+
+    const formattedNotes = [
+      data.location ? `[Lokasi / Ruangan: ${data.location}]` : null,
+      data.notes ? data.notes.trim() : null,
+    ].filter(Boolean).join(" ");
 
     // 1. Check if an assessment of this type already exists for the candidate application
     const { data: existing } = await supabase
@@ -412,6 +428,7 @@ export async function scheduleAssessmentOrInterview(data: {
         .update({
           scheduled_at: data.scheduled_at,
           evaluator_name: data.evaluator_name,
+          notes: formattedNotes || null,
           status: "Scheduled",
         })
         .eq("id", existing.id);
@@ -421,6 +438,7 @@ export async function scheduleAssessmentOrInterview(data: {
         type: data.type,
         scheduled_at: data.scheduled_at,
         evaluator_name: data.evaluator_name,
+        notes: formattedNotes || null,
         score: null,
         status: "Scheduled",
       });
@@ -441,13 +459,14 @@ export async function scheduleAssessmentOrInterview(data: {
       .eq("id", data.application_id);
 
     // 3. Record Audit Trail
+    const locationSuffix = data.location ? ` | Lokasi: ${data.location}` : "";
     await supabase.from("audit_logs").insert({
       application_id: data.application_id,
       old_status: "Diproses",
       new_status: targetStatus,
       stage_detail: `Penjadwalan ${data.type}`,
       changed_by_name: authorName,
-      reason: `Jadwal ${data.type} ditetapkan pada ${new Date(data.scheduled_at).toLocaleString("id-ID")} dengan Penilai: ${data.evaluator_name}`,
+      reason: `Jadwal ${data.type} ditetapkan pada ${new Date(data.scheduled_at).toLocaleString("id-ID")} dengan Penilai: ${data.evaluator_name}${locationSuffix}`,
       created_at: new Date().toISOString(),
     });
 
@@ -582,6 +601,70 @@ export async function submitAssessmentEvaluation(data: {
 }
 
 /**
+ * Direct scoring from Kanban Board for HR Interview & User Interview
+ */
+export async function submitDirectStageScore(data: {
+  application_id: string;
+  stage_type: "Interview HR" | "Interview User";
+  score: number;
+  notes?: string;
+  evaluator_name?: string;
+}): Promise<{ success: boolean; error?: string }> {
+  try {
+    const supabase = await createClient();
+
+    if (data.score < 0 || data.score > 100) {
+      return { success: false, error: "Nilai evaluasi harus berada pada rentang 0 hingga 100." };
+    }
+
+    // Check if an assessment record already exists for this stage
+    const { data: existing } = await supabase
+      .from("assessments_and_interviews")
+      .select("id")
+      .eq("application_id", data.application_id)
+      .eq("type", data.stage_type)
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    if (existing) {
+      const { error: updErr } = await supabase
+        .from("assessments_and_interviews")
+        .update({
+          score: data.score,
+          notes: data.notes || "",
+          status: "Completed",
+          ...(data.evaluator_name ? { evaluator_name: data.evaluator_name } : {}),
+        })
+        .eq("id", existing.id);
+
+      if (updErr) return { success: false, error: updErr.message };
+    } else {
+      const { error: insErr } = await supabase
+        .from("assessments_and_interviews")
+        .insert({
+          application_id: data.application_id,
+          type: data.stage_type,
+          scheduled_at: new Date().toISOString(),
+          evaluator_name: data.evaluator_name || (data.stage_type === "Interview HR" ? "Tim HR" : "Calon Atasan / User"),
+          score: data.score,
+          notes: data.notes || "",
+          status: "Completed",
+        });
+
+      if (insErr) return { success: false, error: insErr.message };
+    }
+
+    revalidatePath("/admin/kanban");
+    revalidatePath("/admin/evaluations");
+    revalidatePath(`/admin/candidates/${data.application_id}`);
+    return { success: true };
+  } catch (err: any) {
+    return { success: false, error: err.message || "Gagal menyimpan nilai evaluasi." };
+  }
+}
+
+/**
  * CASE 2: Fetch All Assessments & Interviews for the Dedicated Evaluator / Selection Portal
  * Fulfills UC-07 (Input nilai tes) & UC-08 (Nilai interview)
  * Zero dummy data: returns only real database rows, empty if none exist.
@@ -590,10 +673,22 @@ export async function getAllAssessmentsWithCandidateInfo(): Promise<{ assessment
   try {
     const supabase = await createClient();
 
-    const [{ data: dbAssessments }, { data: dbApps }, { data: dbProfiles }] = await Promise.all([
+    let dbProfiles: any[] = [];
+    try {
+      const { data } = await supabase
+        .from("profiles")
+        .select("id, full_name, email, phone, nik, ktp_url, ktp_name, avatar_url, address, headline, bio, skills, education, experience, resume_url, resume_name");
+      if (data) dbProfiles = data;
+    } catch {
+      const { data } = await supabase
+        .from("profiles")
+        .select("id, full_name, email, phone, headline, skills, education, resume_url");
+      if (data) dbProfiles = data;
+    }
+
+    const [{ data: dbAssessments }, { data: dbApps }] = await Promise.all([
       supabase.from("assessments_and_interviews").select("*").order("scheduled_at", { ascending: false }),
       supabase.from("applications").select("id, candidate_id, job_title, department"),
-      supabase.from("profiles").select("id, full_name, email, phone, headline, skills, education, resume_url"),
     ]);
 
     if (!dbAssessments || dbAssessments.length === 0) {
@@ -613,13 +708,25 @@ export async function getAllAssessmentsWithCandidateInfo(): Promise<{ assessment
       return {
         id: asm.id,
         application_id: asm.application_id,
+        candidate_id: app?.candidate_id,
         candidate_name: prof?.full_name || "Kandidat Pelamar",
         candidate_email: prof?.email || "-",
         candidate_phone: prof?.phone || "-",
+        candidate_nik: prof?.nik || undefined,
+        candidate_ktp_url: prof?.ktp_url || undefined,
+        candidate_ktp_name: prof?.ktp_name || undefined,
+        candidate_avatar_url: prof?.avatar_url || undefined,
+        candidate_address: prof?.address || undefined,
         candidate_headline: prof?.headline || undefined,
+        candidate_bio: prof?.bio || undefined,
         candidate_skills: prof?.skills && Array.isArray(prof.skills) ? prof.skills : [],
         candidate_education: eduStr,
+        candidate_education_level: firstEdu.level || "S1",
+        candidate_university: firstEdu.school || undefined,
+        candidate_major: firstEdu.major || undefined,
+        candidate_experience: prof?.experience && Array.isArray(prof.experience) ? prof.experience : [],
         candidate_resume_url: prof?.resume_url || undefined,
+        candidate_resume_name: prof?.resume_name || "CV_Kandidat.pdf",
         job_title: app?.job_title || "Lowongan Terkait",
         department: app?.department || "Internal Company",
         type: asm.type,
@@ -727,19 +834,29 @@ export async function getCandidateDetailForScreening(
       id: profData?.id || appData.candidate_id,
       email: profData?.email || "pelamar@example.com",
       full_name: profData?.full_name || "Pelamar",
+      avatar_url: profData?.avatar_url || undefined,
+      nik: profData?.nik || undefined,
+      ktp_url: profData?.ktp_url || undefined,
+      ktp_name: profData?.ktp_name || undefined,
       phone: profData?.phone || "-",
       whatsapp: profData?.whatsapp || "-",
+      address: profData?.address || "",
       linkedin_url: profData?.linkedin_url || "",
       portfolio_url: profData?.portfolio_url || "",
       headline: profData?.headline || "Pelamar Pekerjaan",
       bio: profData?.bio || "",
       role: profData?.role || "candidate",
       education: profData?.education && Array.isArray(profData.education) ? profData.education : [],
+      certifications: profData?.certifications && Array.isArray(profData.certifications) ? profData.certifications : [],
       skills: profData?.skills && Array.isArray(profData.skills) ? profData.skills : [],
+      hard_skills: profData?.hard_skills || "",
+      soft_skills: profData?.soft_skills || "",
+      languages: profData?.languages || "",
       experience: profData?.experience && Array.isArray(profData.experience) ? profData.experience : [],
       resume_url: profData?.resume_url || undefined,
       resume_name: profData?.resume_name || undefined,
       profile_completed: profData?.profile_completed ?? true,
+      profile_score: profData?.profile_score ?? 100,
     };
 
     const assessments: AssessmentItem[] = (dbAssessments || []).map((a) => ({
@@ -1028,5 +1145,253 @@ export async function toggleJobStatus(jobId: string): Promise<{ success: boolean
     return { success: true, newStatus };
   } catch (err: any) {
     return { success: false, error: err.message || "Gagal mengubah status lowongan." };
+  }
+}
+
+/**
+ * ============================================================================
+ * 8. CRUD & FETCH AKUN STAF (HR & PENILAI)
+ * ============================================================================
+ */
+export interface StaffAccount {
+  id: string;
+  full_name: string;
+  email: string;
+  role: "admin" | "hr" | "interviewer" | "penilai";
+  created_at?: string;
+  avatar_url?: string | null;
+}
+
+export async function getStaffAccounts(): Promise<{
+  allStaff: StaffAccount[];
+  hrStaff: StaffAccount[];
+  penilaiStaff: StaffAccount[];
+}> {
+  try {
+    const supabase = await createClient();
+    const { data: dbStaff } = await supabase
+      .from("profiles")
+      .select("id, full_name, email, role, avatar_url, created_at")
+      .in("role", ["admin", "hr", "interviewer", "penilai"])
+      .order("created_at", { ascending: true });
+
+    let staffList: StaffAccount[] = (dbStaff || []).map((s) => ({
+      id: s.id,
+      full_name: s.full_name || s.email.split("@")[0],
+      email: s.email,
+      role: s.role as any,
+      created_at: s.created_at,
+      avatar_url: s.avatar_url,
+    }));
+
+    // Sediakan default staf jika belum ada di database
+    if (!staffList.some((s) => s.role === "admin" || s.role === "hr")) {
+      staffList.push({
+        id: "default-hr",
+        full_name: "Sarah Wijaya (Lead Recruiter HR)",
+        email: "admin@talenthub.com",
+        role: "admin",
+      });
+    }
+
+    if (!staffList.some((s) => s.role === "interviewer" || s.role === "penilai")) {
+      staffList.push({
+        id: "default-penilai",
+        full_name: "Dr. Bambang / Tim Penilai",
+        email: "penilai@talenthub.com",
+        role: "interviewer",
+      });
+    }
+
+    const hrStaff = staffList.filter((s) => s.role === "admin" || s.role === "hr");
+    const penilaiStaff = staffList.filter((s) => s.role === "interviewer" || s.role === "penilai");
+
+    return { allStaff: staffList, hrStaff, penilaiStaff };
+  } catch (err) {
+    console.warn("getStaffAccounts fallback:", err);
+    return {
+      allStaff: [],
+      hrStaff: [
+        {
+          id: "default-hr",
+          full_name: "Sarah Wijaya (Lead Recruiter HR)",
+          email: "admin@talenthub.com",
+          role: "admin",
+        },
+      ],
+      penilaiStaff: [
+        {
+          id: "default-penilai",
+          full_name: "Dr. Bambang / Tim Penilai",
+          email: "penilai@talenthub.com",
+          role: "interviewer",
+        },
+      ],
+    };
+  }
+}
+
+export async function createStaffAccount(data: {
+  full_name: string;
+  email: string;
+  password?: string;
+  role: "admin" | "hr" | "interviewer" | "penilai";
+}): Promise<{ success: boolean; error?: string }> {
+  try {
+    const supabase = await createClient();
+    const cleanEmail = data.email.trim().toLowerCase();
+
+    // Map role to valid Supabase database constraint: ('candidate', 'recruiter', 'admin', 'interviewer')
+    const validDbRole: "admin" | "interviewer" =
+      data.role === "penilai" || data.role === "interviewer" ? "interviewer" : "admin";
+
+    // Cek apakah email sudah terdaftar
+    const { data: existing } = await supabase
+      .from("profiles")
+      .select("id")
+      .eq("email", cleanEmail)
+      .maybeSingle();
+
+    if (existing) {
+      return { success: false, error: "Akun staf dengan email tersebut sudah terdaftar." };
+    }
+
+    const pwd = data.password || "TalentHub2026!";
+    const { data: authData, error: authErr } = await supabase.auth.signUp({
+      email: cleanEmail,
+      password: pwd,
+      options: {
+        data: {
+          full_name: data.full_name.trim(),
+          role: validDbRole,
+        },
+      },
+    });
+
+    const newUserId = authData?.user?.id || crypto.randomUUID();
+
+    // Simpan ke profiles dengan role yang valid
+    const { error: profErr } = await supabase.from("profiles").upsert({
+      id: newUserId,
+      email: cleanEmail,
+      full_name: data.full_name.trim(),
+      role: validDbRole,
+      updated_at: new Date().toISOString(),
+    });
+
+    if (profErr) {
+      console.warn("createStaffAccount profile upsert notice:", profErr.message);
+    }
+
+    revalidatePath("/admin/users");
+    revalidatePath("/admin/kanban");
+    revalidatePath("/admin/evaluations");
+    return { success: true };
+  } catch (err: any) {
+    return { success: false, error: err.message || "Gagal membuat akun staf." };
+  }
+}
+
+export async function updateStaffAccount(
+  id: string,
+  data: { full_name: string; role: "admin" | "hr" | "interviewer" | "penilai" }
+): Promise<{ success: boolean; error?: string }> {
+  try {
+    if (id.startsWith("default-")) {
+      return { success: true };
+    }
+
+    const supabase = await createClient();
+    
+    // Map role to valid Supabase database constraint: ('candidate', 'recruiter', 'admin', 'interviewer')
+    const validDbRole: "admin" | "interviewer" =
+      data.role === "penilai" || data.role === "interviewer" ? "interviewer" : "admin";
+
+    const { error } = await supabase
+      .from("profiles")
+      .update({
+        full_name: data.full_name.trim(),
+        role: validDbRole,
+        updated_at: new Date().toISOString(),
+      })
+      .eq("id", id);
+
+    if (error) {
+      return { success: false, error: error.message };
+    }
+
+    revalidatePath("/admin/users");
+    revalidatePath("/admin/kanban");
+    revalidatePath("/admin/evaluations");
+    return { success: true };
+  } catch (err: any) {
+    return { success: false, error: err.message || "Gagal memperbarui data staf." };
+  }
+}
+
+export async function deleteStaffAccount(id: string): Promise<{ success: boolean; error?: string }> {
+  try {
+    if (id.startsWith("default-")) {
+      return { success: true };
+    }
+
+    const supabase = await createClient();
+    const { error } = await supabase.from("profiles").delete().eq("id", id);
+    if (error) {
+      return { success: false, error: error.message };
+    }
+    revalidatePath("/admin/users");
+    revalidatePath("/admin/kanban");
+    revalidatePath("/admin/evaluations");
+    return { success: true };
+  } catch (err: any) {
+    return { success: false, error: err.message || "Gagal menghapus akun staf." };
+  }
+}
+
+export async function updateStaffSelfProfile(data: {
+  full_name: string;
+  phone?: string;
+  avatar_url?: string;
+  password?: string;
+}): Promise<{ success: boolean; error?: string }> {
+  try {
+    const supabase = await createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      return { success: false, error: "Sesi login Anda telah berakhir." };
+    }
+
+    if (data.password && data.password.trim().length >= 6) {
+      const { error: pwdErr } = await supabase.auth.updateUser({
+        password: data.password.trim(),
+      });
+      if (pwdErr) {
+        return { success: false, error: `Gagal mengubah kata sandi: ${pwdErr.message}` };
+      }
+    }
+
+    const { error: profErr } = await supabase
+      .from("profiles")
+      .update({
+        full_name: data.full_name.trim(),
+        phone: data.phone?.trim() || null,
+        avatar_url: data.avatar_url?.trim() || null,
+        updated_at: new Date().toISOString(),
+      })
+      .eq("id", user.id);
+
+    if (profErr) {
+      return { success: false, error: profErr.message };
+    }
+
+    revalidatePath("/admin/profile");
+    revalidatePath("/admin");
+    return { success: true };
+  } catch (err: any) {
+    return { success: false, error: err.message || "Gagal memperbarui profil." };
   }
 }

@@ -29,8 +29,19 @@ export async function getJobsFromSupabase(
       return { jobs: [] };
     }
 
+    // Filter out closed and expired jobs (pass deadline date)
+    const activeData = data.filter((row: any) => {
+      if (row.status && (row.status.toLowerCase() === "closed" || row.status.toLowerCase() === "nonaktif")) {
+        return false;
+      }
+      if (row.deadline_date && new Date(row.deadline_date) < new Date()) {
+        return false;
+      }
+      return true;
+    });
+
     // Map DB rows to Job interface
-    const mappedJobs: Job[] = data.map((row: any) => ({
+    const mappedJobs: Job[] = activeData.map((row: any) => ({
       id: String(row.id),
       title: row.title,
       dept: row.dept,

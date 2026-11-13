@@ -5,7 +5,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 
 export const metadata = {
-  title: "Daftar Lamaran Saya | TalentHub Candidate",
+  title: "Daftar Lamaran Saya | Nexora Digital",
   description: "Daftar seluruh lamaran kerja yang diajukan beserta status tahapan seleksi terstruktur.",
 };
 

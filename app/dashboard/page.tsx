@@ -4,7 +4,7 @@ import { getCandidateProfile, getCandidateApplications } from "@/app/actions/can
 import CandidateDashboard from "@/components/candidate/CandidateDashboard";
 
 export const metadata = {
-  title: "Dashboard Lamaran Saya | TalentHub",
+  title: "Dashboard Kandidat | Nexora Digital",
   description: "Daftar lamaran pekerjaan kandidat, status terkini, dan statistik progres.",
 };
 
@@ -23,11 +23,6 @@ export default async function DashboardPage() {
     getCandidateProfile(),
     getCandidateApplications(),
   ]);
-
-  // Otomatis alihkan pengguna bermerek Admin / Recruiter ke portal HR Admin
-  if (profile?.role === "admin" || profile?.role === "recruiter") {
-    redirect("/admin");
-  }
 
   return (
     <CandidateDashboard

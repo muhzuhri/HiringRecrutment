@@ -70,7 +70,9 @@ export interface CandidateProfile {
   full_name: string;
   first_name?: string;
   last_name?: string;
-  nik?: string; // NIK / Nomor Identitas
+  nik?: string; // NIK / Nomor Identitas KTP (16 digit unik)
+  ktp_url?: string; // URL file/foto KTP (max 2MB)
+  ktp_name?: string; // Nama file KTP
   phone?: string;
   whatsapp?: string;
   address?: string; // Alamat Domisili
@@ -80,7 +82,7 @@ export interface CandidateProfile {
   headline?: string;
   bio?: string; // Ringkasan Profil / About Me
   avatar_url?: string;
-  role: 'candidate' | 'recruiter' | 'admin' | 'interviewer';
+  role: 'candidate' | 'recruiter' | 'admin' | 'interviewer' | 'hr' | 'penilai';
   education: EducationItem[];
   certifications?: CertificationItem[]; // Sertifikasi & Pelatihan
   skills: string[]; // Key skills list
@@ -91,6 +93,7 @@ export interface CandidateProfile {
   resume_url?: string;
   resume_name?: string;
   profile_completed: boolean;
+  profile_score?: number; // Skor kelengkapan profil (0 - 100%)
   created_at?: string;
   updated_at?: string;
 }

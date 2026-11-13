@@ -5,9 +5,9 @@ import { getJobsFromSupabase } from "@/app/actions/jobs";
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "Beranda | TalentHub",
+  title: "Beranda | Nexora Digital",
   description:
-    "Temukan karier impianmu bersama TalentHub. Bergabung dengan ratusan profesional yang telah membangun karier cemerlang bersama kami.",
+    "Temukan karier impianmu bersama Nexora Digital. Bergabung dengan ratusan profesional yang telah membangun karier cemerlang bersama kami.",
 };
 
 export default async function HomePage() {

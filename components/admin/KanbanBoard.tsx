@@ -3,9 +3,16 @@
 import React, { useState } from "react";
 import { CandidateApplicantCard, KanbanStageKey } from "@/types/admin";
 import { ApplicationStatus, AssessmentType } from "@/types/candidate";
-import { updateApplicantStatus, scheduleAssessmentOrInterview, revertKanbanStage } from "@/app/actions/admin";
+import {
+  updateApplicantStatus,
+  scheduleAssessmentOrInterview,
+  revertKanbanStage,
+  submitDirectStageScore,
+  StaffAccount,
+} from "@/app/actions/admin";
 import AutoTagBadge from "./AutoTagBadge";
 import ClickableDateTimePicker from "./ClickableDateTimePicker";
+import CandidateDetailModal, { CandidateDetailData } from "./CandidateDetailModal";
 import Link from "next/link";
 import {
   Search,
@@ -28,11 +35,15 @@ import {
   Sparkles,
   Layers,
   Check,
+  Building2,
+  Lock,
 } from "lucide-react";
 
 interface KanbanBoardProps {
   initialApplicants: CandidateApplicantCard[];
   jobsList: { id: string; title: string }[];
+  hrStaff?: StaffAccount[];
+  penilaiStaff?: StaffAccount[];
 }
 
 const KANBAN_COLUMNS: {
@@ -101,7 +112,12 @@ const KANBAN_COLUMNS: {
   },
 ];
 
-export default function KanbanBoard({ initialApplicants, jobsList }: KanbanBoardProps) {
+export default function KanbanBoard({
+  initialApplicants,
+  jobsList,
+  hrStaff = [],
+  penilaiStaff = [],
+}: KanbanBoardProps) {
   const [applicants, setApplicants] = useState<CandidateApplicantCard[]>(initialApplicants);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedJobId, setSelectedJobId] = useState("Semua");
@@ -110,16 +126,147 @@ export default function KanbanBoard({ initialApplicants, jobsList }: KanbanBoard
   const [activeStageTab, setActiveStageTab] = useState<string>("all");
   const [updatingId, setUpdatingId] = useState<string | null>(null);
 
+  // Review Candidate Modal State
+  const [selectedReviewCandidate, setSelectedReviewCandidate] = useState<CandidateDetailData | null>(null);
+
   // Quick Schedule Modal State for Kanban
   const [scheduleTargetApp, setScheduleTargetApp] = useState<CandidateApplicantCard | null>(null);
   const [scheduleModalMode, setScheduleModalMode] = useState<"test" | "interview_hr" | "interview_user">("test");
   const [schedType, setSchedType] = useState<AssessmentType>("Technical Test");
   const [schedDateTime, setSchedDateTime] = useState<string>("");
-  const [schedEvaluator, setSchedEvaluator] = useState<string>("Dr. Bambang / Tim Penilai & Interviewer");
+  const [schedEvaluator, setSchedEvaluator] = useState<string>("");
   const [isSchedCustom, setIsSchedCustom] = useState<boolean>(false);
   const [customSchedEvaluator, setCustomSchedEvaluator] = useState<string>("");
+  const [schedLocation, setSchedLocation] = useState<string>("");
+  const [schedNotes, setSchedNotes] = useState<string>("");
   const [loadingSched, setLoadingSched] = useState<boolean>(false);
   const [toastMsg, setToastMsg] = useState<string | null>(null);
+
+  // Direct Grading Modal State (for giving HR / User interview score directly from Kanban)
+  const [directGradeApp, setDirectGradeApp] = useState<CandidateApplicantCard | null>(null);
+  const [directGradeMode, setDirectGradeMode] = useState<"interview_hr" | "interview_user">("interview_hr");
+  const [directScoreInput, setDirectScoreInput] = useState<string>("");
+  const [directNotesInput, setDirectNotesInput] = useState<string>("");
+  const [directEvaluatorInput, setDirectEvaluatorInput] = useState<string>("");
+  const [loadingDirectGrade, setLoadingDirectGrade] = useState<boolean>(false);
+
+  // Open Direct Grade Modal
+  const openDirectGradeModal = (
+    app: CandidateApplicantCard,
+    mode: "interview_hr" | "interview_user"
+  ) => {
+    setDirectGradeApp(app);
+    setDirectGradeMode(mode);
+    if (mode === "interview_hr") {
+      setDirectScoreInput(
+        app.hr_interview_score !== null && app.hr_interview_score !== undefined
+          ? String(app.hr_interview_score)
+          : ""
+      );
+      setDirectEvaluatorInput(
+        app.hr_interview_evaluator || hrStaff[0]?.full_name || "Sarah Wijaya (Lead Recruiter HR)"
+      );
+      setDirectNotesInput(app.hr_interview_notes || "");
+    } else {
+      setDirectScoreInput(
+        app.user_interview_score !== null && app.user_interview_score !== undefined
+          ? String(app.user_interview_score)
+          : ""
+      );
+      setDirectEvaluatorInput(
+        app.user_interview_evaluator || "Calon Atasan / User Lead"
+      );
+      setDirectNotesInput(app.user_interview_notes || "");
+    }
+  };
+
+  // Submit Direct Grade
+  const handleDirectGradeSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!directGradeApp) return;
+
+    const parsedScore = parseFloat(directScoreInput);
+    if (isNaN(parsedScore) || parsedScore < 0 || parsedScore > 100) {
+      alert("Nilai harus berupa angka antara 0 hingga 100.");
+      return;
+    }
+
+    setLoadingDirectGrade(true);
+    const stageType = directGradeMode === "interview_hr" ? "Interview HR" : "Interview User";
+    const res = await submitDirectStageScore({
+      application_id: directGradeApp.id,
+      stage_type: stageType,
+      score: parsedScore,
+      notes: directNotesInput.trim(),
+      evaluator_name: directEvaluatorInput.trim(),
+    });
+    setLoadingDirectGrade(false);
+
+    if (res.success) {
+      setApplicants((prev) =>
+        prev.map((item) => {
+          if (item.id !== directGradeApp.id) return item;
+          if (directGradeMode === "interview_hr") {
+            return {
+              ...item,
+              hr_interview_score: parsedScore,
+              hr_interview_notes: directNotesInput.trim(),
+              hr_interview_evaluator: directEvaluatorInput.trim(),
+            };
+          } else {
+            return {
+              ...item,
+              user_interview_score: parsedScore,
+              user_interview_notes: directNotesInput.trim(),
+              user_interview_evaluator: directEvaluatorInput.trim(),
+            };
+          }
+        })
+      );
+      setToastMsg(`Nilai ${stageType} untuk ${directGradeApp.candidate_name} berhasil disimpan!`);
+      setDirectGradeApp(null);
+      setTimeout(() => setToastMsg(null), 4000);
+    } else {
+      alert(res.error || "Gagal menyimpan nilai.");
+    }
+  };
+
+  // Handler to open full review modal
+  const handleOpenReviewModal = (app: CandidateApplicantCard) => {
+    setSelectedReviewCandidate({
+      id: app.id,
+      candidate_id: app.candidate_id,
+      candidate_name: app.candidate_name,
+      candidate_email: app.candidate_email,
+      candidate_phone: app.candidate_phone,
+      candidate_nik: app.candidate_nik,
+      candidate_ktp_url: app.candidate_ktp_url,
+      candidate_ktp_name: app.candidate_ktp_name,
+      candidate_avatar_url: app.candidate_avatar_url,
+      candidate_address: app.candidate_address,
+      candidate_headline: app.candidate_headline,
+      candidate_bio: app.candidate_bio,
+      job_title: app.job_title,
+      department: app.department,
+      skills: app.candidate_skills || [],
+      education: [
+        {
+          level: app.candidate_education_level || "S1",
+          school: app.candidate_university || "Perguruan Tinggi",
+          major: app.candidate_major || "-",
+        },
+      ],
+      experience: app.candidate_experience || [],
+      resume_url: app.resume_url,
+      resume_name: app.resume_name,
+      test_score: app.test_score,
+      test_evaluator: app.test_evaluator,
+      hr_interview_score: app.hr_interview_score,
+      hr_interview_evaluator: app.hr_interview_evaluator,
+      user_interview_score: app.user_interview_score,
+      user_interview_evaluator: app.user_interview_evaluator,
+    });
+  };
 
   // Open Schedule Modal tailored to the stage
   const openScheduleModal = (
@@ -129,18 +276,26 @@ export default function KanbanBoard({ initialApplicants, jobsList }: KanbanBoard
     setScheduleTargetApp(applicant);
     setScheduleModalMode(mode);
     setSchedDateTime("");
-    setIsSchedCustom(false);
-    setCustomSchedEvaluator("");
+    setSchedLocation("");
+    setSchedNotes("");
 
     if (mode === "test") {
       setSchedType("Technical Test");
-      setSchedEvaluator("Dr. Bambang / Tim Penilai & Interviewer");
+      const firstPenilai = penilaiStaff[0]?.full_name || "Dr. Bambang / Tim Penilai";
+      setSchedEvaluator(firstPenilai);
+      setIsSchedCustom(false);
+      setCustomSchedEvaluator("");
     } else if (mode === "interview_hr") {
       setSchedType("Interview HR");
-      setSchedEvaluator("Sarah Wijaya (Lead Recruiter HR)");
+      const firstHr = hrStaff[0]?.full_name || "Sarah Wijaya (Lead Recruiter HR)";
+      setSchedEvaluator(firstHr);
+      setIsSchedCustom(false);
+      setCustomSchedEvaluator("");
     } else if (mode === "interview_user") {
       setSchedType("Interview User");
-      setSchedEvaluator("Interviewer User (Calon Atasan / Tech Lead)");
+      setSchedEvaluator("");
+      setIsSchedCustom(true);
+      setCustomSchedEvaluator("");
     }
   };
 
@@ -152,9 +307,24 @@ export default function KanbanBoard({ initialApplicants, jobsList }: KanbanBoard
       return;
     }
 
-    const finalEvaluator = isSchedCustom ? customSchedEvaluator.trim() : schedEvaluator;
+    const finalEvaluator =
+      scheduleModalMode === "interview_user"
+        ? customSchedEvaluator.trim()
+        : isSchedCustom
+        ? customSchedEvaluator.trim()
+        : schedEvaluator.trim();
+
     if (!finalEvaluator) {
-      alert("Tentukan nama penilai / interviewer.");
+      alert(
+        scheduleModalMode === "interview_user"
+          ? "Ketikkan nama Calon Atasan (User / Tech Lead)."
+          : "Pilih atau tentukan nama penilai / interviewer."
+      );
+      return;
+    }
+
+    if (!schedLocation.trim()) {
+      alert("Masukkan informasi lokasi, gedung/ruangan atau link pertemuan.");
       return;
     }
 
@@ -164,6 +334,8 @@ export default function KanbanBoard({ initialApplicants, jobsList }: KanbanBoard
       type: schedType,
       scheduled_at: new Date(schedDateTime).toISOString(),
       evaluator_name: finalEvaluator,
+      location: schedLocation.trim(),
+      notes: schedNotes.trim() || undefined,
     });
     setLoadingSched(false);
 
@@ -298,29 +470,25 @@ export default function KanbanBoard({ initialApplicants, jobsList }: KanbanBoard
   return (
     <div className="space-y-6">
       {/* Top Header Summary Bar */}
-      <div className="bg-white dark:bg-[#0c2b29] border border-slate-200 dark:border-emerald-800/40 rounded-2xl p-5 sm:p-6 shadow-sm space-y-4 transition-colors">
+      <div className="bg-white dark:bg-[#0c2b29] border border-slate-200/80 dark:border-teal-800/40 rounded-2xl p-4 sm:p-5 shadow-2xs space-y-4 transition-colors">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100 dark:bg-emerald-950 border border-slate-300 dark:border-emerald-700/50 text-xs font-semibold text-slate-700 dark:text-emerald-300">
-              <Layers className="w-3.5 h-3.5 text-slate-700 dark:text-emerald-400" />
-              Pipeline Seleksi Bertahap Linear
-            </span>
-            <h1 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white mt-1">
-              Papan Kanban Rekrutmen (7 Tahapan)
+            <h1 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight">
+              Papan Kanban Rekrutmen
             </h1>
-            <p className="text-xs text-slate-500 dark:text-emerald-200/80">
-              Alur seleksi transparan terintegrasi: <span className="text-slate-800 dark:text-white font-semibold">Diajukan → Screening HR → Assessment/Tes → Interview HR → Interview User → Keputusan Akhir</span>
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+              Pantau status tahapan seleksi dan jadwal wawancara kandidat.
             </p>
           </div>
 
           {/* Dual View Mode Toggle */}
-          <div className="flex items-center gap-1 bg-slate-100 dark:bg-[#061f1d] p-1 rounded-xl border border-slate-200 dark:border-emerald-800/60 shrink-0 self-start md:self-auto">
+          <div className="flex items-center gap-1 bg-slate-100 dark:bg-[#061f1d] p-1 rounded-xl border border-slate-200/80 dark:border-teal-800/40 shrink-0 self-start md:self-auto">
             <button
               type="button"
               onClick={() => setViewMode("kanban")}
-              className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
                 viewMode === "kanban"
-                  ? "bg-slate-900 text-white shadow-sm dark:bg-emerald-600"
+                  ? "bg-[#0F766E] text-white shadow-2xs"
                   : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
               }`}
             >
@@ -330,14 +498,14 @@ export default function KanbanBoard({ initialApplicants, jobsList }: KanbanBoard
             <button
               type="button"
               onClick={() => setViewMode("tab")}
-              className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
                 viewMode === "tab"
-                  ? "bg-slate-900 text-white shadow-sm dark:bg-emerald-600"
+                  ? "bg-[#0F766E] text-white shadow-2xs"
                   : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
               }`}
             >
               <ListFilter className="w-3.5 h-3.5" />
-              <span>Mode Daftar Tab</span>
+              <span>Mode Tabel</span>
             </button>
           </div>
         </div>
@@ -616,52 +784,41 @@ export default function KanbanBoard({ initialApplicants, jobsList }: KanbanBoard
                             {/* ========================================================== */}
                             {/* ACTION CONTROLS PER STAGE                                  */}
                             {/* ========================================================== */}
-                            <div className="pt-1.5 border-t border-slate-100 dark:border-emerald-950 flex items-center justify-between gap-1 flex-wrap">
-                              {/* Left Actions: Review or Reschedule */}
+                            <div className="pt-2 border-t border-slate-100 dark:border-teal-900/60 flex items-center justify-between gap-1.5 flex-wrap">
+                              {/* Left Actions: Review Full Profile */}
                               <div className="flex items-center gap-1">
-                                <Link
-                                  href={`/admin/candidates/${applicant.id}`}
-                                  className="px-2 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-emerald-950 dark:hover:bg-emerald-900 text-slate-700 dark:text-emerald-300 border border-slate-200 dark:border-emerald-800 text-[10px] font-semibold flex items-center gap-1 transition-colors"
-                                  title="Tinjau Berkas & CV"
+                                <button
+                                  type="button"
+                                  onClick={() => handleOpenReviewModal(applicant)}
+                                  className="px-2.5 py-1 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-teal-950 dark:hover:bg-teal-900 text-slate-700 dark:text-teal-200 border border-slate-200 dark:border-teal-800 text-[10px] font-bold flex items-center gap-1 transition-colors cursor-pointer"
+                                  title="Tinjau Seluruh Data Profil, NIK, KTP & CV"
                                 >
-                                  <Eye className="w-3 h-3" />
+                                  <Eye className="w-3 h-3 text-[#0F766E] dark:text-teal-400" />
                                   <span>Review</span>
-                                </Link>
+                                </button>
 
-                                {/* Reschedule buttons in testing/interview stages */}
-                                {col.id === "assessment" && (
+                                {/* Direct Grade indicator/edit button when already scored */}
+                                {col.id === "interview_hr" && applicant.hr_interview_score !== null && applicant.hr_interview_score !== undefined && (
                                   <button
                                     type="button"
-                                    onClick={() => openScheduleModal(applicant, "test")}
-                                    className="px-2 py-1 rounded-lg bg-purple-50 hover:bg-purple-100 dark:bg-[#0c2b29] dark:hover:bg-emerald-900 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-800 text-[10px] font-semibold flex items-center gap-1 transition-colors cursor-pointer"
-                                    title="Ubah Jadwal Tes"
+                                    onClick={() => openDirectGradeModal(applicant, "interview_hr")}
+                                    className="px-2 py-1 rounded-xl bg-teal-50 dark:bg-teal-950/70 hover:bg-teal-100 dark:hover:bg-teal-900 text-[#0F766E] dark:text-teal-300 text-[10px] font-bold flex items-center gap-0.5 border border-teal-200 dark:border-teal-800 transition-colors cursor-pointer"
+                                    title="Klik untuk mengubah nilai interview HR"
                                   >
-                                    <Calendar className="w-3 h-3 text-purple-600 dark:text-purple-400" />
-                                    <span>Jadwal</span>
+                                    <Award className="w-3 h-3" />
+                                    <span>Nilai: {applicant.hr_interview_score}</span>
                                   </button>
                                 )}
 
-                                {col.id === "interview_hr" && (
+                                {col.id === "interview_user" && applicant.user_interview_score !== null && applicant.user_interview_score !== undefined && (
                                   <button
                                     type="button"
-                                    onClick={() => openScheduleModal(applicant, "interview_hr")}
-                                    className="px-2 py-1 rounded-lg bg-indigo-50 hover:bg-indigo-100 dark:bg-[#0c2b29] dark:hover:bg-emerald-900 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 text-[10px] font-semibold flex items-center gap-1 transition-colors cursor-pointer"
-                                    title="Ubah Jadwal Interview HR"
+                                    onClick={() => openDirectGradeModal(applicant, "interview_user")}
+                                    className="px-2 py-1 rounded-xl bg-teal-50 dark:bg-teal-950/70 hover:bg-teal-100 dark:hover:bg-teal-900 text-[#0F766E] dark:text-teal-300 text-[10px] font-bold flex items-center gap-0.5 border border-teal-200 dark:border-teal-800 transition-colors cursor-pointer"
+                                    title="Klik untuk mengubah nilai interview calon atasan (user)"
                                   >
-                                    <Calendar className="w-3 h-3 text-indigo-600 dark:text-indigo-400" />
-                                    <span>Jadwal</span>
-                                  </button>
-                                )}
-
-                                {col.id === "interview_user" && (
-                                  <button
-                                    type="button"
-                                    onClick={() => openScheduleModal(applicant, "interview_user")}
-                                    className="px-2 py-1 rounded-lg bg-cyan-50 hover:bg-cyan-100 dark:bg-[#0c2b29] dark:hover:bg-emerald-900 text-cyan-700 dark:text-cyan-300 border border-cyan-200 dark:border-cyan-800 text-[10px] font-semibold flex items-center gap-1 transition-colors cursor-pointer"
-                                    title="Ubah Jadwal Interview User"
-                                  >
-                                    <Calendar className="w-3 h-3 text-cyan-600 dark:text-cyan-400" />
-                                    <span>Jadwal</span>
+                                    <Award className="w-3 h-3" />
+                                    <span>Nilai: {applicant.user_interview_score}</span>
                                   </button>
                                 )}
                               </div>
@@ -673,7 +830,7 @@ export default function KanbanBoard({ initialApplicants, jobsList }: KanbanBoard
                                   <button
                                     type="button"
                                     onClick={() => handleRevertStage(applicant.id, "diajukan")}
-                                    className="p-1 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-[#0c2b29] dark:hover:bg-emerald-900 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-emerald-800 hover:text-slate-900 dark:hover:text-white transition-colors"
+                                    className="p-1 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-[#0c2b29] dark:hover:bg-teal-900 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-teal-800 hover:text-slate-900 dark:hover:text-white transition-colors cursor-pointer"
                                     title="Kembalikan ke Diajukan"
                                   >
                                     <ChevronLeft className="w-3.5 h-3.5" />
@@ -683,7 +840,7 @@ export default function KanbanBoard({ initialApplicants, jobsList }: KanbanBoard
                                   <button
                                     type="button"
                                     onClick={() => handleRevertStage(applicant.id, "screening")}
-                                    className="p-1 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-[#0c2b29] dark:hover:bg-emerald-900 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-emerald-800 hover:text-slate-900 dark:hover:text-white transition-colors"
+                                    className="p-1 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-[#0c2b29] dark:hover:bg-teal-900 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-teal-800 hover:text-slate-900 dark:hover:text-white transition-colors cursor-pointer"
                                     title="Kembalikan ke Screening HR"
                                   >
                                     <ChevronLeft className="w-3.5 h-3.5" />
@@ -693,7 +850,7 @@ export default function KanbanBoard({ initialApplicants, jobsList }: KanbanBoard
                                   <button
                                     type="button"
                                     onClick={() => handleRevertStage(applicant.id, "assessment")}
-                                    className="p-1 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-[#0c2b29] dark:hover:bg-emerald-900 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-emerald-800 hover:text-slate-900 dark:hover:text-white transition-colors"
+                                    className="p-1 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-[#0c2b29] dark:hover:bg-teal-900 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-teal-800 hover:text-slate-900 dark:hover:text-white transition-colors cursor-pointer"
                                     title="Kembalikan ke Assessment / Tes"
                                   >
                                     <ChevronLeft className="w-3.5 h-3.5" />
@@ -703,7 +860,7 @@ export default function KanbanBoard({ initialApplicants, jobsList }: KanbanBoard
                                   <button
                                     type="button"
                                     onClick={() => handleRevertStage(applicant.id, "interview_hr")}
-                                    className="p-1 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-[#0c2b29] dark:hover:bg-emerald-900 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-emerald-800 hover:text-slate-900 dark:hover:text-white transition-colors"
+                                    className="p-1 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-[#0c2b29] dark:hover:bg-teal-900 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-teal-800 hover:text-slate-900 dark:hover:text-white transition-colors cursor-pointer"
                                     title="Kembalikan ke Interview HR"
                                   >
                                     <ChevronLeft className="w-3.5 h-3.5" />
@@ -713,14 +870,14 @@ export default function KanbanBoard({ initialApplicants, jobsList }: KanbanBoard
                                   <button
                                     type="button"
                                     onClick={() => handleRevertStage(applicant.id, "interview_user")}
-                                    className="p-1 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-[#0c2b29] dark:hover:bg-emerald-900 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-emerald-800 hover:text-slate-900 dark:hover:text-white transition-colors"
+                                    className="p-1 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-[#0c2b29] dark:hover:bg-teal-900 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-teal-800 hover:text-slate-900 dark:hover:text-white transition-colors cursor-pointer"
                                     title="Kembalikan ke Interview User"
                                   >
                                     <ChevronLeft className="w-3.5 h-3.5" />
                                   </button>
                                 )}
 
-                                {/* Forward Progression Buttons */}
+                                {/* Forward Progression Buttons with Strict Gates & Direct Scoring */}
                                 {col.id === "diajukan" && (
                                   <button
                                     type="button"
@@ -732,7 +889,7 @@ export default function KanbanBoard({ initialApplicants, jobsList }: KanbanBoard
                                         "Lolos verifikasi awal berkas, masuk ke tahap Screening HR."
                                       )
                                     }
-                                    className="px-2 py-1 rounded-lg bg-slate-900 dark:bg-emerald-600 hover:bg-slate-800 dark:hover:bg-emerald-500 text-white text-[10px] font-bold flex items-center gap-0.5 shadow-xs transition-all cursor-pointer"
+                                    className="px-2.5 py-1 rounded-xl bg-[#0F766E] hover:bg-[#0d6962] text-white text-[10px] font-bold flex items-center gap-0.5 shadow-2xs transition-all cursor-pointer"
                                     title="Mulai Screening CV"
                                   >
                                     <span>Screening</span>
@@ -744,7 +901,7 @@ export default function KanbanBoard({ initialApplicants, jobsList }: KanbanBoard
                                   <button
                                     type="button"
                                     onClick={() => openScheduleModal(applicant, "test")}
-                                    className="px-2.5 py-1 rounded-lg bg-purple-600 hover:bg-purple-700 text-white text-[10px] font-bold flex items-center gap-1 shadow-xs transition-all cursor-pointer"
+                                    className="px-2.5 py-1 rounded-xl bg-[#0F766E] hover:bg-[#0d6962] text-white text-[10px] font-bold flex items-center gap-1 shadow-2xs transition-all cursor-pointer"
                                     title="Kandidat lolos screening, tentukan jadwal tes"
                                   >
                                     <span>Lolos ke Tes</span>
@@ -752,47 +909,86 @@ export default function KanbanBoard({ initialApplicants, jobsList }: KanbanBoard
                                   </button>
                                 )}
 
+                                {/* Strict Gate 1: Dari Tes ke Interview HR wajib ada nilai tes */}
                                 {col.id === "assessment" && (
-                                  <button
-                                    type="button"
-                                    onClick={() => openScheduleModal(applicant, "interview_hr")}
-                                    className="px-2.5 py-1 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-[10px] font-bold flex items-center gap-1 shadow-xs transition-all cursor-pointer"
-                                    title="Loloskan kandidat ke sesi wawancara HR"
-                                  >
-                                    <span>Ke Interview HR</span>
-                                    <ChevronRight className="w-3 h-3" />
-                                  </button>
+                                  applicant.test_score !== null && applicant.test_score !== undefined ? (
+                                    <button
+                                      type="button"
+                                      onClick={() => openScheduleModal(applicant, "interview_hr")}
+                                      className="px-2.5 py-1 rounded-xl bg-[#0F766E] hover:bg-[#0d6962] text-white text-[10px] font-bold flex items-center gap-1 shadow-2xs transition-all cursor-pointer"
+                                      title="Nilai tes terpenuhi, lanjutkan ke sesi wawancara HR"
+                                    >
+                                      <span>Ke Interview HR</span>
+                                      <ChevronRight className="w-3 h-3" />
+                                    </button>
+                                  ) : (
+                                    <button
+                                      type="button"
+                                      disabled
+                                      className="px-2 py-1 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-500 text-[10px] font-semibold flex items-center gap-1 border border-slate-200 dark:border-slate-700 cursor-not-allowed opacity-80"
+                                      title="Penilai belum menginput nilai tes untuk kandidat ini."
+                                    >
+                                      <Clock className="w-3 h-3 text-amber-500 shrink-0" />
+                                      <span>Menunggu Nilai Tes</span>
+                                    </button>
+                                  )
                                 )}
 
+                                {/* Strict Gate 2: Direct Grade Button or Advance to Interview User */}
                                 {col.id === "interview_hr" && (
-                                  <button
-                                    type="button"
-                                    onClick={() => openScheduleModal(applicant, "interview_user")}
-                                    className="px-2.5 py-1 rounded-lg bg-cyan-600 hover:bg-cyan-700 text-white text-[10px] font-bold flex items-center gap-1 shadow-xs transition-all cursor-pointer"
-                                    title="Loloskan kandidat ke sesi wawancara calon atasan (user)"
-                                  >
-                                    <span>Ke Interview User</span>
-                                    <ChevronRight className="w-3 h-3" />
-                                  </button>
+                                  applicant.hr_interview_score !== null && applicant.hr_interview_score !== undefined ? (
+                                    <button
+                                      type="button"
+                                      onClick={() => openScheduleModal(applicant, "interview_user")}
+                                      className="px-2.5 py-1 rounded-xl bg-[#0F766E] hover:bg-[#0d6962] text-white text-[10px] font-bold flex items-center gap-1 shadow-2xs transition-all cursor-pointer"
+                                      title="Nilai HR terpenuhi, jadwalkan wawancara calon atasan (user)"
+                                    >
+                                      <span>Ke Interview User</span>
+                                      <ChevronRight className="w-3 h-3" />
+                                    </button>
+                                  ) : (
+                                    <button
+                                      type="button"
+                                      onClick={() => openDirectGradeModal(applicant, "interview_hr")}
+                                      className="px-2.5 py-1 rounded-xl bg-amber-500 hover:bg-amber-600 text-white text-[10px] font-bold flex items-center gap-1 shadow-2xs transition-all cursor-pointer"
+                                      title="Klik untuk langsung memberikan nilai wawancara HR"
+                                    >
+                                      <Award className="w-3 h-3" />
+                                      <span>Beri Nilai HR</span>
+                                    </button>
+                                  )
                                 )}
 
+                                {/* Strict Gate 3: Direct Grade Button or Advance to Diterima */}
                                 {col.id === "interview_user" && (
-                                  <button
-                                    type="button"
-                                    onClick={() =>
-                                      handleDirectStageChange(
-                                        applicant.id,
-                                        "diterima",
-                                        "Diterima",
-                                        "Kandidat dinyatakan Lolos & Diterima setelah seluruh rangkaian seleksi."
-                                      )
-                                    }
-                                    className="px-2.5 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-[10px] font-extrabold flex items-center gap-1 shadow-xs transition-all cursor-pointer"
-                                    title="Terima Kandidat & Berikan Penawaran Kerja"
-                                  >
-                                    <span>Terima Kandidat</span>
-                                    <Check className="w-3 h-3" />
-                                  </button>
+                                  applicant.user_interview_score !== null && applicant.user_interview_score !== undefined ? (
+                                    <button
+                                      type="button"
+                                      onClick={() =>
+                                        handleDirectStageChange(
+                                          applicant.id,
+                                          "diterima",
+                                          "Diterima",
+                                          "Kandidat dinyatakan Lolos & Diterima setelah seluruh rangkaian seleksi."
+                                        )
+                                      }
+                                      className="px-2.5 py-1 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-[10px] font-bold flex items-center gap-1 shadow-2xs transition-all cursor-pointer"
+                                      title="Terima Kandidat & Berikan Penawaran Kerja"
+                                    >
+                                      <Check className="w-3 h-3" />
+                                      <span>Lolos (Diterima)</span>
+                                    </button>
+                                  ) : (
+                                    <button
+                                      type="button"
+                                      onClick={() => openDirectGradeModal(applicant, "interview_user")}
+                                      className="px-2.5 py-1 rounded-xl bg-amber-500 hover:bg-amber-600 text-white text-[10px] font-bold flex items-center gap-1 shadow-2xs transition-all cursor-pointer"
+                                      title="Klik untuk langsung memberikan nilai wawancara calon atasan (user)"
+                                    >
+                                      <Award className="w-3 h-3" />
+                                      <span>Beri Nilai User</span>
+                                    </button>
+                                  )
                                 )}
 
                                 {/* Reject Button */}
@@ -880,7 +1076,6 @@ export default function KanbanBoard({ initialApplicants, jobsList }: KanbanBoard
                 <tr>
                   <th className="px-4 py-3">Nama Kandidat & Email</th>
                   <th className="px-3 py-3">Posisi Lowongan</th>
-                  <th className="px-3 py-3">Pendidikan</th>
                   <th className="px-3 py-3">Tahapan Seleksi</th>
                   <th className="px-3 py-3">Jadwal & Penilai</th>
                   <th className="px-3 py-3">Skor Evaluasi</th>
@@ -897,7 +1092,7 @@ export default function KanbanBoard({ initialApplicants, jobsList }: KanbanBoard
                   if (displayList.length === 0) {
                     return (
                       <tr>
-                        <td colSpan={7} className="p-8 text-center text-slate-400 text-xs">
+                        <td colSpan={6} className="p-8 text-center text-slate-400 text-xs">
                           Tidak ditemukan pelamar pada filter/tahap ini.
                         </td>
                       </tr>
@@ -907,24 +1102,21 @@ export default function KanbanBoard({ initialApplicants, jobsList }: KanbanBoard
                   return displayList.map((app) => (
                     <tr key={app.id} className="hover:bg-slate-50 dark:hover:bg-[#061f1d]/60 transition-colors group">
                       <td className="px-4 py-3">
-                        <Link
-                          href={`/admin/candidates/${app.id}`}
-                          className="font-bold text-slate-900 dark:text-white hover:text-emerald-600 dark:hover:text-emerald-300 transition-colors block text-xs"
+                        <button
+                          type="button"
+                          onClick={() => handleOpenReviewModal(app)}
+                          className="font-bold text-slate-900 dark:text-white hover:text-teal-600 dark:hover:text-teal-400 transition-colors text-left block text-xs cursor-pointer"
                         >
                           {app.candidate_name}
-                        </Link>
+                        </button>
                         <p className="text-[11px] text-slate-500 dark:text-emerald-200/70">{app.candidate_email}</p>
                       </td>
                       <td className="px-3 py-3">
                         <span className="font-semibold text-slate-800 dark:text-emerald-100 text-xs">{app.job_title}</span>
                         <p className="text-[10px] text-slate-500">{app.department}</p>
                       </td>
-                      <td className="px-3 py-3 text-xs">
-                        <p className="font-bold text-slate-800 dark:text-white">{app.candidate_education_level || "S1"}</p>
-                        <p className="text-[10px] text-slate-500">{app.candidate_university || "-"}</p>
-                      </td>
-                      <td className="px-3 py-3">
-                        <span className="px-2.5 py-0.5 rounded-full bg-slate-100 dark:bg-emerald-950 border border-slate-300 dark:border-emerald-700 text-slate-800 dark:text-emerald-300 font-bold text-[10px]">
+                      <td className="px-3 py-3 whitespace-nowrap">
+                        <span className="whitespace-nowrap inline-flex items-center justify-center px-3 py-1 rounded-full bg-slate-100 dark:bg-[#061f1d] border border-slate-300 dark:border-teal-700/60 text-slate-800 dark:text-teal-300 font-bold text-[10px] min-w-[130px]">
                           {KANBAN_COLUMNS.find((c) => c.id === app.kanban_stage)?.title || app.status}
                         </span>
                       </td>
@@ -962,47 +1154,160 @@ export default function KanbanBoard({ initialApplicants, jobsList }: KanbanBoard
                       </td>
                       <td className="px-3 py-3 text-[11px]">
                         <div className="space-y-0.5">
-                          <p className="text-purple-700 dark:text-purple-300">Tes: {app.test_score !== null && app.test_score !== undefined ? `${app.test_score}/100` : "-"}</p>
-                          <p className="text-indigo-700 dark:text-indigo-300">HR: {app.hr_interview_score !== null && app.hr_interview_score !== undefined ? `${app.hr_interview_score}/100` : "-"}</p>
-                          <p className="text-cyan-700 dark:text-cyan-300">User: {app.user_interview_score !== null && app.user_interview_score !== undefined ? `${app.user_interview_score}/100` : "-"}</p>
+                          <p className="text-purple-700 dark:text-purple-300 font-medium">Tes: {app.test_score !== null && app.test_score !== undefined ? `${app.test_score}/100` : "-"}</p>
+                          <p className="text-indigo-700 dark:text-indigo-300 font-medium">HR: {app.hr_interview_score !== null && app.hr_interview_score !== undefined ? `${app.hr_interview_score}/100` : "-"}</p>
+                          <p className="text-cyan-700 dark:text-cyan-300 font-medium">User: {app.user_interview_score !== null && app.user_interview_score !== undefined ? `${app.user_interview_score}/100` : "-"}</p>
                         </div>
                       </td>
                       <td className="px-4 py-3 text-center">
-                        <div className="flex items-center justify-center gap-1.5">
-                          <Link
-                            href={`/admin/candidates/${app.id}`}
-                            className="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-emerald-950 dark:hover:bg-emerald-900 text-slate-700 dark:text-emerald-300 border border-slate-300 dark:border-emerald-800 text-[11px] font-semibold transition-colors"
+                        <div className="flex items-center justify-center gap-1.5 flex-wrap">
+                          <button
+                            type="button"
+                            onClick={() => handleOpenReviewModal(app)}
+                            className="p-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-700 transition-colors cursor-pointer"
+                            title="Review kandidat"
                           >
-                            <Eye className="w-3 h-3" />
-                            <span>Review</span>
-                          </Link>
+                            <Eye className="w-3.5 h-3.5 text-[#0F766E] dark:text-teal-400" />
+                          </button>
+
+                          {app.kanban_stage === "diajukan" && (
+                            <button
+                              type="button"
+                              disabled={updatingId === app.id}
+                              onClick={() =>
+                                handleDirectStageChange(
+                                  app.id,
+                                  "screening",
+                                  "Diproses",
+                                  "Kandidat masuk ke tahap screening CV oleh tim HR."
+                                )
+                              }
+                              className="p-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 dark:bg-teal-600 dark:hover:bg-teal-500 text-white transition-colors cursor-pointer"
+                              title="Screening CV"
+                            >
+                              <ChevronRight className="w-3.5 h-3.5" />
+                            </button>
+                          )}
 
                           {app.kanban_stage === "screening" && (
                             <button
                               type="button"
                               onClick={() => openScheduleModal(app, "test")}
-                              className="px-2.5 py-1 rounded-lg bg-purple-600 hover:bg-purple-700 text-white text-[11px] font-bold transition-colors cursor-pointer"
+                              className="p-1.5 rounded-lg bg-teal-600 hover:bg-teal-700 text-white transition-colors cursor-pointer"
+                              title="Jadwalkan Tes"
                             >
-                              Jadwalkan Tes
+                              <Calendar className="w-3.5 h-3.5" />
                             </button>
                           )}
+
                           {app.kanban_stage === "assessment" && (
-                            <button
-                              type="button"
-                              onClick={() => openScheduleModal(app, "interview_hr")}
-                              className="px-2.5 py-1 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-[11px] font-bold transition-colors cursor-pointer"
-                            >
-                              Jadwalkan HR
-                            </button>
+                            app.test_score === null || app.test_score === undefined ? (
+                              <button
+                                type="button"
+                                disabled
+                                title="Menunggu nilai tes dimasukkan oleh penilai"
+                                className="p-1.5 rounded-lg bg-slate-200 dark:bg-slate-800 text-slate-400 dark:text-slate-500 cursor-not-allowed"
+                              >
+                                <Lock className="w-3.5 h-3.5" />
+                              </button>
+                            ) : (
+                              <button
+                                type="button"
+                                onClick={() => openScheduleModal(app, "interview_hr")}
+                                className="p-1.5 rounded-lg bg-teal-600 hover:bg-teal-700 text-white transition-colors cursor-pointer"
+                                title="Jadwalkan Interview HR"
+                              >
+                                <Calendar className="w-3.5 h-3.5" />
+                              </button>
+                            )
                           )}
+
                           {app.kanban_stage === "interview_hr" && (
-                            <button
-                              type="button"
-                              onClick={() => openScheduleModal(app, "interview_user")}
-                              className="px-2.5 py-1 rounded-lg bg-cyan-600 hover:bg-cyan-700 text-white text-[11px] font-bold transition-colors cursor-pointer"
-                            >
-                              Jadwalkan User
-                            </button>
+                            <>
+                              {app.hr_interview_score === null || app.hr_interview_score === undefined ? (
+                                <button
+                                  type="button"
+                                  onClick={() => openDirectGradeModal(app, "interview_hr")}
+                                  className="p-1.5 rounded-lg bg-amber-500 hover:bg-amber-600 text-white transition-colors cursor-pointer animate-pulse"
+                                  title="Beri Nilai HR"
+                                >
+                                  <Award className="w-3.5 h-3.5" />
+                                </button>
+                              ) : (
+                                <div className="flex items-center gap-1">
+                                  <button
+                                    type="button"
+                                    onClick={() => openDirectGradeModal(app, "interview_hr")}
+                                    className="p-1.5 rounded-lg bg-teal-50 dark:bg-teal-950/60 hover:bg-teal-100 dark:hover:bg-teal-900 text-[#0F766E] dark:text-teal-300 border border-teal-200 dark:border-teal-800 transition-colors cursor-pointer"
+                                    title={`Nilai HR: ${app.hr_interview_score}/100 — klik untuk ubah`}
+                                  >
+                                    <Award className="w-3.5 h-3.5" />
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={() => openScheduleModal(app, "interview_user")}
+                                    className="p-1.5 rounded-lg bg-[#0F766E] hover:bg-[#0d6962] text-white transition-colors cursor-pointer"
+                                    title="Jadwalkan Interview User"
+                                  >
+                                    <Calendar className="w-3.5 h-3.5" />
+                                  </button>
+                                </div>
+                              )}
+                            </>
+                          )}
+
+                          {app.kanban_stage === "interview_user" && (
+                            <>
+                              {app.user_interview_score === null || app.user_interview_score === undefined ? (
+                                <button
+                                  type="button"
+                                  onClick={() => openDirectGradeModal(app, "interview_user")}
+                                  className="p-1.5 rounded-lg bg-amber-500 hover:bg-amber-600 text-white transition-colors cursor-pointer animate-pulse"
+                                  title="Beri Nilai User"
+                                >
+                                  <Award className="w-3.5 h-3.5" />
+                                </button>
+                              ) : (
+                                <div className="flex items-center gap-1">
+                                  <button
+                                    type="button"
+                                    onClick={() => openDirectGradeModal(app, "interview_user")}
+                                    className="p-1.5 rounded-lg bg-teal-50 dark:bg-teal-950/60 hover:bg-teal-100 dark:hover:bg-teal-900 text-[#0F766E] dark:text-teal-300 border border-teal-200 dark:border-teal-800 transition-colors cursor-pointer"
+                                    title={`Nilai User: ${app.user_interview_score}/100 — klik untuk ubah`}
+                                  >
+                                    <Award className="w-3.5 h-3.5" />
+                                  </button>
+                                  <button
+                                    type="button"
+                                    disabled={updatingId === app.id}
+                                    onClick={() =>
+                                      handleDirectStageChange(
+                                        app.id,
+                                        "diterima",
+                                        "Diterima",
+                                        "Kandidat dinyatakan lolos seluruh tahapan seleksi (Tes, HR, User)."
+                                      )
+                                    }
+                                    className="p-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white transition-colors cursor-pointer"
+                                    title="Terima Kandidat"
+                                  >
+                                    <Check className="w-3.5 h-3.5" />
+                                  </button>
+                                </div>
+                              )}
+                            </>
+                          )}
+
+                          {app.kanban_stage === "diterima" && (
+                            <span className="text-emerald-600 dark:text-emerald-400 font-bold text-[11px]">
+                              ✓ Lolos Seleksi
+                            </span>
+                          )}
+
+                          {app.kanban_stage === "ditolak" && (
+                            <span className="text-rose-600 dark:text-rose-400 font-medium text-[11px]">
+                              Ditolak
+                            </span>
                           )}
                         </div>
                       </td>
@@ -1095,55 +1400,109 @@ export default function KanbanBoard({ initialApplicants, jobsList }: KanbanBoard
                 required
               />
 
+              {/* Lokasi / Gedung / Ruangan / Link Meeting */}
               <div>
                 <label className="block font-bold text-slate-700 dark:text-emerald-300 uppercase tracking-wider mb-1">
-                  Pilih Penilai / Interviewer yang Bertugas *
+                  Lokasi / Ruangan / Link Pertemuan *
                 </label>
-                <select
-                  value={isSchedCustom ? "custom" : schedEvaluator}
-                  onChange={(e) => {
-                    if (e.target.value === "custom") {
-                      setIsSchedCustom(true);
-                    } else {
-                      setIsSchedCustom(false);
-                      setSchedEvaluator(e.target.value);
+                <div className="relative">
+                  <Building2 className="w-4 h-4 text-slate-400 absolute left-3 top-3 pointer-events-none" />
+                  <input
+                    type="text"
+                    required
+                    value={schedLocation}
+                    onChange={(e) => setSchedLocation(e.target.value)}
+                    placeholder={
+                      scheduleModalMode === "test"
+                        ? "Misal: Lab Komputer Gd. B Lt. 2 atau Link Google Meet"
+                        : "Misal: Ruang Rapat HR Lt. 3 atau Link Google Meet"
                     }
-                  }}
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-[#061f1d] border border-slate-300 dark:border-emerald-800 text-slate-900 dark:text-white focus:outline-none focus:border-slate-800 dark:focus:border-emerald-500 mb-2"
-                >
-                  {scheduleModalMode === "test" && (
-                    <>
-                      <option value="Dr. Bambang / Tim Penilai & Interviewer">Dr. Bambang / Tim Penilai & Interviewer (Penilai Resmi)</option>
-                      <option value="Assessor Psikotes & Aptitude">Assessor Psikotes & Aptitude</option>
-                      <option value="Lead Technical Assessor">Lead Technical Assessor</option>
-                    </>
-                  )}
-                  {scheduleModalMode === "interview_hr" && (
-                    <>
-                      <option value="Sarah Wijaya (Lead Recruiter HR)">Sarah Wijaya (Lead Recruiter HR)</option>
-                      <option value="Tim Talent Acquisition & HRBP">Tim Talent Acquisition & HRBP</option>
-                      <option value="Dr. Bambang / Tim Penilai & Interviewer">Dr. Bambang / Tim Penilai & Interviewer</option>
-                    </>
-                  )}
-                  {scheduleModalMode === "interview_user" && (
-                    <>
-                      <option value="Interviewer User (Calon Atasan / Tech Lead)">Interviewer User (Calon Atasan / Tech Lead)</option>
-                      <option value="Engineering Manager / VP of Tech">Engineering Manager / VP of Tech</option>
-                      <option value="Dr. Bambang / Tim Penilai & Interviewer">Dr. Bambang / Tim Penilai & Interviewer</option>
-                    </>
-                  )}
-                  <option value="custom">+ Masukkan Nama Penilai Lainnya...</option>
-                </select>
+                    className="w-full pl-9 pr-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-[#061f1d] border border-slate-300 dark:border-emerald-800 text-slate-900 dark:text-white focus:outline-none focus:border-slate-800 dark:focus:border-emerald-500 text-xs"
+                  />
+                </div>
+              </div>
 
-                {isSchedCustom && (
+              {/* Catatan Tambahan (Opsional) */}
+              <div>
+                <label className="block font-bold text-slate-700 dark:text-emerald-300 uppercase tracking-wider mb-1">
+                  Catatan Tambahan untuk Kandidat (Opsional)
+                </label>
+                <textarea
+                  rows={2}
+                  value={schedNotes}
+                  onChange={(e) => setSchedNotes(e.target.value)}
+                  placeholder="Misal: Harap hadir 15 menit lebih awal dan membawa portofolio..."
+                  className="w-full px-3.5 py-2 rounded-xl bg-slate-50 dark:bg-[#061f1d] border border-slate-300 dark:border-emerald-800 text-slate-900 dark:text-white focus:outline-none focus:border-slate-800 dark:focus:border-emerald-500 text-xs resize-none"
+                />
+              </div>
+
+              {/* Penilai / Pewawancara */}
+              <div>
+                <label className="block font-bold text-slate-700 dark:text-emerald-300 uppercase tracking-wider mb-1">
+                  {scheduleModalMode === "interview_user"
+                    ? "Nama Calon Atasan (User / Tech Lead) *"
+                    : "Pilih Penilai / Pewawancara yang Bertugas *"}
+                </label>
+
+                {scheduleModalMode === "interview_user" ? (
                   <input
                     type="text"
                     required
                     value={customSchedEvaluator}
                     onChange={(e) => setCustomSchedEvaluator(e.target.value)}
-                    placeholder="Ketik nama penilai / pewawancara..."
-                    className="w-full px-3.5 py-2 rounded-xl bg-slate-50 dark:bg-[#061f1d] border border-slate-300 dark:border-emerald-500 text-slate-900 dark:text-white focus:outline-none text-xs"
+                    placeholder="Ketik nama Calon Atasan (misal: Budi Santoso - Head of Engineering)"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-[#061f1d] border border-slate-300 dark:border-emerald-800 text-slate-900 dark:text-white focus:outline-none focus:border-slate-800 dark:focus:border-emerald-500 text-xs"
                   />
+                ) : (
+                  <>
+                    <select
+                      value={isSchedCustom ? "custom" : schedEvaluator}
+                      onChange={(e) => {
+                        if (e.target.value === "custom") {
+                          setIsSchedCustom(true);
+                        } else {
+                          setIsSchedCustom(false);
+                          setSchedEvaluator(e.target.value);
+                        }
+                      }}
+                      className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-[#061f1d] border border-slate-300 dark:border-emerald-800 text-slate-900 dark:text-white focus:outline-none focus:border-slate-800 dark:focus:border-emerald-500 mb-2"
+                    >
+                      {scheduleModalMode === "test" && (
+                        penilaiStaff && penilaiStaff.length > 0 ? (
+                          penilaiStaff.map((p) => (
+                            <option key={p.id} value={p.full_name}>
+                              {p.full_name} ({p.role.toUpperCase()})
+                            </option>
+                          ))
+                        ) : (
+                          <option value="Dr. Bambang / Tim Penilai">Dr. Bambang / Tim Penilai (Penilai Resmi)</option>
+                        )
+                      )}
+                      {scheduleModalMode === "interview_hr" && (
+                        hrStaff && hrStaff.length > 0 ? (
+                          hrStaff.map((h) => (
+                            <option key={h.id} value={h.full_name}>
+                              {h.full_name} ({h.role.toUpperCase()})
+                            </option>
+                          ))
+                        ) : (
+                          <option value="Sarah Wijaya (Lead Recruiter HR)">Sarah Wijaya (Lead Recruiter HR)</option>
+                        )
+                      )}
+                      <option value="custom">+ Masukkan Nama Penilai Lainnya...</option>
+                    </select>
+
+                    {isSchedCustom && (
+                      <input
+                        type="text"
+                        required
+                        value={customSchedEvaluator}
+                        onChange={(e) => setCustomSchedEvaluator(e.target.value)}
+                        placeholder="Ketik nama penilai / pewawancara..."
+                        className="w-full px-3.5 py-2 rounded-xl bg-slate-50 dark:bg-[#061f1d] border border-slate-300 dark:border-emerald-500 text-slate-900 dark:text-white focus:outline-none text-xs"
+                      />
+                    )}
+                  </>
                 )}
               </div>
 
@@ -1163,6 +1522,123 @@ export default function KanbanBoard({ initialApplicants, jobsList }: KanbanBoard
                 >
                   {loadingSched && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
                   <span>Simpan Jadwal & Loloskan</span>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Candidate Comprehensive Profile & Detail Modal */}
+      {selectedReviewCandidate && (
+        <CandidateDetailModal
+          data={selectedReviewCandidate}
+          onClose={() => setSelectedReviewCandidate(null)}
+        />
+      )}
+
+      {/* Modal Input Nilai Langsung (Direct Scoring HR / User) */}
+      {directGradeApp && (
+        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white dark:bg-[#0c2b29] border border-slate-200 dark:border-teal-800/80 rounded-2xl max-w-md w-full shadow-2xl p-6 text-xs text-slate-700 dark:text-slate-300 animate-scale-up space-y-4">
+            <div className="flex items-center justify-between border-b border-slate-100 dark:border-teal-900 pb-3">
+              <div className="flex items-center gap-2">
+                <div className="p-2 rounded-xl bg-teal-50 dark:bg-teal-950 text-[#0F766E] dark:text-teal-400">
+                  <Award className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="font-extrabold text-sm text-slate-900 dark:text-white">
+                    {directGradeMode === "interview_hr"
+                      ? "Beri Nilai Interview HR"
+                      : "Beri Nilai Interview User (Calon Atasan)"}
+                  </h3>
+                  <p className="text-[10px] text-slate-500 dark:text-teal-300/80">
+                    Input skor wawancara langsung dari papan rekrutmen
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setDirectGradeApp(null)}
+                className="text-slate-400 hover:text-slate-600 dark:hover:text-white p-1 rounded-lg hover:bg-slate-100 dark:hover:bg-teal-900/50 transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="p-3 bg-slate-50 dark:bg-[#061f1d] rounded-xl border border-slate-200 dark:border-teal-900 space-y-0.5">
+              <p className="font-bold text-slate-900 dark:text-white text-xs">
+                {directGradeApp.candidate_name}
+              </p>
+              <p className="text-[11px] text-slate-500 dark:text-teal-200/80">
+                {directGradeApp.job_title} &bull; {directGradeApp.department}
+              </p>
+            </div>
+
+            <form onSubmit={handleDirectGradeSubmit} className="space-y-3.5">
+              <div>
+                <label className="block text-[11px] font-bold text-slate-700 dark:text-slate-300 mb-1">
+                  Nama Pewawancara / Penilai *
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={directEvaluatorInput}
+                  onChange={(e) => setDirectEvaluatorInput(e.target.value)}
+                  placeholder={
+                    directGradeMode === "interview_hr"
+                      ? "Contoh: Sarah Wijaya (HR Lead)"
+                      : "Contoh: Budi Santoso (Calon Atasan)"
+                  }
+                  className="w-full px-3.5 py-2 rounded-xl bg-white dark:bg-[#061f1d] border border-slate-300 dark:border-teal-800 text-slate-900 dark:text-white text-xs focus:outline-none focus:border-[#0F766E]"
+                />
+              </div>
+
+              <div>
+                <label className="block text-[11px] font-bold text-slate-700 dark:text-slate-300 mb-1">
+                  Skor Penilaian Wawancara (0 - 100) *
+                </label>
+                <input
+                  type="number"
+                  min={0}
+                  max={100}
+                  step={1}
+                  required
+                  value={directScoreInput}
+                  onChange={(e) => setDirectScoreInput(e.target.value)}
+                  placeholder="Contoh: 85"
+                  className="w-full px-3.5 py-2 rounded-xl bg-white dark:bg-[#061f1d] border border-slate-300 dark:border-teal-800 text-slate-900 dark:text-white text-xs font-bold text-base focus:outline-none focus:border-[#0F766E]"
+                />
+              </div>
+
+              <div>
+                <label className="block text-[11px] font-bold text-slate-700 dark:text-slate-300 mb-1">
+                  Catatan Evaluasi / Rekomendasi
+                </label>
+                <textarea
+                  rows={3}
+                  value={directNotesInput}
+                  onChange={(e) => setDirectNotesInput(e.target.value)}
+                  placeholder="Tuliskan catatan hasil interview atau masukan calon atasan..."
+                  className="w-full px-3.5 py-2 rounded-xl bg-white dark:bg-[#061f1d] border border-slate-300 dark:border-teal-800 text-slate-900 dark:text-white text-xs focus:outline-none focus:border-[#0F766E]"
+                />
+              </div>
+
+              <div className="pt-2 flex items-center justify-end gap-2.5">
+                <button
+                  type="button"
+                  onClick={() => setDirectGradeApp(null)}
+                  className="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-[#061f1d] dark:hover:bg-teal-950 text-slate-700 dark:text-slate-300 font-bold text-xs border border-slate-300 dark:border-teal-800 transition-colors cursor-pointer"
+                >
+                  Batal
+                </button>
+                <button
+                  type="submit"
+                  disabled={loadingDirectGrade}
+                  className="px-5 py-2 rounded-xl bg-[#0F766E] hover:bg-[#0d6962] text-white font-bold text-xs shadow-sm flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
+                >
+                  {loadingDirectGrade && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
+                  <span>Simpan Nilai</span>
                 </button>
               </div>
             </form>

@@ -12,8 +12,8 @@ interface HomePageClientProps {
 }
 
 export default function HomePageClient({ jobs = [] }: HomePageClientProps) {
-  const [introPlaying, setIntroPlaying] = useState(true);
-  const [contentVisible, setContentVisible] = useState(false);
+  const [introPlaying, setIntroPlaying] = useState(false);
+  const [contentVisible, setContentVisible] = useState(true);
 
   const featuredJobs = jobs.slice(0, 6);
 
@@ -24,16 +24,15 @@ export default function HomePageClient({ jobs = [] }: HomePageClientProps) {
 
   return (
     <>
-      {/* ===== LOGO INTRO ANIMATION (plays every visit) ===== */}
+      {/* ===== LOGO INTRO ANIMATION (disabled for instant performance) ===== */}
       {introPlaying && <LogoIntroAnimation onComplete={handleIntroComplete} />}
 
-      {/* ===== MAIN PAGE CONTENT (fades in as animation ends) ===== */}
+      {/* ===== MAIN PAGE CONTENT (instant visible) ===== */}
       <div
         className="bg-grid-pattern"
         style={{
-          opacity: contentVisible ? 1 : 0,
-          transform: contentVisible ? "translateY(0)" : "translateY(12px)",
-          transition: "opacity 0.7s ease, transform 0.7s ease",
+          opacity: 1,
+          transform: "translateY(0)",
         }}
       >
         {/* ===== HERO SECTION ===== */}
@@ -64,7 +63,7 @@ export default function HomePageClient({ jobs = [] }: HomePageClientProps) {
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src="/img/logo.png"
-                    alt="TalentHub"
+                    alt="Nexora Digital"
                     style={{ width: "100%", height: "100%", objectFit: "cover" }}
                   />
                 </div>

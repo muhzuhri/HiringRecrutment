@@ -21,13 +21,15 @@ export default function Navbar() {
         <div className="flex items-center justify-between h-16 sm:h-20">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-3 group" id="navbar-logo-link">
-            <img
-              src="/img/logo.png"
-              alt="TalentHub Logo"
-              className="w-14 h-14 rounded-full object-cover shadow-md group-hover:scale-105 transition-transform"
-            />
+            <div className="h-10 w-10 rounded-xl overflow-hidden bg-white p-1 border border-teal-800/40 shadow-md group-hover:scale-105 transition-transform shrink-0 flex items-center justify-center">
+              <img
+                src="/nexora-logo.jpg"
+                alt="Nexora Digital Logo"
+                className="h-full w-full object-contain"
+              />
+            </div>
             <span className="text-white font-extrabold text-xl tracking-tight" style={{ fontFamily: "var(--font-plus-jakarta)" }}>
-              Talent<span className="text-emerald-400">Hub</span>
+              Nexora<span className="text-teal-400"> Digital</span>
             </span>
           </Link>
 

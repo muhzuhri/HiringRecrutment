@@ -5,8 +5,8 @@ import { getJobsFromSupabase } from "@/app/actions/jobs";
 import CandidateJobBoard from "@/components/candidate/CandidateJobBoard";
 
 export const metadata = {
-  title: "Papan Karier & Lowongan Aktif | TalentHub",
-  description: "Cari lowongan pekerjaan terbaru dan gunakan fitur Lamar Cepat 1-click apply.",
+  title: "Cari Lowongan | Nexora Digital",
+  description: "Cari lowongan pekerjaan terbaru dan gunakan fitur lamar posisi.",
 };
 
 export default async function JobBoardPage() {

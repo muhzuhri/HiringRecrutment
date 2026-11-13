@@ -105,10 +105,12 @@ export async function getCandidateProfile(): Promise<{ profile: CandidateProfile
       id: user.id,
       email: user.email || "",
       full_name: fullName,
-      nik: data?.nik || "",
+      nik: data?.nik || user.user_metadata?.nik || "",
+      ktp_url: data?.ktp_url || user.user_metadata?.ktp_url || "",
+      ktp_name: data?.ktp_name || user.user_metadata?.ktp_name || "",
       phone: data?.phone || user.user_metadata?.phone || "",
       whatsapp: data?.whatsapp || user.user_metadata?.whatsapp || "",
-      address: data?.address || "",
+      address: data?.address || user.user_metadata?.address || "",
       linkedin_url: data?.linkedin_url || "",
       github_url: data?.github_url || "",
       portfolio_url: data?.portfolio_url || "",
@@ -119,13 +121,14 @@ export async function getCandidateProfile(): Promise<{ profile: CandidateProfile
       education,
       certifications,
       skills,
-      hard_skills: data?.hard_skills || "",
-      soft_skills: data?.soft_skills || "",
-      languages: data?.languages || "",
+      hard_skills: data?.hard_skills || user.user_metadata?.hard_skills || "",
+      soft_skills: data?.soft_skills || user.user_metadata?.soft_skills || "",
+      languages: data?.languages || user.user_metadata?.languages || "",
       experience,
-      resume_url: data?.resume_url || "",
-      resume_name: data?.resume_name || "",
+      resume_url: data?.resume_url || user.user_metadata?.resume_url || "",
+      resume_name: data?.resume_name || user.user_metadata?.resume_name || "",
       profile_completed: data?.profile_completed ?? false,
+      profile_score: data?.profile_score ?? 0,
       created_at: data?.created_at || new Date().toISOString(),
       updated_at: data?.updated_at || new Date().toISOString(),
     };
@@ -137,11 +140,14 @@ export async function getCandidateProfile(): Promise<{ profile: CandidateProfile
 }
 
 /**
- * Save / Update Candidate Profile in Supabase
+ * Save / Update Candidate Profile in Supabase with strict NIK uniqueness & graceful schema fallback
  */
 export async function updateCandidateProfile(formData: {
   full_name: string;
+  avatar_url?: string;
   nik?: string;
+  ktp_url?: string;
+  ktp_name?: string;
   phone: string;
   whatsapp: string;
   address?: string;
@@ -157,7 +163,7 @@ export async function updateCandidateProfile(formData: {
   soft_skills?: string;
   languages?: string;
   experience: any[];
-}): Promise<{ success: boolean; error?: string }> {
+}): Promise<{ success: boolean; error?: string; completenessScore?: number }> {
   try {
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
@@ -166,11 +172,99 @@ export async function updateCandidateProfile(formData: {
       return { success: false, error: "Sesi Anda telah berakhir. Silakan login kembali." };
     }
 
-    const updatedData = {
+    const cleanNik = (formData.nik || "").trim().replace(/[^0-9]/g, "");
+
+    // 1. Validasi Keunikan NIK (1 NIK = 1 Akun Kandidat)
+    if (cleanNik) {
+      if (cleanNik.length !== 16) {
+        return {
+          success: false,
+          error: "Nomor Induk Kependudukan (NIK) harus berjumlah tepat 16 digit angka sesuai KTP.",
+        };
+      }
+
+      // Periksa apakah NIK sudah dipakai oleh akun user lain
+      try {
+        const { data: existingNikUser } = await supabase
+          .from("profiles")
+          .select("id, email")
+          .eq("nik", cleanNik)
+          .neq("id", user.id)
+          .maybeSingle();
+
+        if (existingNikUser) {
+          return {
+            success: false,
+            error: `NIK "${cleanNik}" sudah terdaftar pada akun lain (${existingNikUser.email || "kandidat lain"}). Setiap kandidat hanya diperbolehkan memiliki 1 akun berdasarkan NIK KTP.`,
+          };
+        }
+      } catch (nikErr) {
+        console.warn("NIK uniqueness check notice:", nikErr);
+      }
+    }
+
+    // 2. Ambil data profil eksisting untuk cek berkas resume / ktp
+    let existingResumeUrl = user.user_metadata?.resume_url || "";
+    let existingKtpUrl = formData.ktp_url || user.user_metadata?.ktp_url || "";
+    try {
+      const { data: existingProfile } = await supabase
+        .from("profiles")
+        .select("resume_url, ktp_url")
+        .eq("id", user.id)
+        .maybeSingle();
+      if (existingProfile?.resume_url) existingResumeUrl = existingProfile.resume_url;
+      if (existingProfile?.ktp_url) existingKtpUrl = existingProfile.ktp_url;
+    } catch {}
+
+    // 3. Kalkulasi Skor Kelengkapan Profil (0 - 100%)
+    let score = 0;
+    if (formData.full_name?.trim()) score += 10;
+    if (cleanNik.length === 16) score += 15;
+    if (existingKtpUrl?.trim() || formData.ktp_url?.trim()) score += 15;
+    if (formData.phone?.trim() || formData.whatsapp?.trim()) score += 10;
+    if (formData.address?.trim()) score += 10;
+    if (formData.headline?.trim() || formData.bio?.trim()) score += 10;
+    if (formData.education && formData.education.length > 0) score += 15;
+    if (formData.experience && formData.experience.length > 0) score += 10;
+    if (formData.skills && formData.skills.length > 0) score += 5;
+    if (existingResumeUrl?.trim()) score += 10;
+
+    const finalScore = Math.min(score, 100);
+    const isComplete = finalScore === 100;
+
+    // 4. Update data ke Auth metadata sebagai fallback cadangan
+    try {
+      await supabase.auth.updateUser({
+        data: {
+          full_name: formData.full_name,
+          nik: cleanNik,
+          ktp_url: formData.ktp_url || existingKtpUrl,
+          ktp_name: formData.ktp_name || "",
+          phone: formData.phone,
+          whatsapp: formData.whatsapp,
+          address: formData.address || "",
+          headline: formData.headline,
+          bio: formData.bio,
+          hard_skills: formData.hard_skills || "",
+          soft_skills: formData.soft_skills || "",
+          languages: formData.languages || "",
+          profile_score: finalScore,
+          profile_completed: isComplete,
+        },
+      });
+    } catch (authMetaErr) {
+      console.warn("Auth metadata update notice:", authMetaErr);
+    }
+
+    // 5. Payload lengkap dengan seluruh kolom
+    const fullPayload: any = {
       id: user.id,
       email: user.email,
       full_name: formData.full_name,
-      nik: formData.nik || "",
+      avatar_url: formData.avatar_url || user.user_metadata?.avatar_url || null,
+      nik: cleanNik,
+      ktp_url: formData.ktp_url || existingKtpUrl || null,
+      ktp_name: formData.ktp_name || null,
       phone: formData.phone,
       whatsapp: formData.whatsapp,
       address: formData.address || "",
@@ -186,15 +280,53 @@ export async function updateCandidateProfile(formData: {
       soft_skills: formData.soft_skills || "",
       languages: formData.languages || "",
       experience: formData.experience,
-      profile_completed: true,
+      profile_completed: isComplete,
+      profile_score: finalScore,
       updated_at: new Date().toISOString(),
     };
 
-    const { error } = await supabase
-      .from("profiles")
-      .upsert(updatedData, { onConflict: "id" });
+    // Upaya 1: Coba simpan full payload
+    let { error } = await supabase.from("profiles").upsert(fullPayload, { onConflict: "id" });
 
-    if (error) {
+    // Upaya 2: Jika gagal karena kolom belum dimigrasi di Supabase (schema cache error),
+    // simpan kolom esensial dan hilangkan kolom yang belum ada
+    if (error && (error.message.includes("schema cache") || error.code === "PGRST204" || error.message.includes("Could not find the"))) {
+      console.warn("Schema cache error detected, retrying upsert with safe core columns:", error.message);
+      
+      const safePayload: any = {
+        id: user.id,
+        email: user.email,
+        full_name: formData.full_name,
+        avatar_url: formData.avatar_url || user.user_metadata?.avatar_url || null,
+        nik: cleanNik || null,
+        phone: formData.phone,
+        whatsapp: formData.whatsapp,
+        address: formData.address || "",
+        linkedin_url: formData.linkedin_url,
+        github_url: formData.github_url || "",
+        portfolio_url: formData.portfolio_url,
+        headline: formData.headline,
+        bio: formData.bio,
+        education: formData.education,
+        certifications: formData.certifications || [],
+        skills: formData.skills,
+        experience: formData.experience,
+        profile_completed: isComplete,
+        updated_at: new Date().toISOString(),
+      };
+
+      const retryRes = await supabase.from("profiles").upsert(safePayload, { onConflict: "id" });
+      if (retryRes.error) {
+        // Fallback lagi jika nik belum ada di DB
+        delete safePayload.nik;
+        const secondRetry = await supabase.from("profiles").upsert(safePayload, { onConflict: "id" });
+        if (secondRetry.error) {
+          console.error("Supabase upsert second fallback error:", secondRetry.error.message);
+          return { success: false, error: `Gagal menyimpan profil: ${secondRetry.error.message}` };
+        }
+      }
+      error = null;
+    } else if (error) {
       console.error("Supabase upsert profile error:", error.message, error.code);
       return { success: false, error: `Gagal menyimpan profil: ${error.message}` };
     }
@@ -281,6 +413,270 @@ export async function updateCandidateProfile(formData: {
 }
 
 /**
+ * Server Action: Upload KTP Document (PNG/JPG/WEBP or PDF up to 2MB)
+ */
+export async function uploadKtpFile(
+  formData: FormData
+): Promise<{ success: boolean; ktpUrl?: string; ktpName?: string; error?: string }> {
+  try {
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+
+    if (!user) {
+      return { success: false, error: "Sesi Anda telah berakhir. Silakan login kembali." };
+    }
+
+    const file = formData.get("ktpFile") as File;
+    if (!file || file.size === 0) {
+      return { success: false, error: "Pilih berkas foto/scan KTP terlebih dahulu." };
+    }
+
+    const MAX_SIZE = 5 * 1024 * 1024;
+    if (file.size > MAX_SIZE) {
+      return {
+        success: false,
+        error: `Ukuran file (${(file.size / (1024 * 1024)).toFixed(2)} MB) melebihi batas maksimum 5 MB.`,
+      };
+    }
+
+    const allowedTypes = [
+      "application/pdf",
+      "image/png",
+      "image/jpeg",
+      "image/jpg",
+      "image/webp",
+    ];
+    if (!allowedTypes.includes(file.type.toLowerCase()) && !file.name.match(/\.(jpg|jpeg|png|webp|pdf)$/i)) {
+      return {
+        success: false,
+        error: "Format berkas KTP harus berupa Gambar (PNG, JPG, JPEG, WEBP) atau Dokumen PDF.",
+      };
+    }
+
+    const sanitizeFileName = file.name.replace(/[^a-zA-Z0-9.-]/g, "_");
+    const filePath = `ktp/${user.id}/${Date.now()}_${sanitizeFileName}`;
+
+    let uploadData: any = null;
+
+    // Coba upload ke candidate-documents atau resumes
+    const tryUpload = await supabase.storage.from("candidate-documents").upload(filePath, file, {
+      cacheControl: "3600",
+      upsert: true,
+    });
+
+    let bucketUsed = "candidate-documents";
+    if (tryUpload.error) {
+      const fallbackUpload = await supabase.storage.from("resumes").upload(filePath, file, {
+        cacheControl: "3600",
+        upsert: true,
+      });
+      if (fallbackUpload.error) {
+        return { success: false, error: `Gagal mengunggah berkas KTP ke Storage: ${fallbackUpload.error.message}` };
+      }
+      uploadData = fallbackUpload.data;
+      bucketUsed = "resumes";
+    } else {
+      uploadData = tryUpload.data;
+    }
+
+    const { data: publicUrlData } = supabase.storage.from(bucketUsed).getPublicUrl(uploadData.path);
+    const publicUrl = publicUrlData.publicUrl;
+
+    // Update data di profiles
+    try {
+      await supabase.from("profiles").upsert({
+        id: user.id,
+        email: user.email,
+        ktp_url: publicUrl,
+        ktp_name: file.name,
+        updated_at: new Date().toISOString(),
+      }, { onConflict: "id" });
+    } catch {}
+
+    // Update metadata user
+    try {
+      await supabase.auth.updateUser({
+        data: { ktp_url: publicUrl, ktp_name: file.name },
+      });
+    } catch {}
+
+    revalidatePath("/dashboard/profile");
+    revalidatePath("/dashboard");
+
+    return {
+      success: true,
+      ktpUrl: publicUrl,
+      ktpName: file.name,
+    };
+  } catch (err: any) {
+    return { success: false, error: err.message || "Gagal mengunggah berkas KTP" };
+  }
+}
+
+/**
+ * Server Action: Hapus Berkas KTP
+ */
+export async function deleteKtpFile(): Promise<{ success: boolean; error?: string }> {
+  try {
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+
+    if (!user) return { success: false, error: "Unauthenticated" };
+
+    try {
+      await supabase
+        .from("profiles")
+        .update({ ktp_url: null, ktp_name: null, updated_at: new Date().toISOString() })
+        .eq("id", user.id);
+    } catch {}
+
+    try {
+      await supabase.auth.updateUser({
+        data: { ktp_url: null, ktp_name: null },
+      });
+    } catch {}
+
+    revalidatePath("/dashboard/profile");
+    return { success: true };
+  } catch (err: any) {
+    return { success: false, error: err.message || "Gagal menghapus KTP" };
+  }
+}
+
+/**
+ * Server Action: Upload Candidate Profile Avatar Photo (PNG/JPG/JPEG/WEBP up to 2MB)
+ */
+export async function uploadAvatarFile(
+  formData: FormData
+): Promise<{ success: boolean; avatarUrl?: string; error?: string }> {
+  try {
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+
+    if (!user) {
+      return { success: false, error: "Sesi Anda telah berakhir. Silakan login kembali." };
+    }
+
+    const file = formData.get("avatarFile") as File;
+    if (!file || file.size === 0) {
+      return { success: false, error: "Pilih berkas foto profil terlebih dahulu." };
+    }
+
+    const MAX_SIZE = 2 * 1024 * 1024;
+    if (file.size > MAX_SIZE) {
+      return {
+        success: false,
+        error: `Ukuran foto (${(file.size / (1024 * 1024)).toFixed(2)} MB) melebihi batas maksimum 2 MB.`,
+      };
+    }
+
+    const allowedTypes = [
+      "image/png",
+      "image/jpeg",
+      "image/jpg",
+      "image/webp",
+    ];
+    if (!allowedTypes.includes(file.type.toLowerCase()) && !file.name.match(/\.(jpg|jpeg|png|webp)$/i)) {
+      return {
+        success: false,
+        error: "Format foto profil harus berupa Gambar (PNG, JPG, JPEG, WEBP).",
+      };
+    }
+
+    const sanitizeFileName = file.name.replace(/[^a-zA-Z0-9.-]/g, "_");
+    const filePath = `avatars/${user.id}/${Date.now()}_${sanitizeFileName}`;
+
+    let uploadData: any = null;
+
+    // Coba upload ke candidate-documents atau resumes
+    const tryUpload = await supabase.storage.from("candidate-documents").upload(filePath, file, {
+      cacheControl: "3600",
+      upsert: true,
+    });
+
+    let bucketUsed = "candidate-documents";
+    if (tryUpload.error) {
+      const fallbackUpload = await supabase.storage.from("resumes").upload(filePath, file, {
+        cacheControl: "3600",
+        upsert: true,
+      });
+      if (fallbackUpload.error) {
+        return { success: false, error: `Gagal mengunggah foto profil ke Storage: ${fallbackUpload.error.message}` };
+      }
+      uploadData = fallbackUpload.data;
+      bucketUsed = "resumes";
+    } else {
+      uploadData = tryUpload.data;
+    }
+
+    const { data: publicUrlData } = supabase.storage.from(bucketUsed).getPublicUrl(uploadData.path);
+    const publicUrl = publicUrlData.publicUrl;
+
+    // Simpan ke tabel profiles
+    try {
+      await supabase.from("profiles").upsert({
+        id: user.id,
+        email: user.email,
+        avatar_url: publicUrl,
+        updated_at: new Date().toISOString(),
+      }, { onConflict: "id" });
+    } catch (dbErr) {
+      console.warn("Profiles avatar upsert notice:", dbErr);
+    }
+
+    // Update metadata user
+    try {
+      await supabase.auth.updateUser({
+        data: { avatar_url: publicUrl },
+      });
+    } catch {}
+
+    revalidatePath("/dashboard");
+    revalidatePath("/dashboard/profile");
+    revalidatePath("/dashboard/jobs");
+    revalidatePath("/dashboard/applications");
+
+    return {
+      success: true,
+      avatarUrl: publicUrl,
+    };
+  } catch (err: any) {
+    return { success: false, error: err.message || "Gagal mengunggah foto profil" };
+  }
+}
+
+/**
+ * Server Action: Hapus Foto Profil
+ */
+export async function deleteAvatarFile(): Promise<{ success: boolean; error?: string }> {
+  try {
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+
+    if (!user) return { success: false, error: "Unauthenticated" };
+
+    try {
+      await supabase
+        .from("profiles")
+        .update({ avatar_url: null, updated_at: new Date().toISOString() })
+        .eq("id", user.id);
+    } catch {}
+
+    try {
+      await supabase.auth.updateUser({
+        data: { avatar_url: null },
+      });
+    } catch {}
+
+    revalidatePath("/dashboard");
+    revalidatePath("/dashboard/profile");
+    return { success: true };
+  } catch (err: any) {
+    return { success: false, error: err.message || "Gagal menghapus foto profil" };
+  }
+}
+
+/**
  * Server Action: Upload Media Attachment (Images PNG/JPG/WEBP or PDF up to 2MB)
  * for Education, Certification, and Experience sections.
  */
@@ -301,11 +697,11 @@ export async function uploadCandidateDocumentFile(
     }
 
     // 1. Validation rule: Max 2MB (2 * 1024 * 1024 bytes)
-    const MAX_SIZE = 2 * 1024 * 1024;
+    const MAX_SIZE = 5 * 1024 * 1024;
     if (file.size > MAX_SIZE) {
       return {
         success: false,
-        error: `Ukuran file (${(file.size / (1024 * 1024)).toFixed(2)} MB) melebihi batas maksimum 2 MB.`,
+        error: `Ukuran file (${(file.size / (1024 * 1024)).toFixed(2)} MB) melebihi batas maksimum 5 MB.`,
       };
     }
 
@@ -764,10 +1160,11 @@ export async function getApplicationById(applicationId: string): Promise<{
 }
 
 /**
- * CASE 1: Apply for Job with strict server-side business rules:
- * Rule A: Satu kandidat hanya boleh 1 lamaran aktif per lowongan (prevent duplicate submission).
- * Rule B: Lowongan yang sudah ditutup atau melewati batas akhir (deadline) TIDAK BOLEH menerima lamaran baru!
- * Rule C: Simpan status awal lamaran sebagai "Diajukan".
+ * CASE 1: Apply for Job with strict business rules:
+ * Rule A: Validasi Profil Wajib 100% Lengkap (NIK 16 digit, KTP, data diri, pendidikan, skill, pengalaman, CV PDF).
+ * Rule B: Kebijakan 1 Lamaran Aktif. Kandidat TIDAK BISA melamar posisi lain jika masih ada lamaran aktif (kecuali berstatus "Ditolak").
+ * Rule C: Lowongan yang sudah ditutup atau melewati batas akhir TIDAK BOLEH menerima lamaran baru.
+ * Rule D: Simpan status awal lamaran sebagai "Diajukan".
  */
 export async function applyForJob(jobId: string): Promise<{ success: boolean; applicationId?: string; message?: string; error?: string }> {
   try {
@@ -775,10 +1172,56 @@ export async function applyForJob(jobId: string): Promise<{ success: boolean; ap
     const { data: { user } } = await supabase.auth.getUser();
 
     if (!user) {
-      return { success: false, error: "Silakan login terlebih dahulu untuk menguji lamaran pekerjaan." };
+      return { success: false, error: "Silakan login terlebih dahulu untuk mengajukan lamaran pekerjaan." };
     }
 
-    // 1. Fetch target job posting from Supabase
+    // 1. Fetch data profil kandidat & Validasi 100% Lengkap
+    const { profile } = await getCandidateProfile();
+    if (!profile) {
+      return { success: false, error: "Data profil kandidat tidak ditemukan. Silakan lengkapi profil terlebih dahulu." };
+    }
+
+    const missingFields: string[] = [];
+    if (!profile.full_name?.trim()) missingFields.push("Nama Lengkap");
+    if (!profile.nik?.trim() || profile.nik.trim().length !== 16) missingFields.push("NIK (16 Digit KTP)");
+    if (!profile.ktp_url?.trim()) missingFields.push("Unggahan Berkas/Foto KTP");
+    if (!profile.phone?.trim() && !profile.whatsapp?.trim()) missingFields.push("Nomor Telepon / WhatsApp");
+    if (!profile.address?.trim()) missingFields.push("Alamat Domisili");
+    if (!profile.headline?.trim() && !profile.bio?.trim()) missingFields.push("Ringkasan Profil / Headline");
+    if (!profile.education || profile.education.length === 0) missingFields.push("Riwayat Pendidikan (min. 1 data)");
+    if (!profile.skills || profile.skills.length === 0) missingFields.push("Keahlian / Skill (min. 1 skill)");
+    if (!profile.experience || profile.experience.length === 0) missingFields.push("Pengalaman Kerja / Organisasi (min. 1 data)");
+    if (!profile.resume_url?.trim()) missingFields.push("Berkas CV Utama (PDF max 2MB)");
+
+    if (missingFields.length > 0) {
+      return {
+        success: false,
+        error: `Profil Anda belum lengkap 100% (Kelengkapan belum memenuhi standar: ${missingFields.join(", ")}). Sesuai aturan, Anda wajib melengkapi seluruh data profil dan mengunggah berkas KTP serta CV sebelum dapat melamar lowongan pekerjaan.`,
+      };
+    }
+
+    // 2. Strict Rule: Kebijakan 1 Lamaran Aktif.
+    // Jika kandidat memiliki lamaran yang statusnya BUKAN "Ditolak" (atau "Rejected"), blokir pengajuan baru!
+    const { data: allUserApps } = await supabase
+      .from("applications")
+      .select("id, job_id, job_title, status")
+      .eq("candidate_id", user.id);
+
+    if (allUserApps && allUserApps.length > 0) {
+      const activeApp = allUserApps.find((app) => {
+        const s = (app.status || "").toLowerCase();
+        return s !== "ditolak" && s !== "rejected";
+      });
+
+      if (activeApp) {
+        return {
+          success: false,
+          error: `Anda masih memiliki lamaran aktif untuk posisi "${activeApp.job_title}" dengan status "${activeApp.status}". Sesuai ketentuan rekrutmen, kandidat hanya dapat melamar 1 posisi dalam satu waktu dan baru dapat melamar posisi lain apabila status seleksi sebelumnya telah dinyatakan "Ditolak".`,
+        };
+      }
+    }
+
+    // 3. Fetch target job posting from Supabase
     const { data: targetJob } = await supabase
       .from("jobs")
       .select("*")
@@ -789,7 +1232,7 @@ export async function applyForJob(jobId: string): Promise<{ success: boolean; ap
       return { success: false, error: "Lowongan pekerjaan tidak ditemukan." };
     }
 
-    // CASE 1 Rule B Validation: Check if job is closed or deadline date has passed
+    // Check if job is closed or deadline date has passed
     if (targetJob.status === "Closed") {
       return {
         success: false,
@@ -807,30 +1250,7 @@ export async function applyForJob(jobId: string): Promise<{ success: boolean; ap
       }
     }
 
-    // CASE 1 Rule A Validation: Check for existing active application (duplicate check)
-    const { data: existingApp } = await supabase
-      .from("applications")
-      .select("id, status")
-      .eq("candidate_id", user.id)
-      .eq("job_id", jobId)
-      .maybeSingle();
-
-    if (existingApp) {
-      return {
-        success: false,
-        error: `Satu kandidat hanya boleh memiliki 1 lamaran aktif per lowongan! Anda telah mengajukan lamaran untuk posisi "${targetJob.title}".`
-      };
-    }
-
-    // Verify candidate profile has uploaded CV PDF
-    const { data: profile } = await supabase
-      .from("profiles")
-      .select("resume_url")
-      .eq("id", user.id)
-      .single();
-
-    // CASE 1 Rule C: Initial status saved as "Diajukan".
-    // Let Supabase generate the UUID — do NOT pass a custom string id.
+    // Initial status saved as "Diajukan"
     const newApplication = {
       candidate_id: user.id,
       job_id: targetJob.id,
@@ -860,14 +1280,14 @@ export async function applyForJob(jobId: string): Promise<{ success: boolean; ap
       };
     }
 
-    // Record initial Audit Trail using the real UUID returned by Supabase
+    // Record initial Audit Trail
     await supabase.from("audit_logs").insert({
       application_id: insertedApp.id,
       old_status: "-",
       new_status: "Diajukan",
       stage_detail: "Pendaftaran Lamaran Baru",
-      changed_by_name: user.email || "Kandidat",
-      reason: "Kandidat berhasil mengajukan lamaran baru.",
+      changed_by_name: user.email || profile.full_name || "Kandidat",
+      reason: "Kandidat berhasil mengajukan lamaran baru (Profil 100% Terverifikasi).",
       created_at: new Date().toISOString(),
     });
 

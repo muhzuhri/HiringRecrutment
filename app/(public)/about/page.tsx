@@ -4,9 +4,9 @@ import FloatingCubes from "@/components/FloatingCubes";
 import { coreValues, benefits, galleryHighlights, visiMisi } from "@/data/about";
 
 export const metadata: Metadata = {
-  title: "Tentang Kami",
+  title: "Tentang Kami | Nexora Digital",
   description:
-    "Kenali TalentHub lebih dalam — visi, misi, nilai-nilai perusahaan, serta budaya kerja yang mendorong inovasi dan kolaborasi.",
+    "Kenali Nexora Digital lebih dalam — visi, misi, nilai-nilai perusahaan, serta budaya kerja yang mendorong inovasi dan kolaborasi.",
 };
 
 export default function AboutPage() {
@@ -32,9 +32,8 @@ export default function AboutPage() {
             <span style={{ color: "#0c2b29" }}>Manusia dan Teknologi</span>
           </h1>
           <p className="text-gray-500 text-lg leading-relaxed">
-            TalentHub didirikan dengan satu misi: mempertemukan talenta terbaik
-            dengan peluang yang paling bermakna. Sejak 2019, kami telah membantu
-            lebih dari 1.200 profesional menemukan panggilan karier mereka.
+            Nexora Digital didirikan dengan satu misi: mempertemukan talenta terbaik
+            dengan peluang yang paling bermakna. Kami membuka kesempatan luas bagi profesional berbakat Indonesia.
           </p>
         </div>
       </section>
@@ -135,7 +134,7 @@ export default function AboutPage() {
       <section className="py-20 bg-slate-50 border-t border-slate-200/60">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-10">
-            <div className="section-tag mb-4 inline-flex"><span>📸</span><span>Life at TalentHub</span></div>
+            <div className="section-tag mb-4 inline-flex"><span>📸</span><span>Life at Nexora Digital</span></div>
             <h2 className="text-3xl md:text-4xl font-bold" style={{ fontFamily: "var(--font-plus-jakarta)", color: "#1a1a2e" }}>
               Lingkungan yang Menginspirasi
             </h2>

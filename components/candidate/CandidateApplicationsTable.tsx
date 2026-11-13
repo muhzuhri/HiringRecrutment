@@ -104,32 +104,28 @@ export default function CandidateApplicationsTable({
   return (
     <div className="space-y-6">
       {/* 1. Header Banner */}
-      <div className="bg-white dark:bg-[#0c2b29] border border-slate-200 dark:border-emerald-800/40 rounded-2xl p-5 sm:p-7 shadow-sm transition-colors flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div className="space-y-1.5 max-w-2xl">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100 dark:bg-emerald-950 border border-slate-200 dark:border-emerald-700/50 text-xs font-semibold text-slate-700 dark:text-emerald-300">
-            <ClipboardList className="w-3.5 h-3.5 text-slate-700 dark:text-emerald-400" />
-            <span>Portal Riwayat Lamaran Kandidat</span>
-          </div>
-          <h1 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight">
-            Daftar Lamaran Saya
+      <div className="bg-white/90 dark:bg-[#0c2b29]/90 backdrop-blur-md border border-slate-200/80 dark:border-teal-800/40 rounded-3xl p-5 sm:p-6 shadow-2xs transition-all flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">
+            Lamaran <span className="text-[#0F766E] dark:text-[#14B8A6]">Saya</span>
           </h1>
-          <p className="text-slate-600 dark:text-emerald-200/80 text-xs sm:text-sm leading-relaxed">
-            Pantau seluruh posisi lowongan yang pernah Anda lamar, tahapan seleksi sinkron dengan progress tracking, serta jadwal interview HR & User secara transparan.
+          <p className="text-slate-500 dark:text-slate-400 text-xs mt-0.5">
+            Pantau status seleksi berkas dan jadwal interview secara real-time.
           </p>
         </div>
 
         <Link
           href="/dashboard/jobs"
-          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-slate-900 dark:bg-emerald-600 hover:bg-slate-800 dark:hover:bg-emerald-500 text-white font-bold text-xs sm:text-sm transition-all shadow-sm shrink-0 self-start md:self-auto"
+          className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#0F766E] hover:bg-[#0d6962] text-white font-semibold text-xs transition-all shadow-2xs shrink-0 self-start md:self-auto cursor-pointer"
         >
-          <Briefcase className="w-4 h-4" />
-          <span>Jelajahi Lowongan Baru</span>
+          <Briefcase className="w-3.5 h-3.5" />
+          <span>Cari Lowongan</span>
         </Link>
       </div>
 
       {/* 2. Quick Stat Counters */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3.5 sm:gap-4">
-        <div className="bg-white dark:bg-[#0c2b29] border border-slate-200 dark:border-emerald-800/40 rounded-2xl p-4 sm:p-5 shadow-sm border-l-4 border-l-slate-800 dark:border-l-emerald-500 transition-colors">
+        <div className="bg-white dark:bg-[#0c2b29] border border-slate-200/80 dark:border-teal-800/40 rounded-2xl p-4 sm:p-5 shadow-2xs border-l-4 border-l-[#0F766E] transition-all">
           <p className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
             Total Lamaran
           </p>
@@ -263,8 +259,6 @@ export default function CandidateApplicationsTable({
                 <tr className="bg-slate-50/80 dark:bg-[#061f1d]/80 border-b border-slate-200 dark:border-emerald-800/40 text-[11px] font-bold text-slate-600 dark:text-emerald-300 uppercase tracking-wider">
                   <th className="py-3.5 px-4 sm:px-6 w-12 text-center">No</th>
                   <th className="py-3.5 px-4 sm:px-6">Posisi & Departemen</th>
-                  <th className="py-3.5 px-4">Tipe & Lokasi</th>
-                  <th className="py-3.5 px-4">Estimasi Gaji</th>
                   <th className="py-3.5 px-4">Tanggal Melamar</th>
                   <th className="py-3.5 px-4">Tahapan / Status</th>
                   <th className="py-3.5 px-4 min-w-[220px]">Jadwal & Seleksi</th>
@@ -306,24 +300,6 @@ export default function CandidateApplicationsTable({
                             </span>
                           </div>
                         </div>
-                      </td>
-
-                      {/* Work Type & Location */}
-                      <td className="py-4 px-4">
-                        <div className="space-y-1">
-                          <span className="inline-block px-2 py-0.5 rounded bg-slate-100 dark:bg-emerald-950/60 text-slate-700 dark:text-slate-300 text-[10px] font-medium border border-slate-200 dark:border-emerald-900">
-                            {app.job_type}
-                          </span>
-                          <p className="text-[11px] text-slate-500 dark:text-slate-400 flex items-center gap-1">
-                            <MapPin className="w-3 h-3 text-slate-400 dark:text-emerald-400 shrink-0" />
-                            <span className="truncate max-w-[130px]">{app.location}</span>
-                          </p>
-                        </div>
-                      </td>
-
-                      {/* Salary */}
-                      <td className="py-4 px-4 font-semibold text-slate-800 dark:text-slate-100">
-                        {app.salary || "Sesuai Standar"}
                       </td>
 
                       {/* Applied Date */}
@@ -370,7 +346,7 @@ export default function CandidateApplicationsTable({
                         <div className="flex items-center justify-end gap-1.5">
                           <Link
                             href={`/dashboard/applications/${app.id}`}
-                            className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-slate-900 dark:bg-emerald-600 hover:bg-slate-800 dark:hover:bg-emerald-500 text-white font-bold text-[11px] transition-all shadow-xs"
+                            className="inline-flex items-center gap-1 px-3.5 py-1.5 rounded-xl bg-[#0F766E] hover:bg-[#0d6962] text-white font-bold text-[11px] transition-all shadow-2xs"
                             title="Lacak kronologi & detail timeline"
                           >
                             <span>Lacak Progress</span>

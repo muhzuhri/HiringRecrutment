@@ -14,57 +14,57 @@ export default function HRAnalyticsChart({ analytics }: HRAnalyticsChartProps) {
   return (
     <div className="space-y-6">
       {/* 1. Quick Metrics Cards */}
-      <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5 sm:gap-4">
-        <div className="bg-white dark:bg-[#0c2b29] border border-slate-200 dark:border-emerald-800/40 rounded-2xl p-5 shadow-sm border-l-4 border-l-emerald-600 flex items-center justify-between transition-colors">
-          <div>
-            <p className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Lowongan Aktif</p>
-            <p className="text-2xl font-black text-slate-900 dark:text-white mt-0.5">{analytics.active_jobs_count}</p>
-            <p className="text-[11px] text-emerald-600 dark:text-emerald-400 mt-1 flex items-center gap-1 font-semibold">
-              <TrendingUp className="w-3.5 h-3.5" /> Posisi siap dilamar
-            </p>
+      <section className="grid grid-cols-2 lg:grid-cols-4 gap-3.5 sm:gap-4">
+        <div className="bg-white dark:bg-[#0c2b29] border border-slate-200/80 dark:border-teal-800/40 rounded-2xl p-4 sm:p-5 shadow-2xs hover:border-[#0F766E]/40 transition-all">
+          <div className="flex items-center justify-between text-slate-400 dark:text-slate-400">
+            <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400">Lowongan Aktif</span>
+            <div className="w-8 h-8 rounded-lg bg-teal-50 dark:bg-teal-950/60 flex items-center justify-center text-[#0F766E] dark:text-teal-400">
+              <Briefcase className="w-4 h-4" />
+            </div>
           </div>
-          <div className="w-11 h-11 rounded-2xl bg-slate-100 dark:bg-[#061f1d] border border-slate-200 dark:border-emerald-800/60 flex items-center justify-center text-emerald-600 dark:text-emerald-400">
-            <Briefcase className="w-5 h-5" />
-          </div>
+          <p className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white mt-2">{analytics.active_jobs_count}</p>
+          <span className="text-[10px] text-teal-700 dark:text-teal-400 font-medium mt-1 inline-block">
+            Posisi dibuka
+          </span>
         </div>
 
-        <div className="bg-white dark:bg-[#0c2b29] border border-slate-200 dark:border-emerald-800/40 rounded-2xl p-5 shadow-sm border-l-4 border-l-blue-600 flex items-center justify-between transition-colors">
-          <div>
-            <p className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Total Pelamar Masuk</p>
-            <p className="text-2xl font-black text-slate-900 dark:text-white mt-0.5">{analytics.total_applicants}</p>
-            <p className="text-[11px] text-blue-600 dark:text-blue-400 mt-1 flex items-center gap-1 font-semibold">
-              <Users className="w-3.5 h-3.5" /> Kandidat terdaftar
-            </p>
+        <div className="bg-white dark:bg-[#0c2b29] border border-slate-200/80 dark:border-teal-800/40 rounded-2xl p-4 sm:p-5 shadow-2xs hover:border-[#0F766E]/40 transition-all">
+          <div className="flex items-center justify-between text-slate-400 dark:text-slate-400">
+            <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400">Total Pelamar</span>
+            <div className="w-8 h-8 rounded-lg bg-blue-50 dark:bg-blue-950/60 flex items-center justify-center text-blue-600 dark:text-blue-400">
+              <Users className="w-4 h-4" />
+            </div>
           </div>
-          <div className="w-11 h-11 rounded-2xl bg-slate-100 dark:bg-[#061f1d] border border-slate-200 dark:border-emerald-800/60 flex items-center justify-center text-blue-600 dark:text-blue-400">
-            <Users className="w-5 h-5" />
-          </div>
+          <p className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white mt-2">{analytics.total_applicants}</p>
+          <span className="text-[10px] text-blue-600 dark:text-blue-400 font-medium mt-1 inline-block">
+            Kandidat terdaftar
+          </span>
         </div>
 
-        <div className="bg-white dark:bg-[#0c2b29] border border-slate-200 dark:border-emerald-800/40 rounded-2xl p-5 shadow-sm border-l-4 border-l-purple-600 flex items-center justify-between transition-colors">
-          <div>
-            <p className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Tahap Seleksi & Tes</p>
-            <p className="text-2xl font-black text-slate-900 dark:text-white mt-0.5">{analytics.interviewing_count}</p>
-            <p className="text-[11px] text-purple-600 dark:text-purple-400 mt-1 flex items-center gap-1 font-semibold">
-              <Sparkles className="w-3.5 h-3.5" /> Evaluasi berjalan
-            </p>
+        <div className="bg-white dark:bg-[#0c2b29] border border-slate-200/80 dark:border-teal-800/40 rounded-2xl p-4 sm:p-5 shadow-2xs hover:border-[#0F766E]/40 transition-all">
+          <div className="flex items-center justify-between text-slate-400 dark:text-slate-400">
+            <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400">Sedang Evaluasi</span>
+            <div className="w-8 h-8 rounded-lg bg-purple-50 dark:bg-purple-950/60 flex items-center justify-center text-purple-600 dark:text-purple-400">
+              <Sparkles className="w-4 h-4" />
+            </div>
           </div>
-          <div className="w-11 h-11 rounded-2xl bg-slate-100 dark:bg-[#061f1d] border border-slate-200 dark:border-emerald-800/60 flex items-center justify-center text-purple-600 dark:text-purple-400">
-            <Sparkles className="w-5 h-5" />
-          </div>
+          <p className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white mt-2">{analytics.interviewing_count}</p>
+          <span className="text-[10px] text-purple-600 dark:text-purple-400 font-medium mt-1 inline-block">
+            Tes & wawancara
+          </span>
         </div>
 
-        <div className="bg-white dark:bg-[#0c2b29] border border-slate-200 dark:border-emerald-800/40 rounded-2xl p-5 shadow-sm border-l-4 border-l-emerald-500 flex items-center justify-between transition-colors">
-          <div>
-            <p className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Diterima (Hired)</p>
-            <p className="text-2xl font-black text-slate-900 dark:text-white mt-0.5">{analytics.hired_count}</p>
-            <p className="text-[11px] text-emerald-700 dark:text-emerald-300 mt-1 flex items-center gap-1 font-semibold">
-              <CheckCircle2 className="w-3.5 h-3.5" /> Offering disetujui
-            </p>
+        <div className="bg-white dark:bg-[#0c2b29] border border-slate-200/80 dark:border-teal-800/40 rounded-2xl p-4 sm:p-5 shadow-2xs hover:border-[#0F766E]/40 transition-all">
+          <div className="flex items-center justify-between text-slate-400 dark:text-slate-400">
+            <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400">Diterima (Hired)</span>
+            <div className="w-8 h-8 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 flex items-center justify-center text-emerald-600 dark:text-emerald-400">
+              <CheckCircle2 className="w-4 h-4" />
+            </div>
           </div>
-          <div className="w-11 h-11 rounded-2xl bg-slate-100 dark:bg-[#061f1d] border border-slate-200 dark:border-emerald-800/60 flex items-center justify-center text-emerald-600 dark:text-emerald-300">
-            <CheckCircle2 className="w-5 h-5" />
-          </div>
+          <p className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white mt-2">{analytics.hired_count}</p>
+          <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-medium mt-1 inline-block">
+            Lolos seleksi
+          </span>
         </div>
       </section>
 

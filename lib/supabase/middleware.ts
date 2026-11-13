@@ -90,7 +90,11 @@ export async function updateSession(request: NextRequest) {
     }
   }
 
-  // 3. Redirect logged-in users away from auth pages
+  // 3. Smart Redirect for Auth Pages:
+  // - On candidate login (/login, /register): only redirect if already logged in AS CANDIDATE.
+  //   If currently logged in as admin/interviewer, do NOT redirect — allow logging in with candidate account.
+  // - On staff login (/admin/login): only redirect if already logged in AS STAFF (admin/interviewer).
+  //   If currently logged in as candidate, do NOT redirect — allow logging in with staff account.
   if (user) {
     if (pathname === "/login" || pathname === "/register") {
       const { data: profile } = await supabase
@@ -100,16 +104,12 @@ export async function updateSession(request: NextRequest) {
         .single();
 
       const userRole = profile?.role || user.user_metadata?.role || "candidate";
-      let targetPath = "/dashboard";
-      if (userRole === "admin" || userRole === "recruiter") {
-        targetPath = "/admin";
-      } else if (userRole === "interviewer") {
-        targetPath = "/admin/evaluations";
+      // Only redirect if already a candidate, so admins can still visit /login to switch/log in as candidate
+      if (userRole === "candidate") {
+        const url = request.nextUrl.clone();
+        url.pathname = "/dashboard";
+        return makeRedirect(url);
       }
-
-      const url = request.nextUrl.clone();
-      url.pathname = targetPath;
-      return makeRedirect(url);
     }
 
     if (pathname === "/admin/login") {
@@ -120,16 +120,13 @@ export async function updateSession(request: NextRequest) {
         .single();
 
       const userRole = profile?.role || user.user_metadata?.role || "candidate";
-      const targetPath =
-        userRole === "interviewer"
-          ? "/admin/evaluations"
-          : userRole === "admin" || userRole === "recruiter"
-          ? "/admin"
-          : "/dashboard";
-
-      const url = request.nextUrl.clone();
-      url.pathname = targetPath;
-      return makeRedirect(url);
+      // Only redirect if already a staff member
+      if (userRole === "admin" || userRole === "recruiter" || userRole === "interviewer") {
+        const targetPath = userRole === "interviewer" ? "/admin/evaluations" : "/admin";
+        const url = request.nextUrl.clone();
+        url.pathname = targetPath;
+        return makeRedirect(url);
+      }
     }
   }
 

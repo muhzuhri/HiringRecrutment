@@ -187,17 +187,16 @@ export default function TimelineView({ application, auditLogs = [] }: TimelineVi
 
       {/* 2. Visual Progress Bar / Milestone Timeline (6 Tahapan Linear) */}
       <div className="bg-white dark:bg-[#0c2b29] border border-slate-200 dark:border-emerald-800/40 rounded-2xl p-6 sm:p-8 shadow-sm dark:shadow-lg space-y-6 transition-colors">
-        <div className="flex items-center justify-between border-b border-slate-200 dark:border-emerald-800/40 pb-4">
+        <div className="flex items-center justify-between border-b border-slate-200/80 dark:border-teal-800/40 pb-3">
           <div>
-            <h2 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
-              <Sparkles className="w-5 h-5 text-slate-700 dark:text-emerald-400" />
-              Progress Tracking Kronologis
+            <h2 className="text-base font-bold text-slate-900 dark:text-white">
+              Progres Seleksi
             </h2>
-            <p className="text-xs text-slate-500 dark:text-emerald-200/70 mt-0.5">
-              Melacak alur proses rekrutmen Anda secara real-time dari pendaftaran hingga keputusan akhir.
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+              Status tahapan rekrutmen terkini.
             </p>
           </div>
-          <span className="text-xs font-bold text-slate-700 dark:text-emerald-300 bg-slate-100 dark:bg-emerald-950 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-emerald-700/50">
+          <span className="text-xs font-semibold text-[#0F766E] dark:text-teal-300 bg-teal-50 dark:bg-teal-950 px-2.5 py-1 rounded-lg border border-teal-200/80 dark:border-teal-800/60">
             {isRejected ? "Status: Tidak Lolos" : `Tahap ${currentStageIndex} dari 6: ${getStageTitle(currentStageIndex)}`}
           </span>
         </div>
@@ -331,16 +330,16 @@ export default function TimelineView({ application, auditLogs = [] }: TimelineVi
 
       {/* 3. PROMINENT SECTION: Jadwal & Detail Seleksi Terjadwal */}
       <div className="bg-white dark:bg-[#0c2b29] border border-slate-200 dark:border-emerald-800/50 rounded-2xl p-6 sm:p-8 shadow-sm dark:shadow-xl space-y-6 transition-colors">
-        <div className="flex items-center gap-3 border-b border-slate-200 dark:border-emerald-800/40 pb-4">
-          <div className="w-10 h-10 rounded-xl bg-purple-50 dark:bg-purple-950/80 border border-purple-200 dark:border-purple-800 flex items-center justify-center text-purple-700 dark:text-purple-300">
-            <CalendarCheck2 className="w-5 h-5" />
+        <div className="flex items-center gap-3 border-b border-slate-200/80 dark:border-teal-800/40 pb-3">
+          <div className="w-9 h-9 rounded-xl bg-purple-50 dark:bg-purple-950/80 border border-purple-200/80 dark:border-purple-800 flex items-center justify-center text-purple-700 dark:text-purple-300">
+            <CalendarCheck2 className="w-4 h-4" />
           </div>
           <div>
-            <h2 className="text-base sm:text-lg font-bold text-slate-900 dark:text-white">
-              Jadwal Seleksi & Ujian Terjadwal
+            <h2 className="text-base font-bold text-slate-900 dark:text-white">
+              Jadwal Seleksi
             </h2>
-            <p className="text-xs text-slate-500 dark:text-emerald-200/70">
-              Informasi lengkap tanggal, waktu pelaksanaan, jenis asesmen, dan penilai resmi Anda.
+            <p className="text-xs text-slate-500 dark:text-slate-400">
+              Waktu pelaksanaan, jenis evaluasi, dan informasi penilai.
             </p>
           </div>
         </div>

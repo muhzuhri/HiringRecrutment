@@ -54,7 +54,7 @@ export default function FAQPage() {
           </h1>
           <p className="text-gray-500 text-lg">
             Temukan jawaban atas pertanyaan umum seputar proses rekrutmen kami. Tidak menemukan jawaban?{" "}
-            <a href="mailto:rekrutmen@talenthub.id" className="text-emerald-800 font-semibold hover:underline">
+            <a href="mailto:careers@nexora.digital" className="text-emerald-800 font-semibold hover:underline">
               Hubungi kami
             </a>.
           </p>
@@ -89,7 +89,7 @@ export default function FAQPage() {
             <div className="text-3xl mb-3">💬</div>
             <h3 className="font-bold text-lg mb-2" style={{ color: "#1a1a2e" }}>Masih Ada Pertanyaan?</h3>
             <p className="text-gray-500 text-sm mb-5">Tim HR kami siap membantu kamu menjawab pertanyaan yang lebih spesifik.</p>
-            <a href="mailto:rekrutmen@talenthub.id" className="btn-primary inline-flex">
+            <a href="mailto:careers@nexora.digital" className="btn-primary inline-flex">
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
               </svg>

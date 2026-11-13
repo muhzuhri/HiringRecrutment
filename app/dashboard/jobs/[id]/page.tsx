@@ -13,7 +13,7 @@ interface Props {
 export async function generateMetadata({ params }: Props) {
   const { id } = await params;
   const { job } = await getJobByIdFromSupabase(id);
-  if (!job) return { title: "Lowongan Tidak Ditemukan | TalentHub" };
+  if (!job) return { title: "Lowongan Tidak Ditemukan | Nexora Digital" };
   return {
     title: `${job.title} | Detail Lowongan Kandidat`,
     description: job.description,

@@ -8,7 +8,7 @@ import { ArrowLeft } from "lucide-react";
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   return {
-    title: `Lacak Progres Lamaran #${id} | TalentHub`,
+    title: `Lacak Progres Lamaran | Nexora Digital`,
     description: "Detail progres kronologis lamaran pekerjaan dan instruksi HR.",
   };
 }

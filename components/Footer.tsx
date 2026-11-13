@@ -27,15 +27,17 @@ export default function Footer() {
           {/* Brand */}
           <div className="md:col-span-1">
             <Link href="/" className="flex items-center gap-3 mb-4">
-              <div className="w-9 h-9 rounded-xl bg-linear-to-tr from-emerald-600 to-teal-500 flex items-center justify-center text-white shadow-md shadow-emerald-950/50">
-                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
-                </svg>
+              <div className="h-10 w-10 rounded-xl overflow-hidden bg-white p-1 border border-teal-800/40 shadow-md shrink-0 flex items-center justify-center">
+                <img
+                  src="/nexora-logo.jpg"
+                  alt="Nexora Digital Logo"
+                  className="h-full w-full object-contain"
+                />
               </div>
-              <span className="text-white font-extrabold text-xl">Talent<span className="text-emerald-400">Hub</span></span>
+              <span className="text-white font-extrabold text-xl tracking-tight">Nexora<span className="text-teal-400"> Digital</span></span>
             </Link>
             <p className="text-slate-300 text-sm leading-relaxed mb-4">
-              Platform rekrutmen end-to-end untuk perusahaan dan kandidat terbaik Indonesia.
+              Platform rekrutmen modern Nexora Digital untuk talenta digital terbaik Indonesia.
             </p>
             <div className="flex gap-3">
               {["linkedin", "instagram", "twitter"].map((social) => (
@@ -79,7 +81,7 @@ export default function Footer() {
 
         <div className="border-t border-emerald-900/80 mt-10 pt-6 flex flex-col md:flex-row items-center justify-between gap-4">
           <p className="text-slate-400 text-sm">
-            &copy; {new Date().getFullYear()} TalentHub. Hak cipta dilindungi.
+            &copy; {new Date().getFullYear()} Nexora Digital. Hak cipta dilindungi.
           </p>
           <p className="text-emerald-400 text-sm font-medium">
             Dibuat dengan 💚 untuk talenta Indonesia

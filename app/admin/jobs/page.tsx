@@ -2,8 +2,8 @@ import { getJobPostings } from "@/app/actions/admin";
 import JobManager from "@/components/admin/JobManager";
 
 export const metadata = {
-  title: "Manajemen Lowongan Pekerjaan | TalentHub Admin",
-  description: "Buat lowongan baru, atur kriteria minimum saringan otomatis (pendidikan S1/skill), dan tutup lowongan.",
+  title: "Manajemen Lowongan | Nexora Digital Admin",
+  description: "Kelola lowongan pekerjaan dan kriteria seleksi kandidat.",
 };
 
 export default async function AdminJobsPage() {

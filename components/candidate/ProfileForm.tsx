@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useMemo } from "react";
-import { updateCandidateProfile, uploadCandidateDocumentFile } from "@/app/actions/candidate";
+import { updateCandidateProfile, uploadCandidateDocumentFile, uploadKtpFile, deleteKtpFile, uploadAvatarFile, deleteAvatarFile } from "@/app/actions/candidate";
 import { CandidateProfile, EducationItem, ExperienceItem, CertificationItem } from "@/types/candidate";
 import ResumeUploader from "./ResumeUploader";
 import ResumeGenerator from "./ResumeGenerator";
@@ -30,7 +30,8 @@ import {
   Check,
   Upload,
   Paperclip,
-  FileCheck
+  FileCheck,
+  Camera
 } from "lucide-react";
 
 interface ProfileFormProps {
@@ -94,7 +95,12 @@ export default function ProfileForm({ initialProfile }: ProfileFormProps) {
 
   // 1. Personal & Contact State (MagangHub standard)
   const [fullName, setFullName] = useState(initialProfile.full_name || "");
+  const [avatarUrl, setAvatarUrl] = useState(initialProfile.avatar_url || "");
+  const [uploadingAvatar, setUploadingAvatar] = useState(false);
   const [nik, setNik] = useState(initialProfile.nik || "");
+  const [ktpUrl, setKtpUrl] = useState(initialProfile.ktp_url || "");
+  const [ktpName, setKtpName] = useState(initialProfile.ktp_name || "");
+  const [uploadingKtp, setUploadingKtp] = useState(false);
   const [phone, setPhone] = useState(initialProfile.phone || "");
   const [whatsapp, setWhatsapp] = useState(initialProfile.whatsapp || initialProfile.phone || "");
   const [address, setAddress] = useState(initialProfile.address || "");
@@ -103,6 +109,71 @@ export default function ProfileForm({ initialProfile }: ProfileFormProps) {
   const [portfolioUrl, setPortfolioUrl] = useState(initialProfile.portfolio_url || "");
   const [headline, setHeadline] = useState(initialProfile.headline || "");
   const [bio, setBio] = useState(initialProfile.bio || "");
+
+  // Avatar Upload Handler
+  const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Validasi ukuran client-side (Max 5 MB)
+    if (file.size > 5 * 1024 * 1024) {
+      setStatusMsg({
+        type: "error",
+        text: `Ukuran foto profil (${(file.size / (1024 * 1024)).toFixed(2)} MB) melebihi batas 5 MB. Silakan gunakan foto yang lebih kecil.`,
+      });
+      return;
+    }
+
+    // Validasi tipe file
+    if (!file.type.startsWith("image/") && !file.name.match(/\.(jpg|jpeg|png|webp)$/i)) {
+      setStatusMsg({
+        type: "error",
+        text: "Format berkas harus berupa gambar (JPG, PNG, atau WEBP).",
+      });
+      return;
+    }
+
+    setUploadingAvatar(true);
+    setStatusMsg(null);
+
+    const formData = new FormData();
+    formData.append("avatarFile", file);
+
+    const res = await uploadAvatarFile(formData);
+    setUploadingAvatar(false);
+
+    if (res.success && res.avatarUrl) {
+      setAvatarUrl(res.avatarUrl);
+      setStatusMsg({
+        type: "success",
+        text: "Foto profil Anda berhasil diunggah!",
+      });
+    } else {
+      setStatusMsg({
+        type: "error",
+        text: res.error || "Gagal mengunggah foto profil.",
+      });
+    }
+  };
+
+  const handleDeleteAvatar = async () => {
+    if (!confirm("Apakah Anda yakin ingin menghapus foto profil?")) return;
+    setUploadingAvatar(true);
+    const res = await deleteAvatarFile();
+    setUploadingAvatar(false);
+    if (res.success) {
+      setAvatarUrl("");
+      setStatusMsg({
+        type: "success",
+        text: "Foto profil berhasil dihapus.",
+      });
+    } else {
+      setStatusMsg({
+        type: "error",
+        text: res.error || "Gagal menghapus foto profil.",
+      });
+    }
+  };
 
   // 2. Education State
   const [educationList, setEducationList] = useState<EducationItem[]>(
@@ -113,6 +184,64 @@ export default function ProfileForm({ initialProfile }: ProfileFormProps) {
   const [certificationsList, setCertificationsList] = useState<CertificationItem[]>(
     initialProfile.certifications || []
   );
+
+  // KTP Upload Handler
+  const handleKtpUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Validasi ukuran client-side (Max 5 MB)
+    if (file.size > 5 * 1024 * 1024) {
+      setStatusMsg({
+        type: "error",
+        text: `Ukuran berkas KTP (${(file.size / (1024 * 1024)).toFixed(2)} MB) melebihi batas 5 MB. Silakan kompres atau pilih berkas yang lebih kecil.`,
+      });
+      return;
+    }
+
+    setUploadingKtp(true);
+    setStatusMsg(null);
+
+    const formData = new FormData();
+    formData.append("ktpFile", file);
+
+    const res = await uploadKtpFile(formData);
+    setUploadingKtp(false);
+
+    if (res.success && res.ktpUrl) {
+      setKtpUrl(res.ktpUrl);
+      setKtpName(res.ktpName || file.name);
+      setStatusMsg({
+        type: "success",
+        text: `Berkas KTP "${res.ktpName || file.name}" berhasil diunggah dan tersimpan di database!`,
+      });
+    } else {
+      setStatusMsg({
+        type: "error",
+        text: res.error || "Gagal mengunggah berkas KTP. Pastikan ukuran max 2MB dan format Gambar/PDF.",
+      });
+    }
+  };
+
+  const handleDeleteKtp = async () => {
+    if (!confirm("Apakah Anda yakin ingin menghapus berkas KTP ini?")) return;
+    setUploadingKtp(true);
+    const res = await deleteKtpFile();
+    setUploadingKtp(false);
+    if (res.success) {
+      setKtpUrl("");
+      setKtpName("");
+      setStatusMsg({
+        type: "success",
+        text: "Berkas KTP berhasil dihapus dari profil kandidat.",
+      });
+    } else {
+      setStatusMsg({
+        type: "error",
+        text: res.error || "Gagal menghapus berkas KTP.",
+      });
+    }
+  };
 
   // File Upload Handler for Education, Certification, and Experience attachments
   const handleFileUpload = async (
@@ -209,28 +338,58 @@ export default function ProfileForm({ initialProfile }: ProfileFormProps) {
   const [softSkills, setSoftSkills] = useState(initialProfile.soft_skills || "");
   const [languages, setLanguages] = useState(initialProfile.languages || "");
 
-  // Calculate realtime Profile Completeness Percentage
+  // Calculate realtime Profile Completeness Percentage (Mandatory 100% to apply)
   const completenessScore = useMemo(() => {
     let score = 0;
-    if (fullName.trim()) score += 15;
-    if (whatsapp.trim()) score += 10;
+    if (fullName.trim()) score += 10;
+    if (nik.trim().length === 16) score += 15;
+    if (ktpUrl.trim()) score += 15;
+    if (whatsapp.trim() || phone.trim()) score += 10;
     if (address.trim()) score += 10;
     if (headline.trim() || bio.trim()) score += 10;
-    if (linkedinUrl.trim() || portfolioUrl.trim() || githubUrl.trim()) score += 10;
     if (educationList.length > 0) score += 15;
-    if (experienceStateList.length > 0) score += 15;
-    if (skillsList.length > 0) score += 10;
-    if (initialProfile.resume_url) score += 5;
+    if (experienceStateList.length > 0) score += 10;
+    if (skillsList.length > 0) score += 5;
+    if (initialProfile.resume_url) score += 10;
     return Math.min(score, 100);
   }, [
     fullName,
+    nik,
+    ktpUrl,
     whatsapp,
+    phone,
     address,
     headline,
     bio,
-    linkedinUrl,
-    portfolioUrl,
-    githubUrl,
+    educationList,
+    experienceStateList,
+    skillsList,
+    initialProfile.resume_url,
+  ]);
+
+  // List of fields required to achieve 100% profile completeness
+  const missingItems = useMemo(() => {
+    const list: string[] = [];
+    if (!fullName.trim()) list.push("Nama Lengkap");
+    if (nik.trim().length !== 16) list.push("NIK (16 Digit KTP)");
+    if (!ktpUrl.trim()) list.push("Unggahan Berkas KTP");
+    if (!whatsapp.trim() && !phone.trim()) list.push("Nomor WhatsApp/HP");
+    if (!address.trim()) list.push("Alamat Domisili");
+    if (!headline.trim() && !bio.trim()) list.push("Ringkasan / Headline");
+    if (educationList.length === 0) list.push("Pendidikan Terakhir (min. 1)");
+    if (experienceStateList.length === 0) list.push("Pengalaman / Organisasi (min. 1)");
+    if (skillsList.length === 0) list.push("Keahlian / Skill (min. 1)");
+    if (!initialProfile.resume_url) list.push("Unggahan Berkas CV (PDF)");
+    return list;
+  }, [
+    fullName,
+    nik,
+    ktpUrl,
+    whatsapp,
+    phone,
+    address,
+    headline,
+    bio,
     educationList,
     experienceStateList,
     skillsList,
@@ -383,7 +542,10 @@ export default function ProfileForm({ initialProfile }: ProfileFormProps) {
 
     const payload = {
       full_name: fullName,
+      avatar_url: avatarUrl,
       nik,
+      ktp_url: ktpUrl,
+      ktp_name: ktpName,
       phone,
       whatsapp,
       address,
@@ -426,18 +588,43 @@ export default function ProfileForm({ initialProfile }: ProfileFormProps) {
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 relative z-10">
           
           <div className="flex items-start sm:items-center gap-4">
-            <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-slate-900 dark:bg-gradient-to-br dark:from-emerald-600 dark:to-teal-800 border-2 border-slate-300 dark:border-emerald-500/50 flex items-center justify-center font-extrabold text-white text-2xl sm:text-3xl shadow-sm shrink-0">
-              {fullName ? fullName.charAt(0).toUpperCase() : "K"}
+            <div className="relative group shrink-0">
+              {avatarUrl ? (
+                <img
+                  src={avatarUrl}
+                  alt={fullName}
+                  className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl object-cover border-2 border-slate-300 dark:border-emerald-500/50 shadow-md"
+                />
+              ) : (
+                <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-slate-900 dark:bg-gradient-to-br dark:from-emerald-600 dark:to-teal-800 border-2 border-slate-300 dark:border-emerald-500/50 flex items-center justify-center font-extrabold text-white text-2xl sm:text-3xl shadow-sm">
+                  {fullName ? fullName.charAt(0).toUpperCase() : "K"}
+                </div>
+              )}
+
+              {/* Upload trigger button on avatar */}
+              <label
+                className="absolute -bottom-1 -right-1 p-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 dark:bg-emerald-600 dark:hover:bg-emerald-500 text-white shadow-md cursor-pointer transition-transform hover:scale-110 border-2 border-white dark:border-slate-800 flex items-center justify-center"
+                title="Unggah / Ganti Foto Profil"
+              >
+                <input
+                  type="file"
+                  accept="image/png,image/jpeg,image/jpg,image/webp"
+                  onChange={handleAvatarUpload}
+                  disabled={uploadingAvatar}
+                  className="hidden"
+                />
+                {uploadingAvatar ? (
+                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                ) : (
+                  <Camera className="w-3.5 h-3.5" />
+                )}
+              </label>
             </div>
 
             <div className="space-y-1">
               <div className="flex items-center gap-2 flex-wrap">
-                <span className="px-3 py-1 rounded-full bg-slate-100 dark:bg-emerald-950 text-slate-700 dark:text-emerald-300 border border-slate-200 dark:border-emerald-700/50 text-xs font-semibold flex items-center gap-1.5">
-                  <Sparkles className="w-3.5 h-3.5 text-slate-700 dark:text-emerald-400" />
-                  Standard Portal MagangHub
-                </span>
                 <span className="px-3 py-1 rounded-full bg-slate-100 dark:bg-teal-950 text-slate-700 dark:text-teal-300 border border-slate-200 dark:border-teal-700/50 text-xs font-semibold">
-                  Role: Kandidat
+                  Akun Kandidat
                 </span>
               </div>
 
@@ -452,27 +639,44 @@ export default function ProfileForm({ initialProfile }: ProfileFormProps) {
           </div>
 
           {/* Completeness Bar Card */}
-          <div className="bg-slate-50 dark:bg-[#061f1d] border border-slate-200 dark:border-emerald-800/60 rounded-xl p-4 sm:p-5 w-full md:w-72 shrink-0 space-y-2.5 shadow-xs">
+          <div className="bg-slate-50 dark:bg-[#061f1d] border border-slate-200 dark:border-emerald-800/60 rounded-xl p-4 sm:p-5 w-full md:w-80 shrink-0 space-y-2.5 shadow-xs">
             <div className="flex justify-between items-center text-xs font-bold">
               <span className="text-slate-700 dark:text-slate-200 flex items-center gap-1.5">
-                <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                <CheckCircle2 className={`w-4 h-4 ${completenessScore === 100 ? "text-emerald-600 dark:text-emerald-400" : "text-amber-500"}`} />
                 Kelengkapan Profil
               </span>
-              <span className="text-slate-900 dark:text-emerald-400 font-extrabold text-sm">{completenessScore}%</span>
+              <span className={`font-black text-sm ${completenessScore === 100 ? "text-emerald-600 dark:text-emerald-400" : "text-amber-600 dark:text-amber-400"}`}>
+                {completenessScore}%
+              </span>
             </div>
 
             <div className="w-full h-2.5 bg-slate-200 dark:bg-emerald-950 rounded-full overflow-hidden border border-slate-300 dark:border-emerald-900">
               <div
-                className="h-full bg-slate-900 dark:bg-gradient-to-r dark:from-emerald-500 dark:to-teal-400 rounded-full transition-all duration-500"
+                className={`h-full rounded-full transition-all duration-500 ${
+                  completenessScore === 100
+                    ? "bg-emerald-600 dark:bg-gradient-to-r dark:from-emerald-500 dark:to-teal-400"
+                    : "bg-amber-500 dark:bg-amber-400"
+                }`}
                 style={{ width: `${completenessScore}%` }}
               />
             </div>
 
-            <p className="text-[11px] text-slate-500 dark:text-emerald-300/80 leading-snug">
-              {completenessScore >= 80
-                ? "Profil Anda sangat lengkap dan siap diajukan ke lowongan!"
-                : "Lengkapi seluruh tab di bawah untuk mencapai 100% kelengkapan."}
-            </p>
+            {completenessScore === 100 ? (
+              <p className="text-[11px] text-emerald-700 dark:text-emerald-300 font-semibold leading-snug">
+                ✓ Profil 100% lengkap! Anda memenuhi syarat untuk melamar pekerjaan.
+              </p>
+            ) : (
+              <div className="space-y-1">
+                <p className="text-[11px] text-amber-700 dark:text-amber-300 font-medium leading-snug">
+                  Wajib 100% sebelum dapat melamar lowongan.
+                </p>
+                {missingItems.length > 0 && (
+                  <p className="text-[10px] text-slate-500 dark:text-slate-400 line-clamp-2">
+                    Belum diisi: {missingItems.slice(0, 3).join(", ")}{missingItems.length > 3 ? ` +${missingItems.length - 3} lainnya` : ""}
+                  </p>
+                )}
+              </div>
+            )}
           </div>
 
         </div>
@@ -514,7 +718,7 @@ export default function ProfileForm({ initialProfile }: ProfileFormProps) {
               key={tab.id}
               type="button"
               onClick={() => setActiveTab(tab.id as any)}
-              className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition-all whitespace-nowrap ${
+              className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition-all whitespace-nowrap cursor-pointer ${
                 isActive
                   ? "bg-slate-900 dark:bg-emerald-600 text-white shadow-sm"
                   : "bg-white dark:bg-[#0c2b29] text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white border border-slate-200 dark:border-emerald-900/40"
@@ -538,169 +742,316 @@ export default function ProfileForm({ initialProfile }: ProfileFormProps) {
                 <User className="w-5 h-5" />
               </div>
               <div>
-                <h2 className="text-base sm:text-lg font-bold text-white">
+                <h2 className="text-base sm:text-lg font-bold text-slate-900 dark:text-white">
                   Informasi Pribadi & Kontak Komprehensif
                 </h2>
-                <p className="text-xs text-emerald-200/70">
-                  Sesuai standar MagangHub untuk mempermudah kontak awal oleh HR Recruiter.
+                <p className="text-xs text-slate-500 dark:text-emerald-200/70">
+                  Sesuai standar MagangHub untuk verifikasi identitas resmi dan mempermudah kontak awal oleh HR Recruiter.
                 </p>
               </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5 text-sm">
+              {/* FOTO PROFIL KANDIDAT */}
+              <div className="md:col-span-2 bg-slate-50 dark:bg-[#061f1d]/90 border border-slate-200 dark:border-emerald-800/60 rounded-xl p-4 sm:p-5 flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div className="flex items-center gap-4">
+                  <div className="relative group shrink-0">
+                    {avatarUrl ? (
+                      <img
+                        src={avatarUrl}
+                        alt={fullName}
+                        className="w-14 h-14 rounded-2xl object-cover border-2 border-slate-300 dark:border-emerald-500/60 shadow-sm"
+                      />
+                    ) : (
+                      <div className="w-14 h-14 rounded-2xl bg-slate-900 dark:bg-emerald-900/60 text-white dark:text-emerald-300 flex items-center justify-center font-extrabold text-xl border border-slate-300 dark:border-emerald-700/60">
+                        {fullName ? fullName.charAt(0).toUpperCase() : "K"}
+                      </div>
+                    )}
+                  </div>
+                  <div className="space-y-0.5 text-center sm:text-left">
+                    <h3 className="text-xs font-bold text-slate-900 dark:text-white uppercase tracking-wider flex items-center justify-center sm:justify-start gap-1.5">
+                      <Camera className="w-4 h-4 text-slate-700 dark:text-emerald-400" />
+                      Foto Profil Kandidat
+                    </h3>
+                    <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                      Format file: PNG, JPG, JPEG, atau WEBP. Maksimal 5 MB. Foto formal mempermudah pengenalan oleh tim rekruter.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2 shrink-0">
+                  <label className="px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 dark:bg-emerald-600 dark:hover:bg-emerald-500 text-white text-xs font-bold transition-all shadow-sm flex items-center gap-1.5 cursor-pointer">
+                    <input
+                      type="file"
+                      accept="image/png,image/jpeg,image/jpg,image/webp"
+                      onChange={handleAvatarUpload}
+                      disabled={uploadingAvatar}
+                      className="hidden"
+                    />
+                    {uploadingAvatar ? (
+                      <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                    ) : (
+                      <Upload className="w-3.5 h-3.5" />
+                    )}
+                    <span>{avatarUrl ? "Ganti Foto" : "Unggah Foto Profil"}</span>
+                  </label>
+
+                  {avatarUrl && (
+                    <button
+                      type="button"
+                      disabled={uploadingAvatar}
+                      onClick={handleDeleteAvatar}
+                      className="px-3.5 py-2 rounded-xl bg-rose-50 dark:bg-rose-950/60 hover:bg-rose-100 dark:hover:bg-rose-900/80 text-rose-700 dark:text-rose-300 text-xs font-semibold border border-rose-200 dark:border-rose-800/60 transition-colors cursor-pointer"
+                    >
+                      Hapus
+                    </button>
+                  )}
+                </div>
+              </div>
+
               <div>
-                <label className="block text-xs font-semibold text-emerald-300 uppercase tracking-wider mb-2">
+                <label className="block text-xs font-semibold text-slate-700 dark:text-emerald-300 uppercase tracking-wider mb-2">
                   Nama Lengkap *
                 </label>
                 <div className="relative">
-                  <User className="w-4 h-4 text-emerald-400 absolute left-3.5 top-3" />
+                  <User className="w-4 h-4 text-slate-400 dark:text-emerald-400 absolute left-3.5 top-3" />
                   <input
                     type="text"
                     required
                     value={fullName}
                     onChange={(e) => setFullName(e.target.value)}
-                    className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-[#061f1d] border border-emerald-800/60 text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500 transition-colors"
+                    className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-50 dark:bg-[#061f1d] border border-slate-300 dark:border-emerald-800/60 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-slate-800 dark:focus:border-emerald-500 transition-colors"
                     placeholder="Contoh: Ahmad Rizky"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-emerald-300 uppercase tracking-wider mb-2">
-                  NIK / Nomor Identitas KTP (Opsional)
+                <label className="block text-xs font-semibold text-slate-700 dark:text-emerald-300 uppercase tracking-wider mb-2">
+                  NIK (Nomor Induk Kependudukan - 16 Digit) *
                 </label>
                 <div className="relative">
-                  <IdCard className="w-4 h-4 text-emerald-400 absolute left-3.5 top-3" />
+                  <IdCard className="w-4 h-4 text-slate-400 dark:text-emerald-400 absolute left-3.5 top-3" />
                   <input
                     type="text"
                     maxLength={16}
+                    required
                     value={nik}
                     onChange={(e) => setNik(e.target.value.replace(/[^0-9]/g, ""))}
-                    className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-[#061f1d] border border-emerald-800/60 text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500 transition-colors"
+                    className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-50 dark:bg-[#061f1d] border border-slate-300 dark:border-emerald-800/60 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-slate-800 dark:focus:border-emerald-500 transition-colors"
                     placeholder="3171012345678900"
                   />
                 </div>
+                <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1">
+                  Wajib 16 digit angka sesuai KTP. 1 NIK hanya berlaku untuk 1 akun kandidat.
+                </p>
+              </div>
+
+              {/* DOKUMEN / FOTO KTP */}
+              <div className="md:col-span-2 bg-slate-50 dark:bg-[#061f1d]/90 border border-slate-200 dark:border-emerald-800/60 rounded-xl p-4 sm:p-5 space-y-3">
+                <div className="flex items-center justify-between flex-wrap gap-2">
+                  <div className="space-y-0.5">
+                    <label className="block text-xs font-bold text-slate-900 dark:text-emerald-300 uppercase tracking-wider flex items-center gap-1.5">
+                      <IdCard className="w-4 h-4 text-slate-700 dark:text-emerald-400" />
+                      Unggah Dokumen / Foto KTP (Wajib untuk Verifikasi & 100% Profil) *
+                    </label>
+                    <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                      Format file: JPG, PNG, WEBP, atau PDF. Maksimal 5 MB. Digunakan untuk validasi 1 orang = 1 akun tunggal.
+                    </p>
+                  </div>
+                  {ktpUrl && (
+                    <span className="px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 text-[11px] font-bold border border-emerald-300 dark:border-emerald-700/60 flex items-center gap-1">
+                      <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+                      KTP Terunggah
+                    </span>
+                  )}
+                </div>
+
+                {ktpUrl ? (
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3.5 bg-white dark:bg-[#0c2b29] border border-slate-200 dark:border-emerald-700/50 rounded-xl">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-lg bg-emerald-50 dark:bg-emerald-900/40 text-emerald-600 dark:text-emerald-300 flex items-center justify-center shrink-0 border border-emerald-200 dark:border-emerald-700">
+                        <FileCheck className="w-5 h-5" />
+                      </div>
+                      <div>
+                        <p className="text-xs font-bold text-slate-900 dark:text-white truncate max-w-xs">
+                          {ktpName || "Dokumen_KTP_Terlampir"}
+                        </p>
+                        <p className="text-[10px] text-slate-500 dark:text-slate-400">
+                          Tersimpan aman di Supabase Storage
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      <a
+                        href={ktpUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-[#061f1d] hover:bg-slate-200 dark:hover:bg-emerald-900/60 text-slate-700 dark:text-emerald-300 text-xs font-semibold border border-slate-200 dark:border-emerald-800 transition-colors"
+                      >
+                        Lihat Berkas KTP
+                      </a>
+                      <button
+                        type="button"
+                        disabled={uploadingKtp}
+                        onClick={handleDeleteKtp}
+                        className="px-3 py-1.5 rounded-lg bg-rose-50 dark:bg-rose-950/60 hover:bg-rose-100 dark:hover:bg-rose-900/80 text-rose-700 dark:text-rose-300 text-xs font-semibold border border-rose-200 dark:border-rose-800/60 transition-colors cursor-pointer"
+                      >
+                        Hapus
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="flex flex-col sm:flex-row items-center gap-3">
+                    <label className="flex-1 w-full border-2 border-dashed border-slate-300 dark:border-emerald-800/80 hover:border-slate-400 dark:hover:border-emerald-500 rounded-xl p-4 text-center cursor-pointer transition-colors bg-white dark:bg-[#0c2b29]">
+                      <input
+                        type="file"
+                        accept="image/png,image/jpeg,image/jpg,image/webp,application/pdf"
+                        onChange={handleKtpUpload}
+                        disabled={uploadingKtp}
+                        className="hidden"
+                      />
+                      <div className="flex flex-col items-center gap-1.5">
+                        {uploadingKtp ? (
+                          <Loader2 className="w-6 h-6 text-slate-600 dark:text-emerald-400 animate-spin" />
+                        ) : (
+                          <Upload className="w-6 h-6 text-slate-500 dark:text-emerald-400" />
+                        )}
+                        <span className="text-xs font-bold text-slate-800 dark:text-white">
+                          {uploadingKtp ? "Mengunggah Berkas KTP..." : "Pilih atau Seret Foto/Scan KTP"}
+                        </span>
+                        <span className="text-[10px] text-slate-500 dark:text-slate-400">
+                          Format PNG, JPG, JPEG, atau Dokumen PDF (Maksimal 5 MB)
+                        </span>
+                      </div>
+                    </label>
+                  </div>
+                )}
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-emerald-300 uppercase tracking-wider mb-2">
+                <label className="block text-xs font-semibold text-slate-700 dark:text-emerald-300 uppercase tracking-wider mb-2">
                   Nomor Telepon Seluler
                 </label>
                 <div className="relative">
-                  <Phone className="w-4 h-4 text-emerald-400 absolute left-3.5 top-3" />
+                  <Phone className="w-4 h-4 text-slate-400 dark:text-emerald-400 absolute left-3.5 top-3" />
                   <input
                     type="tel"
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
-                    className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-[#061f1d] border border-emerald-800/60 text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500 transition-colors"
+                    className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-50 dark:bg-[#061f1d] border border-slate-300 dark:border-emerald-800/60 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-slate-800 dark:focus:border-emerald-500 transition-colors"
                     placeholder="081234567890"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-emerald-300 uppercase tracking-wider mb-2">
+                <label className="block text-xs font-semibold text-slate-700 dark:text-emerald-300 uppercase tracking-wider mb-2">
                   Nomor WhatsApp Aktif *
                 </label>
                 <div className="relative">
-                  <MessageSquare className="w-4 h-4 text-emerald-400 absolute left-3.5 top-3" />
+                  <MessageSquare className="w-4 h-4 text-slate-400 dark:text-emerald-400 absolute left-3.5 top-3" />
                   <input
                     type="tel"
                     required
                     value={whatsapp}
                     onChange={(e) => setWhatsapp(e.target.value)}
-                    className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-[#061f1d] border border-emerald-800/60 text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500 transition-colors"
+                    className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-50 dark:bg-[#061f1d] border border-slate-300 dark:border-emerald-800/60 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-slate-800 dark:focus:border-emerald-500 transition-colors"
                     placeholder="081234567890"
                   />
                 </div>
               </div>
 
               <div className="md:col-span-2">
-                <label className="block text-xs font-semibold text-emerald-300 uppercase tracking-wider mb-2">
-                  Alamat Domisili Lengkap
+                <label className="block text-xs font-semibold text-slate-700 dark:text-emerald-300 uppercase tracking-wider mb-2">
+                  Alamat Domisili Lengkap *
                 </label>
                 <div className="relative">
-                  <MapPin className="w-4 h-4 text-emerald-400 absolute left-3.5 top-3" />
+                  <MapPin className="w-4 h-4 text-slate-400 dark:text-emerald-400 absolute left-3.5 top-3" />
                   <input
                     type="text"
+                    required
                     value={address}
                     onChange={(e) => setAddress(e.target.value)}
-                    className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-[#061f1d] border border-emerald-800/60 text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500 transition-colors"
+                    className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-50 dark:bg-[#061f1d] border border-slate-300 dark:border-emerald-800/60 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-slate-800 dark:focus:border-emerald-500 transition-colors"
                     placeholder="Jl. Sudirman No. 12, Jakarta Selatan, DKI Jakarta"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-emerald-300 uppercase tracking-wider mb-2">
+                <label className="block text-xs font-semibold text-slate-700 dark:text-emerald-300 uppercase tracking-wider mb-2">
                   Tautan Profil LinkedIn
                 </label>
                 <div className="relative">
-                  <LinkIcon className="w-4 h-4 text-emerald-400 absolute left-3.5 top-3" />
+                  <LinkIcon className="w-4 h-4 text-slate-400 dark:text-emerald-400 absolute left-3.5 top-3" />
                   <input
                     type="url"
                     value={linkedinUrl}
                     onChange={(e) => setLinkedinUrl(e.target.value)}
-                    className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-[#061f1d] border border-emerald-800/60 text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500 transition-colors"
+                    className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-50 dark:bg-[#061f1d] border border-slate-300 dark:border-emerald-800/60 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-slate-800 dark:focus:border-emerald-500 transition-colors"
                     placeholder="https://linkedin.com/in/username"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-emerald-300 uppercase tracking-wider mb-2">
+                <label className="block text-xs font-semibold text-slate-700 dark:text-emerald-300 uppercase tracking-wider mb-2">
                   Tautan Profil GitHub
                 </label>
                 <div className="relative">
-                  <Globe className="w-4 h-4 text-emerald-400 absolute left-3.5 top-3" />
+                  <Globe className="w-4 h-4 text-slate-400 dark:text-emerald-400 absolute left-3.5 top-3" />
                   <input
                     type="url"
                     value={githubUrl}
                     onChange={(e) => setGithubUrl(e.target.value)}
-                    className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-[#061f1d] border border-emerald-800/60 text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500 transition-colors"
+                    className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-50 dark:bg-[#061f1d] border border-slate-300 dark:border-emerald-800/60 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-slate-800 dark:focus:border-emerald-500 transition-colors"
                     placeholder="https://github.com/username"
                   />
                 </div>
               </div>
 
               <div className="md:col-span-2">
-                <label className="block text-xs font-semibold text-emerald-300 uppercase tracking-wider mb-2">
+                <label className="block text-xs font-semibold text-slate-700 dark:text-emerald-300 uppercase tracking-wider mb-2">
                   Tautan Portofolio Web / Website Pribadi
                 </label>
                 <div className="relative">
-                  <Globe className="w-4 h-4 text-emerald-400 absolute left-3.5 top-3" />
+                  <Globe className="w-4 h-4 text-slate-400 dark:text-emerald-400 absolute left-3.5 top-3" />
                   <input
                     type="url"
                     value={portfolioUrl}
                     onChange={(e) => setPortfolioUrl(e.target.value)}
-                    className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-[#061f1d] border border-emerald-800/60 text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500 transition-colors"
+                    className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-50 dark:bg-[#061f1d] border border-slate-300 dark:border-emerald-800/60 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-slate-800 dark:focus:border-emerald-500 transition-colors"
                     placeholder="https://myportfolio.com"
                   />
                 </div>
               </div>
 
               <div className="md:col-span-2">
-                <label className="block text-xs font-semibold text-emerald-300 uppercase tracking-wider mb-2">
-                  Headline Profesional
+                <label className="block text-xs font-semibold text-slate-700 dark:text-emerald-300 uppercase tracking-wider mb-2">
+                  Headline Profesional *
                 </label>
                 <input
                   type="text"
+                  required
                   value={headline}
                   onChange={(e) => setHeadline(e.target.value)}
-                  className="w-full px-4 py-2.5 rounded-xl bg-[#061f1d] border border-emerald-800/60 text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500 transition-colors"
+                  className="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-[#061f1d] border border-slate-300 dark:border-emerald-800/60 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-slate-800 dark:focus:border-emerald-500 transition-colors"
                   placeholder="Contoh: Frontend Engineer | Ex-Tech Intern at MagangHub"
                 />
               </div>
 
               <div className="md:col-span-2">
-                <label className="block text-xs font-semibold text-emerald-300 uppercase tracking-wider mb-2">
-                  Bio & Ringkasan Kualifikasi Diri
+                <label className="block text-xs font-semibold text-slate-700 dark:text-emerald-300 uppercase tracking-wider mb-2">
+                  Bio & Ringkasan Kualifikasi Diri *
                 </label>
                 <textarea
                   rows={3}
+                  required
                   value={bio}
                   onChange={(e) => setBio(e.target.value)}
-                  className="w-full px-4 py-2.5 rounded-xl bg-[#061f1d] border border-emerald-800/60 text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500 transition-colors resize-none text-xs sm:text-sm"
+                  className="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-[#061f1d] border border-slate-300 dark:border-emerald-800/60 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-slate-800 dark:focus:border-emerald-500 transition-colors resize-none text-xs sm:text-sm"
                   placeholder="Tuliskan perkenalan singkat, latar belakang pendidikan, dan ambisi karier Anda..."
                 />
               </div>

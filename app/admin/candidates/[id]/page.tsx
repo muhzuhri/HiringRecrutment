@@ -7,7 +7,7 @@ import { ArrowLeft } from "lucide-react";
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   return {
-    title: `Screening Kandidat #${id} | TalentHub Admin`,
+    title: `Screening Kandidat | Nexora Digital Admin`,
     description: "Pratinjau CV PDF, data terstruktur pelamar, catatan rahasia HR, dan log audit.",
   };
 }

@@ -16,16 +16,16 @@ const plusJakarta = Plus_Jakarta_Sans({
 
 export const metadata: Metadata = {
   title: {
-    default: "TalentHub – Karier & Rekrutmen",
-    template: "%s | TalentHub",
+    default: "Nexora Digital – Karier & Rekrutmen",
+    template: "%s | Nexora Digital",
   },
   description:
-    "Bergabunglah bersama kami dan temukan karier impianmu. TalentHub membuka peluang luar biasa bagi para profesional berbakat Indonesia.",
-  keywords: ["lowongan kerja", "karier", "rekrutmen", "hiring", "talent"],
+    "Bergabunglah bersama Nexora Digital dan temukan karier impianmu. Kami membuka peluang luar biasa bagi para profesional berbakat Indonesia.",
+  keywords: ["lowongan kerja", "karier", "rekrutmen", "hiring", "talent", "nexora digital"],
   openGraph: {
-    title: "TalentHub – Temukan Karier Impianmu",
+    title: "Nexora Digital – Temukan Karier Impianmu",
     description:
-      "Platform rekrutmen modern untuk kandidat terbaik Indonesia.",
+      "Platform rekrutmen modern Nexora Digital untuk kandidat terbaik Indonesia.",
     type: "website",
   },
 };
