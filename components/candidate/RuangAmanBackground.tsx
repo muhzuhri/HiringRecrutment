@@ -25,10 +25,10 @@ export default function RuangAmanBackground({
       aria-hidden="true"
     >
       {/* 1. Top Radial Gradient Glow (Pencahayaan Modern) */}
-      <div className="absolute -top-24 left-1/2 -translate-x-1/2 w-[700px] sm:w-[1000px] h-[450px] bg-[radial-gradient(ellipse_at_top,rgba(20,184,166,0.18),rgba(15,118,110,0.06)_45%,transparent_75%)] dark:bg-[radial-gradient(ellipse_at_top,rgba(20,184,166,0.22),rgba(6,31,29,0.1)_50%,transparent_80%)] blur-2xl" />
+      <div className="absolute -top-24 left-1/2 -translate-x-1/2 w-[700px] sm:w-[1000px] h-[450px] bg-[radial-gradient(ellipse_at_top,rgba(20,184,166,0.18),rgba(15,118,110,0.06)_45%,transparent_75%)] dark:bg-[radial-gradient(ellipse_at_top,rgba(0,242,254,0.18),rgba(11,19,43,0.1)_50%,transparent_80%)] blur-2xl" />
 
       {/* 2. Secondary Ambient Glow on Top Right */}
-      <div className="absolute top-12 right-0 w-80 h-80 bg-teal-400/10 dark:bg-teal-500/10 rounded-full blur-3xl" />
+      <div className="absolute top-12 right-0 w-80 h-80 bg-teal-400/10 dark:bg-cyan-500/10 rounded-full blur-3xl" />
 
       {/* 3. 3D Floating Isometric Wireframe Cubes (Opasitas 10% - 20%, Warna Teal & Slate) */}
       {showCubes && (

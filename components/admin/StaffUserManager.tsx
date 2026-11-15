@@ -199,7 +199,7 @@ export default function StaffUserManager({ initialStaff }: StaffUserManagerProps
       )}
 
       {/* Header Banner */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-slate-200/80 dark:border-teal-800/40">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-slate-200/80 dark:border-slate-800/80">
         <div>
           <h1 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">
             Kelola Akun Staf
@@ -221,19 +221,19 @@ export default function StaffUserManager({ initialStaff }: StaffUserManagerProps
 
       {/* Metrics Row */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5 sm:gap-4">
-        <div className="bg-white/90 dark:bg-[#0c2b29]/90 backdrop-blur-md border border-slate-200/80 dark:border-teal-800/40 rounded-2xl p-4 shadow-2xs">
+        <div className="bg-white/90 dark:bg-[#132238]/90 backdrop-blur-md border border-slate-200/80 dark:border-slate-800/80 rounded-2xl p-4 shadow-2xs">
           <p className="text-[11px] font-semibold text-slate-500 dark:text-slate-400">Total Akun Staf</p>
           <p className="text-2xl font-black text-slate-900 dark:text-white mt-1">{totalCount}</p>
           <p className="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5">Pengguna internal terdaftar</p>
         </div>
 
-        <div className="bg-white/90 dark:bg-[#0c2b29]/90 backdrop-blur-md border border-slate-200/80 dark:border-teal-800/40 rounded-2xl p-4 shadow-2xs">
+        <div className="bg-white/90 dark:bg-[#132238]/90 backdrop-blur-md border border-slate-200/80 dark:border-slate-800/80 rounded-2xl p-4 shadow-2xs">
           <p className="text-[11px] font-semibold text-slate-500 dark:text-slate-400">Tim HR & Recruiter</p>
           <p className="text-2xl font-black text-teal-700 dark:text-teal-400 mt-1">{hrCount}</p>
           <p className="text-[10px] text-teal-600 dark:text-teal-300 mt-0.5">Akses penuh rekrutmen & kanban</p>
         </div>
 
-        <div className="bg-white/90 dark:bg-[#0c2b29]/90 backdrop-blur-md border border-slate-200/80 dark:border-teal-800/40 rounded-2xl p-4 shadow-2xs">
+        <div className="bg-white/90 dark:bg-[#132238]/90 backdrop-blur-md border border-slate-200/80 dark:border-slate-800/80 rounded-2xl p-4 shadow-2xs">
           <p className="text-[11px] font-semibold text-slate-500 dark:text-slate-400">Tim Penilai & Assessor</p>
           <p className="text-2xl font-black text-purple-700 dark:text-purple-400 mt-1">{penilaiCount}</p>
           <p className="text-[10px] text-purple-600 dark:text-purple-300 mt-0.5">Evaluasi & penilaian tes seleksi</p>
@@ -241,9 +241,9 @@ export default function StaffUserManager({ initialStaff }: StaffUserManagerProps
       </div>
 
       {/* Navigation Filter & Search Bar */}
-      <div className="bg-white dark:bg-[#0c2b29] border border-slate-200 dark:border-emerald-800/40 rounded-2xl p-3 sm:p-3.5 shadow-sm space-y-3 transition-colors">
+      <div className="bg-white dark:bg-[#132238] border border-slate-200 dark:border-slate-800/80 rounded-2xl p-3 sm:p-3.5 shadow-sm space-y-3 transition-colors">
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
-          <div className="flex flex-wrap items-center gap-1 p-1 bg-slate-100 dark:bg-[#061f1d] rounded-xl border border-slate-200 dark:border-emerald-800/60 text-xs">
+          <div className="flex flex-wrap items-center gap-1 p-1 bg-slate-100 dark:bg-[#0B132B] rounded-xl border border-slate-200 dark:border-slate-800/80 text-xs">
             <button
               type="button"
               onClick={() => setRoleFilter("all")}
@@ -286,17 +286,17 @@ export default function StaffUserManager({ initialStaff }: StaffUserManagerProps
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Cari nama atau email staf..."
-              className="w-full pl-9 pr-3.5 py-1.5 rounded-xl bg-slate-50 dark:bg-[#061f1d] border border-slate-200 dark:border-emerald-800/60 text-slate-900 dark:text-white text-xs focus:outline-none focus:border-slate-800 dark:focus:border-emerald-500"
+              className="w-full pl-9 pr-3.5 py-1.5 rounded-xl bg-slate-50 dark:bg-[#0B132B] border border-slate-200 dark:border-slate-800/80 text-slate-900 dark:text-white text-xs focus:outline-none focus:border-slate-800 dark:focus:border-emerald-500"
             />
           </div>
         </div>
       </div>
 
       {/* Staff Table */}
-      <div className="bg-white dark:bg-[#0c2b29] border border-slate-200 dark:border-emerald-800/40 rounded-2xl p-4 sm:p-5 shadow-sm space-y-4 transition-colors">
+      <div className="bg-white dark:bg-[#132238] border border-slate-200 dark:border-slate-800/80 rounded-2xl p-4 sm:p-5 shadow-sm space-y-4 transition-colors">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs text-slate-700 dark:text-slate-300">
-            <thead className="bg-slate-100 dark:bg-[#061f1d] text-slate-700 dark:text-emerald-300 uppercase font-bold text-[10px] border-b border-slate-200 dark:border-emerald-800">
+            <thead className="bg-slate-100 dark:bg-[#0B132B] text-slate-700 dark:text-teal-300 uppercase font-bold text-[10px] border-b border-slate-200 dark:border-slate-800">
               <tr>
                 <th className="px-4 py-3">Nama Lengkap & Staf</th>
                 <th className="px-3 py-3">Email Akun</th>
@@ -317,12 +317,12 @@ export default function StaffUserManager({ initialStaff }: StaffUserManagerProps
                   const isHr = staff.role === "admin" || staff.role === "hr";
 
                   return (
-                    <tr key={staff.id} className="hover:bg-slate-50 dark:hover:bg-[#061f1d]/60 transition-colors group">
+                    <tr key={staff.id} className="hover:bg-slate-50 dark:hover:bg-[#0B132B]/60 transition-colors group">
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-3">
                           <div className={`w-9 h-9 rounded-xl flex items-center justify-center font-bold text-xs shrink-0 ${
                             isHr
-                              ? "bg-teal-100 dark:bg-teal-950 text-teal-800 dark:text-teal-300 border border-teal-200 dark:border-teal-800"
+                              ? "bg-teal-100 dark:bg-teal-950 text-teal-800 dark:text-teal-300 border border-teal-200 dark:border-slate-800"
                               : "bg-purple-100 dark:bg-purple-950 text-purple-800 dark:text-purple-300 border border-purple-200 dark:border-purple-800"
                           }`}>
                             {staff.full_name.charAt(0).toUpperCase()}
@@ -340,7 +340,7 @@ export default function StaffUserManager({ initialStaff }: StaffUserManagerProps
                         <span
                           className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold border inline-flex items-center gap-1 ${
                             isHr
-                              ? "bg-teal-50 dark:bg-teal-950/80 text-teal-700 dark:text-teal-300 border-teal-300 dark:border-teal-800"
+                              ? "bg-teal-50 dark:bg-teal-950/80 text-teal-700 dark:text-teal-300 border-teal-300 dark:border-slate-800"
                               : "bg-purple-50 dark:bg-purple-950/80 text-purple-700 dark:text-purple-300 border-purple-300 dark:border-purple-800"
                           }`}
                         >
@@ -385,10 +385,10 @@ export default function StaffUserManager({ initialStaff }: StaffUserManagerProps
       {/* MODAL 1: Create Staff Modal */}
       {showCreateModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in">
-          <div className="bg-white dark:bg-[#0c2b29] border border-slate-300 dark:border-emerald-700 rounded-3xl max-w-md w-full p-6 space-y-4 text-slate-800 dark:text-slate-100 shadow-2xl">
-            <div className="flex items-center justify-between border-b border-slate-200 dark:border-emerald-800 pb-3">
+          <div className="bg-white dark:bg-[#132238] border border-slate-300 dark:border-emerald-700 rounded-3xl max-w-md w-full p-6 space-y-4 text-slate-800 dark:text-slate-100 shadow-2xl">
+            <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3">
               <div className="flex items-center gap-2">
-                <Users className="w-5 h-5 text-teal-600 dark:text-emerald-400" />
+                <Users className="w-5 h-5 text-teal-600 dark:text-teal-400" />
                 <h3 className="font-extrabold text-slate-900 dark:text-white text-base">Tambah Akun Staf Baru</h3>
               </div>
               <button
@@ -401,7 +401,7 @@ export default function StaffUserManager({ initialStaff }: StaffUserManagerProps
 
             <form onSubmit={handleCreateSubmit} className="space-y-4 text-xs">
               <div>
-                <label className="block font-bold text-slate-700 dark:text-emerald-300 uppercase tracking-wider mb-1">
+                <label className="block font-bold text-slate-700 dark:text-teal-300 uppercase tracking-wider mb-1">
                   Nama Lengkap Staf *
                 </label>
                 <input
@@ -410,12 +410,12 @@ export default function StaffUserManager({ initialStaff }: StaffUserManagerProps
                   value={createName}
                   onChange={(e) => setCreateName(e.target.value)}
                   placeholder="Contoh: Sarah Wijaya / Dr. Bambang"
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-[#061f1d] border border-slate-300 dark:border-emerald-800 text-slate-900 dark:text-white focus:outline-none focus:border-slate-800 dark:focus:border-emerald-500"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-[#0B132B] border border-slate-300 dark:border-slate-800 text-slate-900 dark:text-white focus:outline-none focus:border-slate-800 dark:focus:border-emerald-500"
                 />
               </div>
 
               <div>
-                <label className="block font-bold text-slate-700 dark:text-emerald-300 uppercase tracking-wider mb-1">
+                <label className="block font-bold text-slate-700 dark:text-teal-300 uppercase tracking-wider mb-1">
                   Email Akun Staf *
                 </label>
                 <input
@@ -424,12 +424,12 @@ export default function StaffUserManager({ initialStaff }: StaffUserManagerProps
                   value={createEmail}
                   onChange={(e) => setCreateEmail(e.target.value)}
                   placeholder="Contoh: sarah@talenthub.com"
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-[#061f1d] border border-slate-300 dark:border-emerald-800 text-slate-900 dark:text-white focus:outline-none focus:border-slate-800 dark:focus:border-emerald-500"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-[#0B132B] border border-slate-300 dark:border-slate-800 text-slate-900 dark:text-white focus:outline-none focus:border-slate-800 dark:focus:border-emerald-500"
                 />
               </div>
 
               <div>
-                <label className="block font-bold text-slate-700 dark:text-emerald-300 uppercase tracking-wider mb-1">
+                <label className="block font-bold text-slate-700 dark:text-teal-300 uppercase tracking-wider mb-1">
                   Password Awal (Opsional)
                 </label>
                 <input
@@ -437,21 +437,21 @@ export default function StaffUserManager({ initialStaff }: StaffUserManagerProps
                   value={createPassword}
                   onChange={(e) => setCreatePassword(e.target.value)}
                   placeholder="Default: TalentHub2026!"
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-[#061f1d] border border-slate-300 dark:border-emerald-800 text-slate-900 dark:text-white focus:outline-none focus:border-slate-800 dark:focus:border-emerald-500"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-[#0B132B] border border-slate-300 dark:border-slate-800 text-slate-900 dark:text-white focus:outline-none focus:border-slate-800 dark:focus:border-emerald-500"
                 />
               </div>
 
               <div>
-                <label className="block font-bold text-slate-700 dark:text-emerald-300 uppercase tracking-wider mb-1">
+                <label className="block font-bold text-slate-700 dark:text-teal-300 uppercase tracking-wider mb-1">
                   Peran / Hak Akses (Role) *
                 </label>
                 <select
                   value={createRole}
                   onChange={(e) => setCreateRole(e.target.value as "hr" | "penilai")}
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-[#061f1d] border border-slate-300 dark:border-emerald-800 text-slate-900 dark:text-white focus:outline-none focus:border-slate-800 dark:focus:border-emerald-500"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-[#0B132B] border border-slate-300 dark:border-slate-800 text-slate-900 dark:text-white focus:outline-none focus:border-slate-800 dark:focus:border-emerald-500"
                 >
-                  <option value="hr">Tim HR & Recruiter (Kelola Lowongan, Kanban, Screening)</option>
-                  <option value="penilai">Tim Penilai & Assessor (Evaluasi & Nilai Ujian Tes)</option>
+                  <option value="hr">Hiring Recrutment</option>
+                  <option value="penilai">Penilai</option>
                 </select>
               </div>
 
@@ -459,7 +459,7 @@ export default function StaffUserManager({ initialStaff }: StaffUserManagerProps
                 <button
                   type="button"
                   onClick={() => setShowCreateModal(false)}
-                  className="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-[#061f1d] dark:hover:bg-emerald-950 text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-emerald-800 font-bold transition-colors cursor-pointer"
+                  className="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-[#0B132B] dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-800 font-bold transition-colors cursor-pointer"
                 >
                   Batal
                 </button>
@@ -480,10 +480,10 @@ export default function StaffUserManager({ initialStaff }: StaffUserManagerProps
       {/* MODAL 2: Edit Staff Modal */}
       {editingStaff && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in">
-          <div className="bg-white dark:bg-[#0c2b29] border border-slate-300 dark:border-emerald-700 rounded-3xl max-w-md w-full p-6 space-y-4 text-slate-800 dark:text-slate-100 shadow-2xl">
-            <div className="flex items-center justify-between border-b border-slate-200 dark:border-emerald-800 pb-3">
+          <div className="bg-white dark:bg-[#132238] border border-slate-300 dark:border-emerald-700 rounded-3xl max-w-md w-full p-6 space-y-4 text-slate-800 dark:text-slate-100 shadow-2xl">
+            <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3">
               <div className="flex items-center gap-2">
-                <Edit3 className="w-5 h-5 text-teal-600 dark:text-emerald-400" />
+                <Edit3 className="w-5 h-5 text-teal-600 dark:text-teal-400" />
                 <h3 className="font-extrabold text-slate-900 dark:text-white text-base">Edit Data Staf</h3>
               </div>
               <button
@@ -495,13 +495,13 @@ export default function StaffUserManager({ initialStaff }: StaffUserManagerProps
             </div>
 
             <form onSubmit={handleEditSubmit} className="space-y-4 text-xs">
-              <div className="p-3 rounded-xl bg-slate-50 dark:bg-[#061f1d] border border-slate-200 dark:border-emerald-800/60">
+              <div className="p-3 rounded-xl bg-slate-50 dark:bg-[#0B132B] border border-slate-200 dark:border-slate-800/80">
                 <p className="text-[10px] text-slate-500 uppercase font-bold">Email Akun (Tetap):</p>
                 <p className="font-bold text-slate-900 dark:text-white mt-0.5">{editingStaff.email}</p>
               </div>
 
               <div>
-                <label className="block font-bold text-slate-700 dark:text-emerald-300 uppercase tracking-wider mb-1">
+                <label className="block font-bold text-slate-700 dark:text-teal-300 uppercase tracking-wider mb-1">
                   Nama Lengkap Staf *
                 </label>
                 <input
@@ -509,21 +509,21 @@ export default function StaffUserManager({ initialStaff }: StaffUserManagerProps
                   required
                   value={editName}
                   onChange={(e) => setEditName(e.target.value)}
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-[#061f1d] border border-slate-300 dark:border-emerald-800 text-slate-900 dark:text-white focus:outline-none focus:border-slate-800 dark:focus:border-emerald-500"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-[#0B132B] border border-slate-300 dark:border-slate-800 text-slate-900 dark:text-white focus:outline-none focus:border-slate-800 dark:focus:border-emerald-500"
                 />
               </div>
 
               <div>
-                <label className="block font-bold text-slate-700 dark:text-emerald-300 uppercase tracking-wider mb-1">
+                <label className="block font-bold text-slate-700 dark:text-teal-300 uppercase tracking-wider mb-1">
                   Peran / Hak Akses (Role) *
                 </label>
                 <select
                   value={editRole}
                   onChange={(e) => setEditRole(e.target.value as "hr" | "penilai")}
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-[#061f1d] border border-slate-300 dark:border-emerald-800 text-slate-900 dark:text-white focus:outline-none focus:border-slate-800 dark:focus:border-emerald-500"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-[#0B132B] border border-slate-300 dark:border-slate-800 text-slate-900 dark:text-white focus:outline-none focus:border-slate-800 dark:focus:border-emerald-500"
                 >
-                  <option value="hr">Tim HR & Recruiter (Kelola Lowongan, Kanban, Screening)</option>
-                  <option value="penilai">Tim Penilai & Assessor (Evaluasi & Nilai Ujian Tes)</option>
+                  <option value="hr">Hiring Recrutment</option>
+                  <option value="penilai">Penilai</option>
                 </select>
               </div>
 
@@ -531,7 +531,7 @@ export default function StaffUserManager({ initialStaff }: StaffUserManagerProps
                 <button
                   type="button"
                   onClick={() => setEditingStaff(null)}
-                  className="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-[#061f1d] dark:hover:bg-emerald-950 text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-emerald-800 font-bold transition-colors cursor-pointer"
+                  className="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-[#0B132B] dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-800 font-bold transition-colors cursor-pointer"
                 >
                   Batal
                 </button>
@@ -552,7 +552,7 @@ export default function StaffUserManager({ initialStaff }: StaffUserManagerProps
       {/* MODAL 3: Confirm Delete Modal */}
       {deletingStaff && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in">
-          <div className="bg-white dark:bg-[#0c2b29] border border-rose-300 dark:border-rose-800/60 rounded-3xl max-w-md w-full p-6 shadow-2xl space-y-4">
+          <div className="bg-white dark:bg-[#132238] border border-rose-300 dark:border-rose-800/60 rounded-3xl max-w-md w-full p-6 shadow-2xl space-y-4">
             <div className="w-12 h-12 rounded-2xl bg-rose-50 dark:bg-rose-950 border border-rose-200 dark:border-rose-700/60 text-rose-600 dark:text-rose-400 flex items-center justify-center font-bold mx-auto">
               <AlertTriangle className="w-6 h-6" />
             </div>
@@ -568,7 +568,7 @@ export default function StaffUserManager({ initialStaff }: StaffUserManagerProps
               <button
                 type="button"
                 onClick={() => setDeletingStaff(null)}
-                className="flex-1 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-[#061f1d] dark:hover:bg-emerald-950 border border-slate-300 dark:border-emerald-800 text-slate-700 dark:text-slate-300 text-xs font-bold transition-colors cursor-pointer"
+                className="flex-1 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-[#0B132B] dark:hover:bg-slate-800 border border-slate-300 dark:border-slate-800 text-slate-700 dark:text-slate-300 text-xs font-bold transition-colors cursor-pointer"
               >
                 Batal
               </button>

@@ -169,7 +169,7 @@ export default function CandidateScreeningView({ detail }: CandidateScreeningVie
   return (
     <div className="space-y-8">
       {/* 1. Candidate Header Banner */}
-      <div className="bg-white dark:bg-[#0c2b29] border border-slate-200 dark:border-emerald-800/50 rounded-2xl p-6 sm:p-8 shadow-sm dark:shadow-xl relative overflow-hidden transition-colors">
+      <div className="bg-white dark:bg-[#132238] border border-slate-200 dark:border-slate-800/80 rounded-2xl p-6 sm:p-8 shadow-sm dark:shadow-xl relative overflow-hidden transition-colors">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 relative z-10">
           <div className="flex items-center gap-4">
             <div className="w-16 h-16 rounded-2xl bg-slate-900 dark:bg-emerald-900 border border-slate-300 dark:border-emerald-600/50 flex items-center justify-center font-extrabold text-white text-2xl shadow-sm">
@@ -178,7 +178,7 @@ export default function CandidateScreeningView({ detail }: CandidateScreeningVie
 
             <div className="space-y-1">
               <div className="flex items-center gap-2 flex-wrap">
-                <span className="px-3 py-1 rounded-full bg-slate-100 dark:bg-emerald-500/20 text-slate-700 dark:text-emerald-300 border border-slate-200 dark:border-emerald-500/40 text-xs font-bold">
+                <span className="px-3 py-1 rounded-full bg-slate-100 dark:bg-emerald-500/20 text-slate-700 dark:text-teal-300 border border-slate-200 dark:border-emerald-500/40 text-xs font-bold">
                   Status: {application.status}
                 </span>
                 {isQualified && (
@@ -196,7 +196,7 @@ export default function CandidateScreeningView({ detail }: CandidateScreeningVie
                 {profile.full_name}
               </h1>
 
-              <p className="text-slate-600 dark:text-emerald-200/80 text-xs sm:text-sm">
+              <p className="text-slate-600 dark:text-teal-200/80 text-xs sm:text-sm">
                 Melamar posisi <strong>{application.job_title}</strong> ({application.department} - {application.job_type})
               </p>
             </div>
@@ -221,7 +221,7 @@ export default function CandidateScreeningView({ detail }: CandidateScreeningVie
             <select
               value={application.status}
               onChange={(e) => handleStatusChange(e.target.value)}
-              className="px-4 py-2.5 rounded-xl bg-[#061f1d] border border-emerald-700 text-white text-xs font-bold focus:outline-none focus:border-emerald-500"
+              className="px-4 py-2.5 rounded-xl bg-[#0B132B] border border-emerald-700 text-white text-xs font-bold focus:outline-none focus:border-emerald-500"
             >
               <option value="Diajukan">Ubah Status: Diajukan</option>
               <option value="Diproses">Ubah Status: Diproses (Screening)</option>
@@ -251,7 +251,7 @@ export default function CandidateScreeningView({ detail }: CandidateScreeningVie
               className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition-all whitespace-nowrap ${
                 isActive
                   ? "bg-slate-900 text-white shadow-sm dark:bg-emerald-600 dark:text-white"
-                  : "bg-white dark:bg-[#0c2b29] text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white border border-slate-200 dark:border-emerald-900/40"
+                  : "bg-white dark:bg-[#132238] text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white border border-slate-200 dark:border-slate-800/40"
               }`}
             >
               <Icon className="w-4 h-4" />
@@ -266,24 +266,24 @@ export default function CandidateScreeningView({ detail }: CandidateScreeningVie
       {/* Tab 1: Profile & Skills */}
       {activeTab === "profile" && (
         <div className="space-y-6">
-          <div className="bg-white dark:bg-[#0c2b29] border border-slate-200 dark:border-emerald-800/40 rounded-2xl p-6 space-y-3 shadow-sm transition-colors">
+          <div className="bg-white dark:bg-[#132238] border border-slate-200 dark:border-slate-800/80 rounded-2xl p-6 space-y-3 shadow-sm transition-colors">
             <h3 className="text-base font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
-              <User className="w-4 h-4 text-slate-700 dark:text-emerald-400" />
+              <User className="w-4 h-4 text-slate-700 dark:text-teal-400" />
               Ringkasan Kualifikasi Diri
             </h3>
-            <p className="text-xs text-slate-600 dark:text-emerald-300 font-semibold">{profile.headline}</p>
+            <p className="text-xs text-slate-600 dark:text-teal-300 font-semibold">{profile.headline}</p>
             <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">{profile.bio}</p>
           </div>
 
-          <div className="bg-white dark:bg-[#0c2b29] border border-slate-200 dark:border-emerald-800/40 rounded-2xl p-6 space-y-4 shadow-sm transition-colors">
+          <div className="bg-white dark:bg-[#132238] border border-slate-200 dark:border-slate-800/80 rounded-2xl p-6 space-y-4 shadow-sm transition-colors">
             <h3 className="text-base font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
-              <GraduationCap className="w-4 h-4 text-slate-700 dark:text-emerald-400" />
+              <GraduationCap className="w-4 h-4 text-slate-700 dark:text-teal-400" />
               Riwayat Pendidikan Terstruktur
             </h3>
             <div className="space-y-3">
               {profile.education.map((edu, idx) => (
-                <div key={idx} className="bg-slate-50 dark:bg-[#061f1d] p-4 rounded-xl border border-slate-200 dark:border-emerald-800/40 space-y-1">
-                  <div className="flex justify-between items-center text-xs font-bold text-slate-800 dark:text-emerald-300">
+                <div key={idx} className="bg-slate-50 dark:bg-[#0B132B] p-4 rounded-xl border border-slate-200 dark:border-slate-800/80 space-y-1">
+                  <div className="flex justify-between items-center text-xs font-bold text-slate-800 dark:text-teal-300">
                     <span>{edu.level} - {edu.school}</span>
                     <span className="text-slate-500 dark:text-slate-400">Lulus {edu.endYear}</span>
                   </div>
@@ -293,16 +293,16 @@ export default function CandidateScreeningView({ detail }: CandidateScreeningVie
             </div>
           </div>
 
-          <div className="bg-white dark:bg-[#0c2b29] border border-slate-200 dark:border-emerald-800/40 rounded-2xl p-6 space-y-4 shadow-sm transition-colors">
+          <div className="bg-white dark:bg-[#132238] border border-slate-200 dark:border-slate-800/80 rounded-2xl p-6 space-y-4 shadow-sm transition-colors">
             <h3 className="text-base font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
-              <Award className="w-4 h-4 text-slate-700 dark:text-emerald-400" />
+              <Award className="w-4 h-4 text-slate-700 dark:text-teal-400" />
               Daftar Keahlian & Technical Skills
             </h3>
             <div className="flex flex-wrap gap-2">
               {profile.skills.map((skill) => (
                 <span
                   key={skill}
-                  className="px-3 py-1 bg-slate-100 dark:bg-[#061f1d] text-slate-700 dark:text-emerald-300 border border-slate-200 dark:border-emerald-700/50 rounded-xl text-xs font-semibold"
+                  className="px-3 py-1 bg-slate-100 dark:bg-[#0B132B] text-slate-700 dark:text-teal-300 border border-slate-200 dark:border-emerald-700/50 rounded-xl text-xs font-semibold"
                 >
                   {skill}
                 </span>
@@ -314,11 +314,11 @@ export default function CandidateScreeningView({ detail }: CandidateScreeningVie
 
       {/* Tab 2: Document CV Viewer */}
       {activeTab === "cv" && (
-        <div className="bg-white dark:bg-[#0c2b29] border border-slate-200 dark:border-emerald-800/40 rounded-2xl p-6 space-y-4 shadow-sm transition-colors">
-          <div className="flex items-center justify-between border-b border-slate-200 dark:border-emerald-800/40 pb-4">
+        <div className="bg-white dark:bg-[#132238] border border-slate-200 dark:border-slate-800/80 rounded-2xl p-6 space-y-4 shadow-sm transition-colors">
+          <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800/80 pb-4">
             <div>
               <h3 className="text-base font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
-                <FileText className="w-5 h-5 text-slate-700 dark:text-emerald-400" />
+                <FileText className="w-5 h-5 text-slate-700 dark:text-teal-400" />
                 Pratinjau Dokumen CV PDF (Maksimal 2 MB)
               </h3>
               <p className="text-xs text-slate-500 dark:text-slate-300 mt-0.5">
@@ -354,11 +354,11 @@ export default function CandidateScreeningView({ detail }: CandidateScreeningVie
 
       {/* Tab 3: CASE 2 Assessment & Interview Management */}
       {activeTab === "assessments" && (
-        <div className="bg-white dark:bg-[#0c2b29] border border-slate-200 dark:border-emerald-800/40 rounded-2xl p-6 space-y-6 shadow-sm transition-colors">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 dark:border-emerald-800/40 pb-4">
+        <div className="bg-white dark:bg-[#132238] border border-slate-200 dark:border-slate-800/80 rounded-2xl p-6 space-y-6 shadow-sm transition-colors">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 dark:border-slate-800/80 pb-4">
             <div>
               <h3 className="text-base font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
-                <ClipboardList className="w-5 h-5 text-slate-700 dark:text-emerald-400" />
+                <ClipboardList className="w-5 h-5 text-slate-700 dark:text-teal-400" />
                 Manajemen Penilaian Asesmen & Wawancara (CASE 2)
               </h3>
               <p className="text-xs text-slate-500 dark:text-slate-300 mt-0.5">
@@ -376,8 +376,8 @@ export default function CandidateScreeningView({ detail }: CandidateScreeningVie
             </button>
           </div>
 
-          <div className="p-4 rounded-xl bg-slate-50 dark:bg-[#061f1d] border border-slate-200 dark:border-emerald-800/60 text-xs text-slate-700 dark:text-emerald-200 flex items-center gap-3">
-            <ShieldAlert className="w-4 h-4 text-slate-700 dark:text-emerald-400 shrink-0" />
+          <div className="p-4 rounded-xl bg-slate-50 dark:bg-[#0B132B] border border-slate-200 dark:border-slate-800/80 text-xs text-slate-700 dark:text-teal-200 flex items-center gap-3">
+            <ShieldAlert className="w-4 h-4 text-slate-700 dark:text-teal-400 shrink-0" />
             <span>
               <strong>Pembatasan Akses:</strong> Penilai hanya dapat memasukkan & memperbarui evaluasi kandidat yang ditugaskan kepadanya. Sistem secara ketat membedakan antara nilai 0 dengan status belum dinilai.
             </span>
@@ -386,7 +386,7 @@ export default function CandidateScreeningView({ detail }: CandidateScreeningVie
           {/* Assessment List Table */}
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs text-slate-700 dark:text-slate-300">
-              <thead className="bg-slate-50 dark:bg-[#061f1d] text-slate-700 dark:text-emerald-300 uppercase font-bold text-[11px] border-b border-slate-200 dark:border-emerald-800">
+              <thead className="bg-slate-50 dark:bg-[#0B132B] text-slate-700 dark:text-teal-300 uppercase font-bold text-[11px] border-b border-slate-200 dark:border-slate-800">
                 <tr>
                   <th className="p-3">Jenis Tes / Wawancara</th>
                   <th className="p-3">Jadwal Pelaksanaan</th>
@@ -405,16 +405,16 @@ export default function CandidateScreeningView({ detail }: CandidateScreeningVie
                   </tr>
                 ) : (
                   assessments.map((asm) => (
-                    <tr key={asm.id} className="hover:bg-slate-50 dark:hover:bg-[#061f1d]/60">
+                    <tr key={asm.id} className="hover:bg-slate-50 dark:hover:bg-[#0B132B]/60">
                       <td className="p-3 font-bold text-slate-900 dark:text-white">
-                        <span className="px-2 py-0.5 rounded bg-slate-100 dark:bg-emerald-950 text-slate-700 dark:text-emerald-300 border border-slate-200 dark:border-emerald-800 font-semibold">
+                        <span className="px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-900 text-slate-700 dark:text-teal-300 border border-slate-200 dark:border-slate-800 font-semibold">
                           {asm.type}
                         </span>
                       </td>
                       <td className="p-3 text-slate-600 dark:text-slate-300">
                         {new Date(asm.scheduled_at).toLocaleString("id-ID")}
                       </td>
-                      <td className="p-3 font-semibold text-slate-800 dark:text-emerald-200">
+                      <td className="p-3 font-semibold text-slate-800 dark:text-teal-200">
                         {asm.evaluator_name}
                       </td>
                       <td className="p-3">
@@ -423,7 +423,7 @@ export default function CandidateScreeningView({ detail }: CandidateScreeningVie
                             Belum Dinilai
                           </span>
                         ) : (
-                          <span className={`px-2.5 py-1 rounded font-extrabold text-xs ${asm.score >= 75 ? "bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-600" : "bg-rose-50 dark:bg-rose-950 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-800"}`}>
+                          <span className={`px-2.5 py-1 rounded font-extrabold text-xs ${asm.score >= 75 ? "bg-emerald-50 dark:bg-slate-900 text-emerald-700 dark:text-teal-300 border border-emerald-200 dark:border-emerald-600" : "bg-rose-50 dark:bg-rose-950 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-800"}`}>
                             Skor: {asm.score} / 100
                           </span>
                         )}
@@ -440,7 +440,7 @@ export default function CandidateScreeningView({ detail }: CandidateScreeningVie
                             setGradeNotes(asm.notes || "");
                             setEvaluatorName(asm.evaluator_name);
                           }}
-                          className="px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-emerald-950 dark:hover:bg-emerald-900 border border-slate-300 dark:border-emerald-700 text-slate-800 dark:text-emerald-300 font-bold text-xs"
+                          className="px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-slate-900 dark:hover:bg-slate-800 border border-slate-300 dark:border-emerald-700 text-slate-800 dark:text-teal-300 font-bold text-xs"
                         >
                           Input Nilai / Catatan
                         </button>
@@ -456,10 +456,10 @@ export default function CandidateScreeningView({ detail }: CandidateScreeningVie
 
       {/* Tab 4: CASE 3 HR Internal Confidential Notes */}
       {activeTab === "notes" && (
-        <div className="bg-white dark:bg-[#0c2b29] border border-slate-200 dark:border-emerald-800/40 rounded-2xl p-6 space-y-6 shadow-sm transition-colors">
-          <div className="border-b border-slate-200 dark:border-emerald-800/40 pb-4">
+        <div className="bg-white dark:bg-[#132238] border border-slate-200 dark:border-slate-800/80 rounded-2xl p-6 space-y-6 shadow-sm transition-colors">
+          <div className="border-b border-slate-200 dark:border-slate-800/80 pb-4">
             <h3 className="text-base font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
-              <MessageSquare className="w-5 h-5 text-slate-700 dark:text-emerald-400" />
+              <MessageSquare className="w-5 h-5 text-slate-700 dark:text-teal-400" />
               Catatan Diskusi Rahasia HR (Disembunyikan dari Kandidat)
             </h3>
             <p className="text-xs text-slate-500 dark:text-slate-300 mt-0.5">
@@ -473,7 +473,7 @@ export default function CandidateScreeningView({ detail }: CandidateScreeningVie
               required
               value={newNoteText}
               onChange={(e) => setNewNoteText(e.target.value)}
-              className="w-full p-4 rounded-xl bg-slate-50 dark:bg-[#061f1d] border border-slate-300 dark:border-emerald-800/60 text-slate-900 dark:text-white placeholder-slate-400 text-xs sm:text-sm focus:outline-none focus:border-slate-800 dark:focus:border-emerald-500 resize-none transition-colors"
+              className="w-full p-4 rounded-xl bg-slate-50 dark:bg-[#0B132B] border border-slate-300 dark:border-slate-800/80 text-slate-900 dark:text-white placeholder-slate-400 text-xs sm:text-sm focus:outline-none focus:border-slate-800 dark:focus:border-emerald-500 resize-none transition-colors"
               placeholder="Tuliskan rekomendasi gaji, hasil diskusi interviu, atau instruksi internal..."
             />
             <button
@@ -488,9 +488,9 @@ export default function CandidateScreeningView({ detail }: CandidateScreeningVie
 
           <div className="space-y-3 pt-2">
             {internal_notes.map((note) => (
-              <div key={note.id} className="bg-slate-50 dark:bg-[#061f1d] border border-slate-200 dark:border-emerald-800/50 rounded-xl p-4 space-y-1.5">
+              <div key={note.id} className="bg-slate-50 dark:bg-[#0B132B] border border-slate-200 dark:border-slate-800/80 rounded-xl p-4 space-y-1.5">
                 <div className="flex justify-between items-center text-xs">
-                  <span className="font-bold text-slate-800 dark:text-emerald-300">{note.author_name}</span>
+                  <span className="font-bold text-slate-800 dark:text-teal-300">{note.author_name}</span>
                   <span className="text-slate-500 dark:text-slate-400">{new Date(note.created_at).toLocaleString("id-ID")}</span>
                 </div>
                 <p className="text-xs text-slate-700 dark:text-slate-200 leading-relaxed">{note.note_text}</p>
@@ -502,10 +502,10 @@ export default function CandidateScreeningView({ detail }: CandidateScreeningVie
 
       {/* Tab 5: CASE 3 Audit Trail History */}
       {activeTab === "audit" && (
-        <div className="bg-white dark:bg-[#0c2b29] border border-slate-200 dark:border-emerald-800/40 rounded-2xl p-6 space-y-6 shadow-sm transition-colors">
-          <div className="border-b border-slate-200 dark:border-emerald-800/40 pb-4">
+        <div className="bg-white dark:bg-[#132238] border border-slate-200 dark:border-slate-800/80 rounded-2xl p-6 space-y-6 shadow-sm transition-colors">
+          <div className="border-b border-slate-200 dark:border-slate-800/80 pb-4">
             <h3 className="text-base font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
-              <History className="w-5 h-5 text-slate-700 dark:text-emerald-400" />
+              <History className="w-5 h-5 text-slate-700 dark:text-teal-400" />
               Log Audit Trail Perubahan Status Rekrutmen
             </h3>
             <p className="text-xs text-slate-500 dark:text-slate-300 mt-0.5">
@@ -513,18 +513,18 @@ export default function CandidateScreeningView({ detail }: CandidateScreeningVie
             </p>
           </div>
 
-          <div className="space-y-4 pl-4 border-l-2 border-slate-200 dark:border-emerald-800/60 ml-2">
+          <div className="space-y-4 pl-4 border-l-2 border-slate-200 dark:border-slate-800/80 ml-2">
             {audit_logs.map((log) => (
               <div key={log.id} className="relative pl-6">
                 <span className="absolute -left-[31px] top-1 w-4 h-4 rounded-full bg-slate-900 dark:bg-emerald-500 ring-4 ring-slate-200 dark:ring-emerald-950" />
-                <div className="bg-slate-50 dark:bg-[#061f1d] border border-slate-200 dark:border-emerald-800/40 rounded-xl p-4 space-y-1">
+                <div className="bg-slate-50 dark:bg-[#0B132B] border border-slate-200 dark:border-slate-800/80 rounded-xl p-4 space-y-1">
                   <div className="flex justify-between items-center text-xs">
                     <span className="font-bold text-slate-900 dark:text-white">
-                      {log.old_status} → <span className="text-emerald-600 dark:text-emerald-300 font-extrabold">{log.new_status}</span>
+                      {log.old_status} → <span className="text-emerald-600 dark:text-teal-300 font-extrabold">{log.new_status}</span>
                     </span>
                     <span className="text-slate-400">{new Date(log.created_at).toLocaleString("id-ID")}</span>
                   </div>
-                  {log.stage_detail && <p className="text-xs text-slate-700 dark:text-emerald-400 font-semibold">{log.stage_detail}</p>}
+                  {log.stage_detail && <p className="text-xs text-slate-700 dark:text-teal-400 font-semibold">{log.stage_detail}</p>}
                   <p className="text-xs text-slate-600 dark:text-slate-300">Pelaku: {log.changed_by_name}</p>
                   {log.reason && <p className="text-xs text-slate-500 dark:text-slate-400 italic">Catatan: {log.reason}</p>}
                 </div>
@@ -537,8 +537,8 @@ export default function CandidateScreeningView({ detail }: CandidateScreeningVie
       {/* Modal Schedule Assessment */}
       {showScheduleModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-          <div className="bg-white dark:bg-[#0c2b29] border border-slate-200 dark:border-emerald-700 rounded-2xl max-w-md w-full p-6 space-y-4 text-slate-900 dark:text-slate-100 shadow-xl transition-colors">
-            <div className="flex items-center justify-between border-b border-slate-200 dark:border-emerald-800 pb-3">
+          <div className="bg-white dark:bg-[#132238] border border-slate-200 dark:border-emerald-700 rounded-2xl max-w-md w-full p-6 space-y-4 text-slate-900 dark:text-slate-100 shadow-xl transition-colors">
+            <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3">
               <h3 className="font-bold text-slate-900 dark:text-white text-base">Jadwalkan Assessment / Interview</h3>
               <button onClick={() => setShowScheduleModal(false)} className="text-slate-400 hover:text-slate-800 dark:hover:text-white">
                 <X className="w-5 h-5" />
@@ -551,7 +551,7 @@ export default function CandidateScreeningView({ detail }: CandidateScreeningVie
                 <select
                   value={assessmentType}
                   onChange={(e) => setAssessmentType(e.target.value as any)}
-                  className="w-full px-3 py-2 rounded-xl bg-[#061f1d] border border-emerald-800 text-white"
+                  className="w-full px-3 py-2 rounded-xl bg-[#0B132B] border border-emerald-800 text-white"
                 >
                   <option value="Psikotes">Psikotes</option>
                   <option value="Technical Test">Technical Test</option>
@@ -581,7 +581,7 @@ export default function CandidateScreeningView({ detail }: CandidateScreeningVie
                       setEvaluatorName(e.target.value);
                     }
                   }}
-                  className="w-full px-3 py-2 rounded-xl bg-[#061f1d] border border-emerald-800 text-white mb-2"
+                  className="w-full px-3 py-2 rounded-xl bg-[#0B132B] border border-emerald-800 text-white mb-2"
                 >
                   <option value="Dr. Bambang / Tim Penilai & Interviewer">Dr. Bambang / Tim Penilai & Interviewer (Penilai Resmi)</option>
                   <option value="Sarah Wijaya (Lead Recruiter HR)">Sarah Wijaya (Lead Recruiter HR)</option>
@@ -596,7 +596,7 @@ export default function CandidateScreeningView({ detail }: CandidateScreeningVie
                     required
                     value={customEvaluator}
                     onChange={(e) => setCustomEvaluator(e.target.value)}
-                    className="w-full px-3 py-2 rounded-xl bg-[#061f1d] border border-emerald-500 text-white"
+                    className="w-full px-3 py-2 rounded-xl bg-[#0B132B] border border-emerald-500 text-white"
                     placeholder="Ketik nama penilai / tim..."
                   />
                 )}
@@ -618,8 +618,8 @@ export default function CandidateScreeningView({ detail }: CandidateScreeningVie
       {/* Modal Grading Assessment Score */}
       {gradingAssessmentId && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-          <div className="bg-white dark:bg-[#0c2b29] border border-slate-200 dark:border-emerald-700 rounded-2xl max-w-md w-full p-6 space-y-4 text-slate-900 dark:text-slate-100 shadow-xl transition-colors">
-            <div className="flex items-center justify-between border-b border-slate-200 dark:border-emerald-800 pb-3">
+          <div className="bg-white dark:bg-[#132238] border border-slate-200 dark:border-emerald-700 rounded-2xl max-w-md w-full p-6 space-y-4 text-slate-900 dark:text-slate-100 shadow-xl transition-colors">
+            <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3">
               <h3 className="font-bold text-slate-900 dark:text-white text-base">Input Nilai Evaluasi (Skala 0 - 100)</h3>
               <button onClick={() => setGradingAssessmentId(null)} className="text-slate-400 hover:text-slate-800 dark:hover:text-white">
                 <X className="w-5 h-5" />
@@ -628,7 +628,7 @@ export default function CandidateScreeningView({ detail }: CandidateScreeningVie
 
             <form onSubmit={handleGradeSubmit} className="space-y-3 text-xs">
               <div>
-                <label className="block font-semibold text-slate-700 dark:text-emerald-300 mb-1">
+                <label className="block font-semibold text-slate-700 dark:text-teal-300 mb-1">
                   Nilai Angka (0 – 100, Kosongkan untuk Belum Dinilai) *
                 </label>
                 <input
@@ -637,7 +637,7 @@ export default function CandidateScreeningView({ detail }: CandidateScreeningVie
                   max={100}
                   value={gradeScoreInput}
                   onChange={(e) => setGradeScoreInput(e.target.value)}
-                  className="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-[#061f1d] border border-slate-300 dark:border-emerald-800 text-slate-900 dark:text-white"
+                  className="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-[#0B132B] border border-slate-300 dark:border-slate-800 text-slate-900 dark:text-white"
                   placeholder="Contoh: 85 (atau 0 untuk nilai 0)"
                 />
                 <p className="text-[10px] text-emerald-400/80 mt-1">
@@ -652,7 +652,7 @@ export default function CandidateScreeningView({ detail }: CandidateScreeningVie
                   required
                   value={evaluatorName}
                   onChange={(e) => setEvaluatorName(e.target.value)}
-                  className="w-full px-3 py-2 rounded-xl bg-[#061f1d] border border-emerald-800 text-white"
+                  className="w-full px-3 py-2 rounded-xl bg-[#0B132B] border border-emerald-800 text-white"
                 />
               </div>
 
@@ -663,7 +663,7 @@ export default function CandidateScreeningView({ detail }: CandidateScreeningVie
                   required
                   value={gradeNotes}
                   onChange={(e) => setGradeNotes(e.target.value)}
-                  className="w-full px-3 py-2 rounded-xl bg-[#061f1d] border border-emerald-800 text-white resize-none"
+                  className="w-full px-3 py-2 rounded-xl bg-[#0B132B] border border-emerald-800 text-white resize-none"
                   placeholder="Berikan ringkasan kelebihan & catatan hasil tes..."
                 />
               </div>

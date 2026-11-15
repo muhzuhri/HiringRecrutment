@@ -16,16 +16,16 @@ export default function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
 
   return (
-    <header className="sticky top-0 z-50 bg-[#0c2b29] border-b border-emerald-800/40 text-slate-100 shadow-lg backdrop-blur-md">
+    <header className="sticky top-0 z-50 bg-[#132238] border-b border-emerald-800/40 text-slate-100 shadow-lg backdrop-blur-md">
       <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 sm:h-20">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-3 group" id="navbar-logo-link">
-            <div className="h-10 w-10 rounded-xl overflow-hidden bg-white p-1 border border-teal-800/40 shadow-md group-hover:scale-105 transition-transform shrink-0 flex items-center justify-center">
+            <div className="h-10 w-10 rounded-xl overflow-hidden bg-white p-1 border border-slate-700 shadow-md group-hover:scale-105 transition-transform shrink-0 flex items-center justify-center">
               <img
-                src="/nexora-logo.jpg"
-                alt="Nexora Digital Logo"
-                className="h-full w-full object-contain"
+                src="/nexora-icon-trans.png"
+                alt="Nexora Digital"
+                className="w-full h-full object-contain"
               />
             </div>
             <span className="text-white font-extrabold text-xl tracking-tight" style={{ fontFamily: "var(--font-plus-jakarta)" }}>
@@ -34,7 +34,7 @@ export default function Navbar() {
           </Link>
 
           {/* Desktop Nav Pills */}
-          <div className="hidden md:flex items-center gap-1 bg-[#061f1d] p-1.5 rounded-2xl border border-emerald-900/50">
+          <div className="hidden md:flex items-center gap-1 bg-[#0B132B] p-1.5 rounded-2xl border border-emerald-900/50">
             {navLinks.map((link) => (
               <Link
                 key={link.href}

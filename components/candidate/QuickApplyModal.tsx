@@ -58,12 +58,12 @@ export default function QuickApplyModal({ job, profile, onClose, onSuccess }: Qu
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm animate-fade-in-up">
-      <div className="bg-white dark:bg-[#0c2b29] border border-slate-200 dark:border-emerald-700/50 rounded-2xl max-w-lg w-full p-6 sm:p-8 shadow-2xl relative text-slate-900 dark:text-slate-100 space-y-6 transition-colors">
+      <div className="bg-white dark:bg-[#132238] border border-slate-200 dark:border-emerald-700/50 rounded-2xl max-w-lg w-full p-6 sm:p-8 shadow-2xl relative text-slate-900 dark:text-slate-100 space-y-6 transition-colors">
         
         {/* Close Button */}
         <button
           onClick={onClose}
-          className="absolute top-5 right-5 p-1.5 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-emerald-900/40 transition-colors cursor-pointer"
+          className="absolute top-5 right-5 p-1.5 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800/80 transition-colors cursor-pointer"
         >
           <X className="w-5 h-5" />
         </button>
@@ -74,7 +74,7 @@ export default function QuickApplyModal({ job, profile, onClose, onSuccess }: Qu
             <Sparkles className="w-6 h-6 text-amber-400 dark:text-white" />
           </div>
           <div>
-            <span className="text-[11px] font-bold text-slate-700 dark:text-emerald-400 uppercase tracking-widest bg-slate-100 dark:bg-emerald-950 px-2.5 py-0.5 rounded border border-slate-200 dark:border-emerald-800">
+            <span className="text-[11px] font-bold text-slate-700 dark:text-teal-400 uppercase tracking-widest bg-slate-100 dark:bg-slate-900 px-2.5 py-0.5 rounded border border-slate-200 dark:border-slate-800">
               Lamar Cepat (1-Click Apply)
             </span>
             <h2 className="text-xl font-extrabold text-slate-900 dark:text-white leading-tight mt-1">
@@ -84,8 +84,8 @@ export default function QuickApplyModal({ job, profile, onClose, onSuccess }: Qu
         </div>
 
         {/* Target Job Summary */}
-        <div className="bg-slate-50 dark:bg-[#061f1d] border border-slate-200 dark:border-emerald-800/60 rounded-xl p-4 space-y-1.5">
-          <p className="text-[11px] text-slate-500 dark:text-emerald-300 font-bold uppercase tracking-wider">Posisi Yang Dilamar:</p>
+        <div className="bg-slate-50 dark:bg-[#0B132B] border border-slate-200 dark:border-slate-800/80 rounded-xl p-4 space-y-1.5">
+          <p className="text-[11px] text-slate-500 dark:text-teal-300 font-bold uppercase tracking-wider">Posisi Yang Dilamar:</p>
           <h3 className="text-lg font-extrabold text-slate-900 dark:text-white">{job.title}</h3>
           <p className="text-xs text-slate-600 dark:text-slate-300 flex items-center gap-2">
             <span className="font-semibold">{job.dept}</span> • <span>{job.type}</span> • <span>{job.location}</span>
@@ -101,12 +101,12 @@ export default function QuickApplyModal({ job, profile, onClose, onSuccess }: Qu
 
         {/* Structured Profile Preview Card */}
         <div className="space-y-3">
-          <p className="text-xs font-bold text-slate-700 dark:text-emerald-300 uppercase tracking-wider flex items-center gap-1.5">
-            <UserCheck className="w-4 h-4 text-slate-600 dark:text-emerald-400" />
+          <p className="text-xs font-bold text-slate-700 dark:text-teal-300 uppercase tracking-wider flex items-center gap-1.5">
+            <UserCheck className="w-4 h-4 text-slate-600 dark:text-teal-400" />
             Data Identitas & Berkas Terkirim:
           </p>
 
-          <div className="bg-slate-50 dark:bg-[#061f1d]/80 rounded-xl p-4 border border-slate-200 dark:border-emerald-900/60 space-y-2 text-xs">
+          <div className="bg-slate-50 dark:bg-[#0B132B]/80 rounded-xl p-4 border border-slate-200 dark:border-slate-800 space-y-2 text-xs">
             <div className="flex justify-between items-center">
               <span className="text-slate-500 dark:text-slate-400">Nama Pelamar:</span>
               <span className="font-bold text-slate-900 dark:text-white">{profile?.full_name || "Kandidat"}</span>
@@ -120,7 +120,7 @@ export default function QuickApplyModal({ job, profile, onClose, onSuccess }: Qu
             <div className="flex justify-between items-center border-t border-slate-200 dark:border-emerald-950 pt-1.5">
               <span className="text-slate-500 dark:text-slate-400">Dokumen KTP:</span>
               {hasKtp ? (
-                <span className="font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
+                <span className="font-bold text-emerald-600 dark:text-teal-400 flex items-center gap-1">
                   <CheckCircle2 className="w-3.5 h-3.5" /> Terunggah
                 </span>
               ) : (
@@ -130,7 +130,7 @@ export default function QuickApplyModal({ job, profile, onClose, onSuccess }: Qu
             <div className="flex justify-between items-center border-t border-slate-200 dark:border-emerald-950 pt-1.5">
               <span className="text-slate-500 dark:text-slate-400">Berkas CV (PDF):</span>
               {hasCv ? (
-                <span className="font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-1 truncate max-w-[180px]">
+                <span className="font-bold text-emerald-600 dark:text-teal-400 flex items-center gap-1 truncate max-w-[180px]">
                   <CheckCircle2 className="w-3.5 h-3.5 shrink-0" /> {profile?.resume_name || "CV_Terlampir.pdf"}
                 </span>
               ) : (
@@ -151,7 +151,7 @@ export default function QuickApplyModal({ job, profile, onClose, onSuccess }: Qu
             <Link
               href="/dashboard/profile"
               onClick={onClose}
-              className="inline-block text-xs font-bold text-emerald-700 dark:text-emerald-300 underline hover:text-emerald-600 dark:hover:text-emerald-200 mt-1"
+              className="inline-block text-xs font-bold text-emerald-700 dark:text-teal-300 underline hover:text-emerald-600 dark:hover:text-emerald-200 mt-1"
             >
               Lengkapi Seluruh Data di Halaman Profil →
             </Link>
@@ -163,7 +163,7 @@ export default function QuickApplyModal({ job, profile, onClose, onSuccess }: Qu
           <button
             type="button"
             onClick={onClose}
-            className="flex-1 py-3 bg-slate-100 hover:bg-slate-200 dark:bg-[#061f1d] dark:hover:bg-emerald-950 border border-slate-300 dark:border-emerald-800/60 text-slate-700 dark:text-slate-300 font-semibold text-xs rounded-xl transition-colors cursor-pointer"
+            className="flex-1 py-3 bg-slate-100 hover:bg-slate-200 dark:bg-[#0B132B] dark:hover:bg-slate-800 border border-slate-300 dark:border-slate-800/80 text-slate-700 dark:text-slate-300 font-semibold text-xs rounded-xl transition-colors cursor-pointer"
           >
             Batal
           </button>

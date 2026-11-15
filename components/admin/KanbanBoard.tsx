@@ -59,7 +59,7 @@ const KANBAN_COLUMNS: {
     title: "1. Diajukan",
     subtitle: "Lamaran Masuk Baru",
     badgeBg: "bg-amber-100 dark:bg-amber-950/80 text-amber-800 dark:text-amber-300 border-amber-300 dark:border-amber-800",
-    headerBorder: "border-amber-300 dark:border-amber-700/50 bg-amber-50/70 dark:bg-[#061f1d]",
+    headerBorder: "border-amber-300 dark:border-amber-700/50 bg-amber-50/70 dark:bg-[#0B132B]",
     accentColor: "text-amber-700 dark:text-amber-400",
   },
   {
@@ -67,7 +67,7 @@ const KANBAN_COLUMNS: {
     title: "2. Screening HR",
     subtitle: "Pemeriksaan CV & Kualifikasi",
     badgeBg: "bg-blue-100 dark:bg-blue-950/80 text-blue-800 dark:text-blue-300 border-blue-300 dark:border-blue-800",
-    headerBorder: "border-blue-300 dark:border-blue-700/50 bg-blue-50/70 dark:bg-[#061f1d]",
+    headerBorder: "border-blue-300 dark:border-blue-700/50 bg-blue-50/70 dark:bg-[#0B132B]",
     accentColor: "text-blue-700 dark:text-blue-400",
   },
   {
@@ -75,7 +75,7 @@ const KANBAN_COLUMNS: {
     title: "3. Assessment / Tes",
     subtitle: "Ujian Teknis & Psikotes",
     badgeBg: "bg-purple-100 dark:bg-purple-950/80 text-purple-800 dark:text-purple-300 border-purple-300 dark:border-purple-800",
-    headerBorder: "border-purple-300 dark:border-purple-700/50 bg-purple-50/70 dark:bg-[#061f1d]",
+    headerBorder: "border-purple-300 dark:border-purple-700/50 bg-purple-50/70 dark:bg-[#0B132B]",
     accentColor: "text-purple-700 dark:text-purple-400",
   },
   {
@@ -83,7 +83,7 @@ const KANBAN_COLUMNS: {
     title: "4. Interview HR",
     subtitle: "Wawancara Tim HR",
     badgeBg: "bg-indigo-100 dark:bg-indigo-950/80 text-indigo-800 dark:text-indigo-300 border-indigo-300 dark:border-indigo-800",
-    headerBorder: "border-indigo-300 dark:border-indigo-700/50 bg-indigo-50/70 dark:bg-[#061f1d]",
+    headerBorder: "border-indigo-300 dark:border-indigo-700/50 bg-indigo-50/70 dark:bg-[#0B132B]",
     accentColor: "text-indigo-700 dark:text-indigo-400",
   },
   {
@@ -91,23 +91,23 @@ const KANBAN_COLUMNS: {
     title: "5. Interview User",
     subtitle: "Wawancara Calon Atasan",
     badgeBg: "bg-cyan-100 dark:bg-cyan-950/80 text-cyan-800 dark:text-cyan-300 border-cyan-300 dark:border-cyan-800",
-    headerBorder: "border-cyan-300 dark:border-cyan-700/50 bg-cyan-50/70 dark:bg-[#061f1d]",
+    headerBorder: "border-cyan-300 dark:border-cyan-700/50 bg-cyan-50/70 dark:bg-[#0B132B]",
     accentColor: "text-cyan-700 dark:text-cyan-400",
   },
   {
     id: "diterima",
     title: "6. Diterima / Hired",
     subtitle: "Penawaran Kerja & Keputusan Final",
-    badgeBg: "bg-emerald-100 dark:bg-emerald-950/80 text-emerald-800 dark:text-emerald-300 border-emerald-300 dark:border-emerald-800",
-    headerBorder: "border-emerald-300 dark:border-emerald-700/50 bg-emerald-50/70 dark:bg-[#061f1d]",
-    accentColor: "text-emerald-700 dark:text-emerald-400",
+    badgeBg: "bg-emerald-100 dark:bg-slate-900/80 text-emerald-800 dark:text-teal-300 border-emerald-300 dark:border-slate-800",
+    headerBorder: "border-emerald-300 dark:border-emerald-700/50 bg-emerald-50/70 dark:bg-[#0B132B]",
+    accentColor: "text-emerald-700 dark:text-teal-400",
   },
   {
     id: "ditolak",
     title: "7. Ditolak",
     subtitle: "Kandidat Tidak Lolos Seleksi",
     badgeBg: "bg-rose-100 dark:bg-rose-950/80 text-rose-800 dark:text-rose-300 border-rose-300 dark:border-rose-800",
-    headerBorder: "border-rose-300 dark:border-rose-700/50 bg-rose-50/70 dark:bg-[#061f1d]",
+    headerBorder: "border-rose-300 dark:border-rose-700/50 bg-rose-50/70 dark:bg-[#0B132B]",
     accentColor: "text-rose-700 dark:text-rose-400",
   },
 ];
@@ -470,7 +470,7 @@ export default function KanbanBoard({
   return (
     <div className="space-y-6">
       {/* Top Header Summary Bar */}
-      <div className="bg-white dark:bg-[#0c2b29] border border-slate-200/80 dark:border-teal-800/40 rounded-2xl p-4 sm:p-5 shadow-2xs space-y-4 transition-colors">
+      <div className="bg-white dark:bg-[#132238] border border-slate-200/80 dark:border-slate-800/80 rounded-2xl p-4 sm:p-5 shadow-2xs space-y-4 transition-colors">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <h1 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight">
@@ -482,7 +482,7 @@ export default function KanbanBoard({
           </div>
 
           {/* Dual View Mode Toggle */}
-          <div className="flex items-center gap-1 bg-slate-100 dark:bg-[#061f1d] p-1 rounded-xl border border-slate-200/80 dark:border-teal-800/40 shrink-0 self-start md:self-auto">
+          <div className="flex items-center gap-1 bg-slate-100 dark:bg-[#0B132B] p-1 rounded-xl border border-slate-200/80 dark:border-slate-800/80 shrink-0 self-start md:self-auto">
             <button
               type="button"
               onClick={() => setViewMode("kanban")}
@@ -512,7 +512,7 @@ export default function KanbanBoard({
 
         {/* Quick Stat Counter Cards for all 7 stages */}
         <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-2 pt-1">
-          <div className="bg-slate-50 dark:bg-[#061f1d] border border-slate-200 dark:border-emerald-800/50 rounded-xl p-2.5 text-center">
+          <div className="bg-slate-50 dark:bg-[#0B132B] border border-slate-200 dark:border-slate-800/80 rounded-xl p-2.5 text-center">
             <p className="text-[10px] text-slate-500 font-bold uppercase">Total</p>
             <p className="text-lg font-black text-slate-900 dark:text-white">{totalCount}</p>
           </div>
@@ -531,7 +531,7 @@ export default function KanbanBoard({
       </div>
 
       {/* Advanced Search & Filter Toolbar */}
-      <div className="bg-white dark:bg-[#0c2b29] border border-slate-200 dark:border-emerald-800/40 rounded-2xl p-3.5 sm:p-4 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-3 transition-colors">
+      <div className="bg-white dark:bg-[#132238] border border-slate-200 dark:border-slate-800/80 rounded-2xl p-3.5 sm:p-4 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-3 transition-colors">
         {/* Search Input */}
         <div className="flex-1 relative">
           <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-2.5" />
@@ -539,7 +539,7 @@ export default function KanbanBoard({
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-9 pr-3.5 py-1.5 rounded-xl bg-slate-50 dark:bg-[#061f1d] border border-slate-300 dark:border-emerald-800/60 text-slate-900 dark:text-white placeholder-slate-400 text-xs focus:outline-none focus:border-slate-800 dark:focus:border-emerald-500 transition-colors"
+            className="w-full pl-9 pr-3.5 py-1.5 rounded-xl bg-slate-50 dark:bg-[#0B132B] border border-slate-300 dark:border-slate-800/80 text-slate-900 dark:text-white placeholder-slate-400 text-xs focus:outline-none focus:border-slate-800 dark:focus:border-emerald-500 transition-colors"
             placeholder="Cari pelamar berdasarkan nama, email, atau posisi lowongan..."
           />
         </div>
@@ -547,11 +547,11 @@ export default function KanbanBoard({
         <div className="flex items-center gap-2.5 flex-wrap">
           {/* Job Filter */}
           <div className="flex items-center gap-1.5">
-            <Filter className="w-3.5 h-3.5 text-slate-500 dark:text-emerald-400 shrink-0" />
+            <Filter className="w-3.5 h-3.5 text-slate-500 dark:text-teal-400 shrink-0" />
             <select
               value={selectedJobId}
               onChange={(e) => setSelectedJobId(e.target.value)}
-              className="px-3 py-1.5 rounded-xl bg-slate-50 dark:bg-[#061f1d] border border-slate-300 dark:border-emerald-800/60 text-slate-800 dark:text-white text-xs font-medium focus:outline-none focus:border-slate-800 dark:focus:border-emerald-500 cursor-pointer"
+              className="px-3 py-1.5 rounded-xl bg-slate-50 dark:bg-[#0B132B] border border-slate-300 dark:border-slate-800/80 text-slate-800 dark:text-white text-xs font-medium focus:outline-none focus:border-slate-800 dark:focus:border-emerald-500 cursor-pointer"
             >
               <option value="Semua">Semua Lowongan Pekerjaan</option>
               {jobsList.map((j) => (
@@ -563,7 +563,7 @@ export default function KanbanBoard({
           </div>
 
           {/* Qualified Candidates Checkbox Filter */}
-          <label className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-50 dark:bg-[#061f1d] border border-slate-300 dark:border-emerald-800/60 text-xs text-slate-700 dark:text-emerald-200 cursor-pointer hover:border-slate-400 transition-colors select-none font-medium">
+          <label className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-50 dark:bg-[#0B132B] border border-slate-300 dark:border-slate-800/80 text-xs text-slate-700 dark:text-teal-200 cursor-pointer hover:border-slate-400 transition-colors select-none font-medium">
             <input
               type="checkbox"
               checked={onlyQualified}
@@ -586,7 +586,7 @@ export default function KanbanBoard({
               return (
                 <div
                   key={col.id}
-                  className="w-[290px] shrink-0 bg-slate-100/70 dark:bg-[#0c2b29] border border-slate-200 dark:border-emerald-800/40 rounded-2xl p-3 flex flex-col h-[calc(100vh-230px)] max-h-[780px] min-h-[540px] shadow-sm overflow-hidden transition-colors"
+                  className="w-[290px] shrink-0 bg-slate-100/70 dark:bg-[#132238] border border-slate-200 dark:border-slate-800/80 rounded-2xl p-3 flex flex-col h-[calc(100vh-230px)] max-h-[780px] min-h-[540px] shadow-sm overflow-hidden transition-colors"
                 >
                   {/* Column Sticky Top Header */}
                   <div
@@ -594,7 +594,7 @@ export default function KanbanBoard({
                   >
                     <div className="min-w-0 pr-2">
                       <h3 className="text-xs font-black tracking-tight truncate text-slate-900 dark:text-white">{col.title}</h3>
-                      <p className="text-[10px] text-slate-500 dark:text-emerald-200/70 truncate">{col.subtitle}</p>
+                      <p className="text-[10px] text-slate-500 dark:text-teal-200/70 truncate">{col.subtitle}</p>
                     </div>
                     <span className={`px-2 py-0.5 rounded-full text-[10px] font-black border ${col.badgeBg} shrink-0`}>
                       {colApplicants.length}
@@ -604,7 +604,7 @@ export default function KanbanBoard({
                   {/* Internal Scrollable Stack of Cards */}
                   <div className="flex-1 overflow-y-auto pr-0.5 space-y-2.5 custom-scrollbar">
                     {colApplicants.length === 0 ? (
-                      <div className="border border-dashed border-slate-300 dark:border-emerald-900/60 rounded-xl p-5 text-center text-slate-400 text-xs flex flex-col items-center justify-center gap-1.5 h-32">
+                      <div className="border border-dashed border-slate-300 dark:border-slate-800 rounded-xl p-5 text-center text-slate-400 text-xs flex flex-col items-center justify-center gap-1.5 h-32">
                         <User className="w-5 h-5 text-slate-300 dark:text-emerald-800/40" />
                         <span>Tidak ada pelamar pada tahap ini</span>
                       </div>
@@ -615,7 +615,7 @@ export default function KanbanBoard({
                         return (
                           <div
                             key={applicant.id}
-                            className={`bg-white dark:bg-[#061f1d] border border-slate-200 dark:border-emerald-800/60 hover:border-slate-400 dark:hover:border-emerald-500/80 rounded-xl p-3 space-y-2 shadow-xs transition-all duration-200 ${
+                            className={`bg-white dark:bg-[#0B132B] border border-slate-200 dark:border-slate-800/80 hover:border-slate-400 dark:hover:border-emerald-500/80 rounded-xl p-3 space-y-2 shadow-xs transition-all duration-200 ${
                               isUpdating ? "opacity-50 pointer-events-none" : ""
                             }`}
                           >
@@ -625,18 +625,18 @@ export default function KanbanBoard({
                                 href={`/admin/candidates/${applicant.id}`}
                                 className="font-bold text-xs sm:text-sm text-slate-900 dark:text-white hover:text-emerald-600 dark:hover:text-emerald-300 transition-colors flex items-center gap-1.5 truncate group"
                               >
-                                <User className="w-3.5 h-3.5 text-slate-500 dark:text-emerald-400 shrink-0 group-hover:scale-110 transition-transform" />
+                                <User className="w-3.5 h-3.5 text-slate-500 dark:text-teal-400 shrink-0 group-hover:scale-110 transition-transform" />
                                 <span className="truncate">{applicant.candidate_name}</span>
                               </Link>
-                              <p className="text-[11px] text-slate-500 dark:text-emerald-200/70 truncate mt-0.5 font-medium">
+                              <p className="text-[11px] text-slate-500 dark:text-teal-200/70 truncate mt-0.5 font-medium">
                                 {applicant.job_title}
                               </p>
                             </div>
 
                             {/* Qualified Badge */}
                             {applicant.is_qualified && (
-                              <div className="px-2 py-0.5 rounded-md bg-emerald-50 dark:bg-emerald-950 border border-emerald-300 dark:border-emerald-500/60 text-emerald-800 dark:text-emerald-300 text-[9px] font-extrabold flex items-center gap-1">
-                                <Award className="w-3 h-3 text-emerald-600 dark:text-emerald-400 shrink-0" />
+                              <div className="px-2 py-0.5 rounded-md bg-emerald-50 dark:bg-slate-900 border border-emerald-300 dark:border-emerald-500/60 text-emerald-800 dark:text-teal-300 text-[9px] font-extrabold flex items-center gap-1">
+                                <Award className="w-3 h-3 text-emerald-600 dark:text-teal-400 shrink-0" />
                                 <span>Qualified Candidate</span>
                               </div>
                             )}
@@ -663,13 +663,13 @@ export default function KanbanBoard({
 
                             {/* TAHAP 3: Assessment / Tes Info Card Block */}
                             {col.id === "assessment" && (
-                              <div className="bg-purple-50/70 dark:bg-[#0c2b29] border border-purple-200 dark:border-purple-800/40 rounded-lg p-2 text-[10px] space-y-1">
+                              <div className="bg-purple-50/70 dark:bg-[#132238] border border-purple-200 dark:border-purple-800/40 rounded-lg p-2 text-[10px] space-y-1">
                                 <div className="flex items-center justify-between">
                                   <span className="font-extrabold text-purple-800 dark:text-purple-300">
                                     📝 {applicant.test_type || "Technical Test"}
                                   </span>
                                   {applicant.test_score !== null && applicant.test_score !== undefined ? (
-                                    <span className="px-1.5 py-0.2 rounded bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-600 font-extrabold text-[9px]">
+                                    <span className="px-1.5 py-0.2 rounded bg-emerald-100 dark:bg-slate-900 text-emerald-800 dark:text-teal-300 border border-emerald-300 dark:border-emerald-600 font-extrabold text-[9px]">
                                       Skor: {applicant.test_score}/100
                                     </span>
                                   ) : (
@@ -692,13 +692,13 @@ export default function KanbanBoard({
 
                             {/* TAHAP 4: Interview HR Info Card Block */}
                             {col.id === "interview_hr" && (
-                              <div className="bg-indigo-50/70 dark:bg-[#0c2b29] border border-indigo-200 dark:border-indigo-800/40 rounded-lg p-2 text-[10px] space-y-1">
+                              <div className="bg-indigo-50/70 dark:bg-[#132238] border border-indigo-200 dark:border-indigo-800/40 rounded-lg p-2 text-[10px] space-y-1">
                                 <div className="flex items-center justify-between">
                                   <span className="font-extrabold text-indigo-800 dark:text-indigo-300">
                                     🎙️ Interview HR
                                   </span>
                                   {applicant.hr_interview_score !== null && applicant.hr_interview_score !== undefined ? (
-                                    <span className="px-1.5 py-0.2 rounded bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-600 font-extrabold text-[9px]">
+                                    <span className="px-1.5 py-0.2 rounded bg-emerald-100 dark:bg-slate-900 text-emerald-800 dark:text-teal-300 border border-emerald-300 dark:border-emerald-600 font-extrabold text-[9px]">
                                       Skor HR: {applicant.hr_interview_score}/100
                                     </span>
                                   ) : (
@@ -726,13 +726,13 @@ export default function KanbanBoard({
 
                             {/* TAHAP 5: Interview User Info Card Block */}
                             {col.id === "interview_user" && (
-                              <div className="bg-cyan-50/70 dark:bg-[#0c2b29] border border-cyan-200 dark:border-cyan-800/40 rounded-lg p-2 text-[10px] space-y-1">
+                              <div className="bg-cyan-50/70 dark:bg-[#132238] border border-cyan-200 dark:border-cyan-800/40 rounded-lg p-2 text-[10px] space-y-1">
                                 <div className="flex items-center justify-between">
                                   <span className="font-extrabold text-cyan-800 dark:text-cyan-300">
                                     👥 Interview User (Atasan)
                                   </span>
                                   {applicant.user_interview_score !== null && applicant.user_interview_score !== undefined ? (
-                                    <span className="px-1.5 py-0.2 rounded bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-600 font-extrabold text-[9px]">
+                                    <span className="px-1.5 py-0.2 rounded bg-emerald-100 dark:bg-slate-900 text-emerald-800 dark:text-teal-300 border border-emerald-300 dark:border-emerald-600 font-extrabold text-[9px]">
                                       Skor User: {applicant.user_interview_score}/100
                                     </span>
                                   ) : (
@@ -760,8 +760,8 @@ export default function KanbanBoard({
 
                             {/* TAHAP 6: Diterima / Hired Summary Block */}
                             {col.id === "diterima" && (
-                              <div className="bg-emerald-50/70 dark:bg-[#0c2b29] border border-emerald-200 dark:border-emerald-800/60 rounded-lg p-2 text-[10px] space-y-1">
-                                <div className="flex items-center gap-1 text-emerald-800 dark:text-emerald-400 font-black">
+                              <div className="bg-emerald-50/70 dark:bg-[#132238] border border-emerald-200 dark:border-slate-800/80 rounded-lg p-2 text-[10px] space-y-1">
+                                <div className="flex items-center gap-1 text-emerald-800 dark:text-teal-400 font-black">
                                   <Check className="w-3.5 h-3.5" />
                                   <span>Kandidat Diterima / Hired</span>
                                 </div>
@@ -790,7 +790,7 @@ export default function KanbanBoard({
                                 <button
                                   type="button"
                                   onClick={() => handleOpenReviewModal(applicant)}
-                                  className="px-2.5 py-1 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-teal-950 dark:hover:bg-teal-900 text-slate-700 dark:text-teal-200 border border-slate-200 dark:border-teal-800 text-[10px] font-bold flex items-center gap-1 transition-colors cursor-pointer"
+                                  className="px-2.5 py-1 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-teal-950 dark:hover:bg-teal-900 text-slate-700 dark:text-teal-200 border border-slate-200 dark:border-slate-800 text-[10px] font-bold flex items-center gap-1 transition-colors cursor-pointer"
                                   title="Tinjau Seluruh Data Profil, NIK, KTP & CV"
                                 >
                                   <Eye className="w-3 h-3 text-[#0F766E] dark:text-teal-400" />
@@ -802,7 +802,7 @@ export default function KanbanBoard({
                                   <button
                                     type="button"
                                     onClick={() => openDirectGradeModal(applicant, "interview_hr")}
-                                    className="px-2 py-1 rounded-xl bg-teal-50 dark:bg-teal-950/70 hover:bg-teal-100 dark:hover:bg-teal-900 text-[#0F766E] dark:text-teal-300 text-[10px] font-bold flex items-center gap-0.5 border border-teal-200 dark:border-teal-800 transition-colors cursor-pointer"
+                                    className="px-2 py-1 rounded-xl bg-teal-50 dark:bg-teal-950/70 hover:bg-teal-100 dark:hover:bg-teal-900 text-[#0F766E] dark:text-teal-300 text-[10px] font-bold flex items-center gap-0.5 border border-teal-200 dark:border-slate-800 transition-colors cursor-pointer"
                                     title="Klik untuk mengubah nilai interview HR"
                                   >
                                     <Award className="w-3 h-3" />
@@ -814,7 +814,7 @@ export default function KanbanBoard({
                                   <button
                                     type="button"
                                     onClick={() => openDirectGradeModal(applicant, "interview_user")}
-                                    className="px-2 py-1 rounded-xl bg-teal-50 dark:bg-teal-950/70 hover:bg-teal-100 dark:hover:bg-teal-900 text-[#0F766E] dark:text-teal-300 text-[10px] font-bold flex items-center gap-0.5 border border-teal-200 dark:border-teal-800 transition-colors cursor-pointer"
+                                    className="px-2 py-1 rounded-xl bg-teal-50 dark:bg-teal-950/70 hover:bg-teal-100 dark:hover:bg-teal-900 text-[#0F766E] dark:text-teal-300 text-[10px] font-bold flex items-center gap-0.5 border border-teal-200 dark:border-slate-800 transition-colors cursor-pointer"
                                     title="Klik untuk mengubah nilai interview calon atasan (user)"
                                   >
                                     <Award className="w-3 h-3" />
@@ -830,7 +830,7 @@ export default function KanbanBoard({
                                   <button
                                     type="button"
                                     onClick={() => handleRevertStage(applicant.id, "diajukan")}
-                                    className="p-1 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-[#0c2b29] dark:hover:bg-teal-900 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-teal-800 hover:text-slate-900 dark:hover:text-white transition-colors cursor-pointer"
+                                    className="p-1 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-[#132238] dark:hover:bg-teal-900 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-800 hover:text-slate-900 dark:hover:text-white transition-colors cursor-pointer"
                                     title="Kembalikan ke Diajukan"
                                   >
                                     <ChevronLeft className="w-3.5 h-3.5" />
@@ -840,7 +840,7 @@ export default function KanbanBoard({
                                   <button
                                     type="button"
                                     onClick={() => handleRevertStage(applicant.id, "screening")}
-                                    className="p-1 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-[#0c2b29] dark:hover:bg-teal-900 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-teal-800 hover:text-slate-900 dark:hover:text-white transition-colors cursor-pointer"
+                                    className="p-1 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-[#132238] dark:hover:bg-teal-900 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-800 hover:text-slate-900 dark:hover:text-white transition-colors cursor-pointer"
                                     title="Kembalikan ke Screening HR"
                                   >
                                     <ChevronLeft className="w-3.5 h-3.5" />
@@ -850,7 +850,7 @@ export default function KanbanBoard({
                                   <button
                                     type="button"
                                     onClick={() => handleRevertStage(applicant.id, "assessment")}
-                                    className="p-1 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-[#0c2b29] dark:hover:bg-teal-900 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-teal-800 hover:text-slate-900 dark:hover:text-white transition-colors cursor-pointer"
+                                    className="p-1 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-[#132238] dark:hover:bg-teal-900 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-800 hover:text-slate-900 dark:hover:text-white transition-colors cursor-pointer"
                                     title="Kembalikan ke Assessment / Tes"
                                   >
                                     <ChevronLeft className="w-3.5 h-3.5" />
@@ -860,7 +860,7 @@ export default function KanbanBoard({
                                   <button
                                     type="button"
                                     onClick={() => handleRevertStage(applicant.id, "interview_hr")}
-                                    className="p-1 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-[#0c2b29] dark:hover:bg-teal-900 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-teal-800 hover:text-slate-900 dark:hover:text-white transition-colors cursor-pointer"
+                                    className="p-1 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-[#132238] dark:hover:bg-teal-900 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-800 hover:text-slate-900 dark:hover:text-white transition-colors cursor-pointer"
                                     title="Kembalikan ke Interview HR"
                                   >
                                     <ChevronLeft className="w-3.5 h-3.5" />
@@ -870,7 +870,7 @@ export default function KanbanBoard({
                                   <button
                                     type="button"
                                     onClick={() => handleRevertStage(applicant.id, "interview_user")}
-                                    className="p-1 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-[#0c2b29] dark:hover:bg-teal-900 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-teal-800 hover:text-slate-900 dark:hover:text-white transition-colors cursor-pointer"
+                                    className="p-1 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-[#132238] dark:hover:bg-teal-900 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-800 hover:text-slate-900 dark:hover:text-white transition-colors cursor-pointer"
                                     title="Kembalikan ke Interview User"
                                   >
                                     <ChevronLeft className="w-3.5 h-3.5" />
@@ -1030,16 +1030,16 @@ export default function KanbanBoard({
 
       {/* VIEW MODE 2: Tab / High-Density List View for Bulk Applicants */}
       {viewMode === "tab" && (
-        <div className="bg-white dark:bg-[#0c2b29] border border-slate-200 dark:border-emerald-800/40 rounded-2xl p-5 shadow-sm space-y-4 transition-colors">
+        <div className="bg-white dark:bg-[#132238] border border-slate-200 dark:border-slate-800/80 rounded-2xl p-5 shadow-sm space-y-4 transition-colors">
           {/* Stage Tabs Navigation Header */}
-          <div className="flex items-center gap-1.5 overflow-x-auto pb-2 border-b border-slate-200 dark:border-emerald-800/40 custom-scrollbar">
+          <div className="flex items-center gap-1.5 overflow-x-auto pb-2 border-b border-slate-200 dark:border-slate-800/80 custom-scrollbar">
             <button
               type="button"
               onClick={() => setActiveStageTab("all")}
               className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap ${
                 activeStageTab === "all"
                   ? "bg-slate-900 text-white shadow-sm dark:bg-emerald-600"
-                  : "bg-slate-100 dark:bg-[#061f1d] text-slate-700 dark:text-slate-300 hover:bg-slate-200"
+                  : "bg-slate-100 dark:bg-[#0B132B] text-slate-700 dark:text-slate-300 hover:bg-slate-200"
               }`}
             >
               Semua Pelamar ({filteredApplicants.length})
@@ -1057,11 +1057,11 @@ export default function KanbanBoard({
                   className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap flex items-center gap-1.5 ${
                     isActive
                       ? "bg-slate-900 text-white shadow-sm dark:bg-emerald-600"
-                      : "bg-slate-100 dark:bg-[#061f1d] text-slate-700 dark:text-slate-300 hover:bg-slate-200"
+                      : "bg-slate-100 dark:bg-[#0B132B] text-slate-700 dark:text-slate-300 hover:bg-slate-200"
                   }`}
                 >
                   <span>{col.title}</span>
-                  <span className="px-1.5 py-0.2 rounded-full bg-slate-200 dark:bg-emerald-950 text-slate-800 dark:text-emerald-300 text-[10px] font-black">
+                  <span className="px-1.5 py-0.2 rounded-full bg-slate-200 dark:bg-slate-900 text-slate-800 dark:text-teal-300 text-[10px] font-black">
                     {count}
                   </span>
                 </button>
@@ -1072,7 +1072,7 @@ export default function KanbanBoard({
           {/* High-Density Applicant List Table */}
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs text-slate-700 dark:text-slate-300">
-              <thead className="bg-slate-100 dark:bg-[#061f1d] text-slate-700 dark:text-emerald-300 uppercase font-bold text-[10px] border-b border-slate-200 dark:border-emerald-800">
+              <thead className="bg-slate-100 dark:bg-[#0B132B] text-slate-700 dark:text-teal-300 uppercase font-bold text-[10px] border-b border-slate-200 dark:border-slate-800">
                 <tr>
                   <th className="px-4 py-3">Nama Kandidat & Email</th>
                   <th className="px-3 py-3">Posisi Lowongan</th>
@@ -1100,7 +1100,7 @@ export default function KanbanBoard({
                   }
 
                   return displayList.map((app) => (
-                    <tr key={app.id} className="hover:bg-slate-50 dark:hover:bg-[#061f1d]/60 transition-colors group">
+                    <tr key={app.id} className="hover:bg-slate-50 dark:hover:bg-[#0B132B]/60 transition-colors group">
                       <td className="px-4 py-3">
                         <button
                           type="button"
@@ -1109,14 +1109,14 @@ export default function KanbanBoard({
                         >
                           {app.candidate_name}
                         </button>
-                        <p className="text-[11px] text-slate-500 dark:text-emerald-200/70">{app.candidate_email}</p>
+                        <p className="text-[11px] text-slate-500 dark:text-teal-200/70">{app.candidate_email}</p>
                       </td>
                       <td className="px-3 py-3">
                         <span className="font-semibold text-slate-800 dark:text-emerald-100 text-xs">{app.job_title}</span>
                         <p className="text-[10px] text-slate-500">{app.department}</p>
                       </td>
                       <td className="px-3 py-3 whitespace-nowrap">
-                        <span className="whitespace-nowrap inline-flex items-center justify-center px-3 py-1 rounded-full bg-slate-100 dark:bg-[#061f1d] border border-slate-300 dark:border-teal-700/60 text-slate-800 dark:text-teal-300 font-bold text-[10px] min-w-[130px]">
+                        <span className="whitespace-nowrap inline-flex items-center justify-center px-3 py-1 rounded-full bg-slate-100 dark:bg-[#0B132B] border border-slate-300 dark:border-teal-700/60 text-slate-800 dark:text-teal-300 font-bold text-[10px] min-w-[130px]">
                           {KANBAN_COLUMNS.find((c) => c.id === app.kanban_stage)?.title || app.status}
                         </span>
                       </td>
@@ -1146,7 +1146,7 @@ export default function KanbanBoard({
                           <span className="text-amber-700 dark:text-amber-400 text-[11px]">Baru Diajukan</span>
                         )}
                         {app.kanban_stage === "diterima" && (
-                          <span className="text-emerald-700 dark:text-emerald-400 font-bold text-[11px]">✓ Lolos Final</span>
+                          <span className="text-emerald-700 dark:text-teal-400 font-bold text-[11px]">✓ Lolos Final</span>
                         )}
                         {app.kanban_stage === "ditolak" && (
                           <span className="text-rose-700 dark:text-rose-400 font-semibold text-[11px]">Tidak Lolos</span>
@@ -1238,7 +1238,7 @@ export default function KanbanBoard({
                                   <button
                                     type="button"
                                     onClick={() => openDirectGradeModal(app, "interview_hr")}
-                                    className="p-1.5 rounded-lg bg-teal-50 dark:bg-teal-950/60 hover:bg-teal-100 dark:hover:bg-teal-900 text-[#0F766E] dark:text-teal-300 border border-teal-200 dark:border-teal-800 transition-colors cursor-pointer"
+                                    className="p-1.5 rounded-lg bg-teal-50 dark:bg-teal-950/60 hover:bg-teal-100 dark:hover:bg-teal-900 text-[#0F766E] dark:text-teal-300 border border-teal-200 dark:border-slate-800 transition-colors cursor-pointer"
                                     title={`Nilai HR: ${app.hr_interview_score}/100 — klik untuk ubah`}
                                   >
                                     <Award className="w-3.5 h-3.5" />
@@ -1272,7 +1272,7 @@ export default function KanbanBoard({
                                   <button
                                     type="button"
                                     onClick={() => openDirectGradeModal(app, "interview_user")}
-                                    className="p-1.5 rounded-lg bg-teal-50 dark:bg-teal-950/60 hover:bg-teal-100 dark:hover:bg-teal-900 text-[#0F766E] dark:text-teal-300 border border-teal-200 dark:border-teal-800 transition-colors cursor-pointer"
+                                    className="p-1.5 rounded-lg bg-teal-50 dark:bg-teal-950/60 hover:bg-teal-100 dark:hover:bg-teal-900 text-[#0F766E] dark:text-teal-300 border border-teal-200 dark:border-slate-800 transition-colors cursor-pointer"
                                     title={`Nilai User: ${app.user_interview_score}/100 — klik untuk ubah`}
                                   >
                                     <Award className="w-3.5 h-3.5" />
@@ -1299,7 +1299,7 @@ export default function KanbanBoard({
                           )}
 
                           {app.kanban_stage === "diterima" && (
-                            <span className="text-emerald-600 dark:text-emerald-400 font-bold text-[11px]">
+                            <span className="text-emerald-600 dark:text-teal-400 font-bold text-[11px]">
                               ✓ Lolos Seleksi
                             </span>
                           )}
@@ -1326,7 +1326,7 @@ export default function KanbanBoard({
           <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0" />
           <div>
             <p className="font-bold text-xs">Jadwal Ditetapkan</p>
-            <p className="text-[11px] text-slate-300 dark:text-emerald-200">{toastMsg}</p>
+            <p className="text-[11px] text-slate-300 dark:text-teal-200">{toastMsg}</p>
           </div>
         </div>
       )}
@@ -1334,10 +1334,10 @@ export default function KanbanBoard({
       {/* Modal Quick Schedule tailored to the linear stages with CLICKABLE PICKER */}
       {scheduleTargetApp && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in">
-          <div className="bg-white dark:bg-[#0c2b29] border border-slate-300 dark:border-emerald-700 rounded-3xl max-w-lg w-full p-6 space-y-4 text-slate-800 dark:text-slate-100 shadow-2xl max-h-[92vh] overflow-y-auto custom-scrollbar">
-            <div className="flex items-center justify-between border-b border-slate-200 dark:border-emerald-800 pb-3">
+          <div className="bg-white dark:bg-[#132238] border border-slate-300 dark:border-emerald-700 rounded-3xl max-w-lg w-full p-6 space-y-4 text-slate-800 dark:text-slate-100 shadow-2xl max-h-[92vh] overflow-y-auto custom-scrollbar">
+            <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3">
               <div className="flex items-center gap-2">
-                <Calendar className="w-5 h-5 text-slate-700 dark:text-emerald-400" />
+                <Calendar className="w-5 h-5 text-slate-700 dark:text-teal-400" />
                 <h3 className="font-extrabold text-slate-900 dark:text-white text-base">
                   {scheduleModalMode === "test" && "Jadwalkan Assessment / Ujian Tes"}
                   {scheduleModalMode === "interview_hr" && "Jadwalkan Wawancara HR (HR Interview)"}
@@ -1353,10 +1353,10 @@ export default function KanbanBoard({
             </div>
 
             <form onSubmit={handleQuickScheduleSubmit} className="space-y-4 text-xs">
-              <div className="p-3 bg-slate-50 dark:bg-[#061f1d] rounded-xl border border-slate-200 dark:border-emerald-800/60">
+              <div className="p-3 bg-slate-50 dark:bg-[#0B132B] rounded-xl border border-slate-200 dark:border-slate-800/80">
                 <span className="text-[10px] text-slate-500 uppercase font-bold block">Kandidat Terpilih</span>
                 <span className="font-black text-slate-900 dark:text-white text-sm">{scheduleTargetApp.candidate_name}</span>
-                <p className="text-slate-600 dark:text-emerald-300 text-xs mt-0.5">
+                <p className="text-slate-600 dark:text-teal-300 text-xs mt-0.5">
                   {scheduleTargetApp.job_title} ({scheduleTargetApp.department})
                 </p>
               </div>
@@ -1364,13 +1364,13 @@ export default function KanbanBoard({
               {/* Selection for Test Type (Only enabled if mode === 'test') */}
               {scheduleModalMode === "test" && (
                 <div>
-                  <label className="block font-bold text-slate-700 dark:text-emerald-300 uppercase tracking-wider mb-1">
+                  <label className="block font-bold text-slate-700 dark:text-teal-300 uppercase tracking-wider mb-1">
                     Pilih Jenis Tes *
                   </label>
                   <select
                     value={schedType}
                     onChange={(e) => setSchedType(e.target.value as AssessmentType)}
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-[#061f1d] border border-slate-300 dark:border-emerald-800 text-slate-900 dark:text-white focus:outline-none focus:border-slate-800 dark:focus:border-emerald-500"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-[#0B132B] border border-slate-300 dark:border-slate-800 text-slate-900 dark:text-white focus:outline-none focus:border-slate-800 dark:focus:border-emerald-500"
                   >
                     <option value="Technical Test">Technical Test (Tes Koding / Teknis)</option>
                     <option value="Psikotes">Psikotes (Psikologi & Bakat)</option>
@@ -1402,7 +1402,7 @@ export default function KanbanBoard({
 
               {/* Lokasi / Gedung / Ruangan / Link Meeting */}
               <div>
-                <label className="block font-bold text-slate-700 dark:text-emerald-300 uppercase tracking-wider mb-1">
+                <label className="block font-bold text-slate-700 dark:text-teal-300 uppercase tracking-wider mb-1">
                   Lokasi / Ruangan / Link Pertemuan *
                 </label>
                 <div className="relative">
@@ -1417,14 +1417,14 @@ export default function KanbanBoard({
                         ? "Misal: Lab Komputer Gd. B Lt. 2 atau Link Google Meet"
                         : "Misal: Ruang Rapat HR Lt. 3 atau Link Google Meet"
                     }
-                    className="w-full pl-9 pr-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-[#061f1d] border border-slate-300 dark:border-emerald-800 text-slate-900 dark:text-white focus:outline-none focus:border-slate-800 dark:focus:border-emerald-500 text-xs"
+                    className="w-full pl-9 pr-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-[#0B132B] border border-slate-300 dark:border-slate-800 text-slate-900 dark:text-white focus:outline-none focus:border-slate-800 dark:focus:border-emerald-500 text-xs"
                   />
                 </div>
               </div>
 
               {/* Catatan Tambahan (Opsional) */}
               <div>
-                <label className="block font-bold text-slate-700 dark:text-emerald-300 uppercase tracking-wider mb-1">
+                <label className="block font-bold text-slate-700 dark:text-teal-300 uppercase tracking-wider mb-1">
                   Catatan Tambahan untuk Kandidat (Opsional)
                 </label>
                 <textarea
@@ -1432,13 +1432,13 @@ export default function KanbanBoard({
                   value={schedNotes}
                   onChange={(e) => setSchedNotes(e.target.value)}
                   placeholder="Misal: Harap hadir 15 menit lebih awal dan membawa portofolio..."
-                  className="w-full px-3.5 py-2 rounded-xl bg-slate-50 dark:bg-[#061f1d] border border-slate-300 dark:border-emerald-800 text-slate-900 dark:text-white focus:outline-none focus:border-slate-800 dark:focus:border-emerald-500 text-xs resize-none"
+                  className="w-full px-3.5 py-2 rounded-xl bg-slate-50 dark:bg-[#0B132B] border border-slate-300 dark:border-slate-800 text-slate-900 dark:text-white focus:outline-none focus:border-slate-800 dark:focus:border-emerald-500 text-xs resize-none"
                 />
               </div>
 
               {/* Penilai / Pewawancara */}
               <div>
-                <label className="block font-bold text-slate-700 dark:text-emerald-300 uppercase tracking-wider mb-1">
+                <label className="block font-bold text-slate-700 dark:text-teal-300 uppercase tracking-wider mb-1">
                   {scheduleModalMode === "interview_user"
                     ? "Nama Calon Atasan (User / Tech Lead) *"
                     : "Pilih Penilai / Pewawancara yang Bertugas *"}
@@ -1451,7 +1451,7 @@ export default function KanbanBoard({
                     value={customSchedEvaluator}
                     onChange={(e) => setCustomSchedEvaluator(e.target.value)}
                     placeholder="Ketik nama Calon Atasan (misal: Budi Santoso - Head of Engineering)"
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-[#061f1d] border border-slate-300 dark:border-emerald-800 text-slate-900 dark:text-white focus:outline-none focus:border-slate-800 dark:focus:border-emerald-500 text-xs"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-[#0B132B] border border-slate-300 dark:border-slate-800 text-slate-900 dark:text-white focus:outline-none focus:border-slate-800 dark:focus:border-emerald-500 text-xs"
                   />
                 ) : (
                   <>
@@ -1465,7 +1465,7 @@ export default function KanbanBoard({
                           setSchedEvaluator(e.target.value);
                         }
                       }}
-                      className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-[#061f1d] border border-slate-300 dark:border-emerald-800 text-slate-900 dark:text-white focus:outline-none focus:border-slate-800 dark:focus:border-emerald-500 mb-2"
+                      className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-[#0B132B] border border-slate-300 dark:border-slate-800 text-slate-900 dark:text-white focus:outline-none focus:border-slate-800 dark:focus:border-emerald-500 mb-2"
                     >
                       {scheduleModalMode === "test" && (
                         penilaiStaff && penilaiStaff.length > 0 ? (
@@ -1499,7 +1499,7 @@ export default function KanbanBoard({
                         value={customSchedEvaluator}
                         onChange={(e) => setCustomSchedEvaluator(e.target.value)}
                         placeholder="Ketik nama penilai / pewawancara..."
-                        className="w-full px-3.5 py-2 rounded-xl bg-slate-50 dark:bg-[#061f1d] border border-slate-300 dark:border-emerald-500 text-slate-900 dark:text-white focus:outline-none text-xs"
+                        className="w-full px-3.5 py-2 rounded-xl bg-slate-50 dark:bg-[#0B132B] border border-slate-300 dark:border-emerald-500 text-slate-900 dark:text-white focus:outline-none text-xs"
                       />
                     )}
                   </>
@@ -1510,7 +1510,7 @@ export default function KanbanBoard({
                 <button
                   type="button"
                   onClick={() => setScheduleTargetApp(null)}
-                  className="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-[#061f1d] dark:hover:bg-emerald-950 text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-emerald-800 font-bold transition-colors cursor-pointer"
+                  className="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-[#0B132B] dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-800 font-bold transition-colors cursor-pointer"
                 >
                   Batal
                 </button>
@@ -1540,7 +1540,7 @@ export default function KanbanBoard({
       {/* Modal Input Nilai Langsung (Direct Scoring HR / User) */}
       {directGradeApp && (
         <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white dark:bg-[#0c2b29] border border-slate-200 dark:border-teal-800/80 rounded-2xl max-w-md w-full shadow-2xl p-6 text-xs text-slate-700 dark:text-slate-300 animate-scale-up space-y-4">
+          <div className="bg-white dark:bg-[#132238] border border-slate-200 dark:border-slate-800/80 rounded-2xl max-w-md w-full shadow-2xl p-6 text-xs text-slate-700 dark:text-slate-300 animate-scale-up space-y-4">
             <div className="flex items-center justify-between border-b border-slate-100 dark:border-teal-900 pb-3">
               <div className="flex items-center gap-2">
                 <div className="p-2 rounded-xl bg-teal-50 dark:bg-teal-950 text-[#0F766E] dark:text-teal-400">
@@ -1566,7 +1566,7 @@ export default function KanbanBoard({
               </button>
             </div>
 
-            <div className="p-3 bg-slate-50 dark:bg-[#061f1d] rounded-xl border border-slate-200 dark:border-teal-900 space-y-0.5">
+            <div className="p-3 bg-slate-50 dark:bg-[#0B132B] rounded-xl border border-slate-200 dark:border-teal-900 space-y-0.5">
               <p className="font-bold text-slate-900 dark:text-white text-xs">
                 {directGradeApp.candidate_name}
               </p>
@@ -1590,7 +1590,7 @@ export default function KanbanBoard({
                       ? "Contoh: Sarah Wijaya (HR Lead)"
                       : "Contoh: Budi Santoso (Calon Atasan)"
                   }
-                  className="w-full px-3.5 py-2 rounded-xl bg-white dark:bg-[#061f1d] border border-slate-300 dark:border-teal-800 text-slate-900 dark:text-white text-xs focus:outline-none focus:border-[#0F766E]"
+                  className="w-full px-3.5 py-2 rounded-xl bg-white dark:bg-[#0B132B] border border-slate-300 dark:border-slate-800 text-slate-900 dark:text-white text-xs focus:outline-none focus:border-[#0F766E]"
                 />
               </div>
 
@@ -1607,7 +1607,7 @@ export default function KanbanBoard({
                   value={directScoreInput}
                   onChange={(e) => setDirectScoreInput(e.target.value)}
                   placeholder="Contoh: 85"
-                  className="w-full px-3.5 py-2 rounded-xl bg-white dark:bg-[#061f1d] border border-slate-300 dark:border-teal-800 text-slate-900 dark:text-white text-xs font-bold text-base focus:outline-none focus:border-[#0F766E]"
+                  className="w-full px-3.5 py-2 rounded-xl bg-white dark:bg-[#0B132B] border border-slate-300 dark:border-slate-800 text-slate-900 dark:text-white text-xs font-bold text-base focus:outline-none focus:border-[#0F766E]"
                 />
               </div>
 
@@ -1620,7 +1620,7 @@ export default function KanbanBoard({
                   value={directNotesInput}
                   onChange={(e) => setDirectNotesInput(e.target.value)}
                   placeholder="Tuliskan catatan hasil interview atau masukan calon atasan..."
-                  className="w-full px-3.5 py-2 rounded-xl bg-white dark:bg-[#061f1d] border border-slate-300 dark:border-teal-800 text-slate-900 dark:text-white text-xs focus:outline-none focus:border-[#0F766E]"
+                  className="w-full px-3.5 py-2 rounded-xl bg-white dark:bg-[#0B132B] border border-slate-300 dark:border-slate-800 text-slate-900 dark:text-white text-xs focus:outline-none focus:border-[#0F766E]"
                 />
               </div>
 
@@ -1628,7 +1628,7 @@ export default function KanbanBoard({
                 <button
                   type="button"
                   onClick={() => setDirectGradeApp(null)}
-                  className="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-[#061f1d] dark:hover:bg-teal-950 text-slate-700 dark:text-slate-300 font-bold text-xs border border-slate-300 dark:border-teal-800 transition-colors cursor-pointer"
+                  className="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-[#0B132B] dark:hover:bg-teal-950 text-slate-700 dark:text-slate-300 font-bold text-xs border border-slate-300 dark:border-slate-800 transition-colors cursor-pointer"
                 >
                   Batal
                 </button>

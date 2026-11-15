@@ -28,6 +28,11 @@ export default async function AdminLayout({
   // Fetch candidate/admin profile
   const { profile } = await getCandidateProfile();
 
+  // Cegah kandidat masuk ke portal admin/staf
+  if (profile?.role === "candidate") {
+    redirect("/dashboard");
+  }
+
   // Hitung jumlah kandidat yang sedang dalam proses rekrutmen (kecuali yang ditolak)
   const { data: appsData } = await supabase
     .from("applications")

@@ -29,7 +29,7 @@ export default function AboutPage() {
             style={{ fontFamily: "var(--font-plus-jakarta)", color: "#1a1a2e", letterSpacing: "-0.02em" }}
           >
             Kami Percaya pada Kekuatan{" "}
-            <span style={{ color: "#0c2b29" }}>Manusia dan Teknologi</span>
+            <span style={{ color: "#132238" }}>Manusia dan Teknologi</span>
           </h1>
           <p className="text-gray-500 text-lg leading-relaxed">
             Nexora Digital didirikan dengan satu misi: mempertemukan talenta terbaik
@@ -43,18 +43,18 @@ export default function AboutPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid md:grid-cols-2 gap-8">
             <div className="career-card p-8 relative overflow-hidden">
-              <div className="absolute top-0 right-0 w-32 h-32 rounded-bl-full opacity-10" style={{ background: "#0c2b29" }} />
+              <div className="absolute top-0 right-0 w-32 h-32 rounded-bl-full opacity-10" style={{ background: "#132238" }} />
               <div className="text-3xl mb-4">🔭</div>
-              <h2 className="text-2xl font-bold mb-3" style={{ fontFamily: "var(--font-plus-jakarta)", color: "#0c2b29" }}>
+              <h2 className="text-2xl font-bold mb-3" style={{ fontFamily: "var(--font-plus-jakarta)", color: "#132238" }}>
                 Visi Kami
               </h2>
               <p className="text-gray-600 leading-relaxed">{visiMisi.visi}</p>
             </div>
 
             <div className="career-card p-8 relative overflow-hidden">
-              <div className="absolute top-0 right-0 w-32 h-32 rounded-bl-full opacity-10" style={{ background: "#0c2b29" }} />
+              <div className="absolute top-0 right-0 w-32 h-32 rounded-bl-full opacity-10" style={{ background: "#132238" }} />
               <div className="text-3xl mb-4">🎯</div>
-              <h2 className="text-2xl font-bold mb-3" style={{ fontFamily: "var(--font-plus-jakarta)", color: "#0c2b29" }}>
+              <h2 className="text-2xl font-bold mb-3" style={{ fontFamily: "var(--font-plus-jakarta)", color: "#132238" }}>
                 Misi Kami
               </h2>
               <ul className="space-y-3 text-gray-600">

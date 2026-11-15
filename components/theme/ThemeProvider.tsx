@@ -74,7 +74,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
       <div
         className={`min-h-screen transition-colors duration-200 ${
           theme === "dark"
-            ? "dark bg-[#061f1d] text-slate-100"
+            ? "dark bg-[#0B132B] text-slate-100"
             : "bg-slate-50 text-slate-800"
         }`}
       >

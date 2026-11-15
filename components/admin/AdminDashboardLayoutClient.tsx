@@ -23,7 +23,7 @@ export default function AdminDashboardLayoutClient({
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
-    <div className="min-h-screen bg-[#f8fafc] bg-ruangaman-grid dark:bg-[#061f1d] text-slate-900 dark:text-slate-100 flex font-sans selection:bg-[#0F766E] selection:text-white dark:selection:bg-teal-500 transition-colors relative">
+    <div className="min-h-screen bg-[#f8fafc] bg-ruangaman-grid dark:bg-[#0B132B] text-slate-900 dark:text-slate-100 flex font-sans selection:bg-[#0F766E] selection:text-white dark:selection:bg-teal-500 transition-colors relative">
       {/* RuangAman Background: Grid + Radial Glow + Floating 3D Cubes */}
       <RuangAmanBackground />
 
@@ -74,7 +74,7 @@ export default function AdminDashboardLayoutClient({
         </main>
 
         {/* Footer */}
-        <footer className="bg-white/80 dark:bg-[#0c2b29]/80 backdrop-blur-sm border-t border-slate-200/80 text-slate-500 dark:border-teal-800/40 dark:text-teal-300/80 text-xs py-6 mt-12 transition-colors">
+        <footer className="bg-white/80 dark:bg-[#132238]/80 backdrop-blur-sm border-t border-slate-200/80 text-slate-500 dark:border-slate-800/80 dark:text-teal-300/80 text-xs py-6 mt-12 transition-colors">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
             <p>© {new Date().getFullYear()} Nexora Digital – Portal Staf & Penilai Terproteksi.</p>
             <div className="flex items-center gap-4">

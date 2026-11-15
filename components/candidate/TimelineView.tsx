@@ -129,14 +129,14 @@ export default function TimelineView({ application, auditLogs = [] }: TimelineVi
   return (
     <div className="space-y-6 sm:space-y-8">
       {/* 1. Header Card */}
-      <div className="bg-white dark:bg-[#0c2b29] border border-slate-200 dark:border-emerald-800/50 rounded-2xl p-6 sm:p-8 shadow-sm dark:shadow-xl relative overflow-hidden transition-colors">
+      <div className="bg-white dark:bg-[#132238] border border-slate-200 dark:border-slate-800/80 rounded-2xl p-6 sm:p-8 shadow-sm dark:shadow-xl relative overflow-hidden transition-colors">
         <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div className="space-y-2">
             <div className="flex items-center gap-2 flex-wrap">
-              <span className="px-3 py-1 rounded-full bg-slate-100 dark:bg-emerald-950/80 border border-slate-200 dark:border-emerald-700/50 text-xs font-semibold text-slate-700 dark:text-emerald-300">
+              <span className="px-3 py-1 rounded-full bg-slate-100 dark:bg-slate-900/80 border border-slate-200 dark:border-emerald-700/50 text-xs font-semibold text-slate-700 dark:text-teal-300">
                 {application.department}
               </span>
-              <span className="px-3 py-1 rounded-full bg-slate-100 dark:bg-emerald-950/80 border border-slate-200 dark:border-emerald-700/50 text-xs font-semibold text-slate-600 dark:text-slate-300">
+              <span className="px-3 py-1 rounded-full bg-slate-100 dark:bg-slate-900/80 border border-slate-200 dark:border-emerald-700/50 text-xs font-semibold text-slate-600 dark:text-slate-300">
                 {application.job_type}
               </span>
               <StatusBadge status={isRejected ? "Ditolak" : getStageTitle(currentStageIndex)} size="sm" />
@@ -146,23 +146,23 @@ export default function TimelineView({ application, auditLogs = [] }: TimelineVi
               {application.job_title}
             </h1>
 
-            <div className="flex items-center gap-4 text-xs sm:text-sm text-slate-500 dark:text-emerald-200/80 flex-wrap">
+            <div className="flex items-center gap-4 text-xs sm:text-sm text-slate-500 dark:text-teal-200/80 flex-wrap">
               <span className="flex items-center gap-1">
-                <MapPin className="w-3.5 h-3.5 text-slate-400 dark:text-emerald-400" />
+                <MapPin className="w-3.5 h-3.5 text-slate-400 dark:text-teal-400" />
                 {application.location}
               </span>
               <span>•</span>
               <span className="flex items-center gap-1 font-semibold text-slate-700 dark:text-white">
-                <DollarSign className="w-3.5 h-3.5 text-slate-400 dark:text-emerald-400" />
+                <DollarSign className="w-3.5 h-3.5 text-slate-400 dark:text-teal-400" />
                 {application.salary || "Kompensasi Kompetitif"}
               </span>
             </div>
           </div>
 
           {/* Quick Date Meta Box */}
-          <div className="bg-slate-50 dark:bg-[#061f1d] border border-slate-200 dark:border-emerald-900/60 p-4 rounded-xl text-xs space-y-1.5 shrink-0 min-w-[210px] shadow-xs">
+          <div className="bg-slate-50 dark:bg-[#0B132B] border border-slate-200 dark:border-slate-800 p-4 rounded-xl text-xs space-y-1.5 shrink-0 min-w-[210px] shadow-xs">
             <div className="flex items-center justify-between gap-2">
-              <span className="text-slate-500 dark:text-emerald-400/80 font-medium flex items-center gap-1">
+              <span className="text-slate-500 dark:text-teal-400/80 font-medium flex items-center gap-1">
                 <Calendar className="w-3.5 h-3.5" /> Diajukan:
               </span>
               <span className="font-semibold text-slate-800 dark:text-white">
@@ -173,8 +173,8 @@ export default function TimelineView({ application, auditLogs = [] }: TimelineVi
                 })}
               </span>
             </div>
-            <div className="flex items-center justify-between gap-2 border-t border-slate-200 dark:border-emerald-900/60 pt-1.5">
-              <span className="text-slate-500 dark:text-emerald-400/80 font-medium flex items-center gap-1">
+            <div className="flex items-center justify-between gap-2 border-t border-slate-200 dark:border-slate-800 pt-1.5">
+              <span className="text-slate-500 dark:text-teal-400/80 font-medium flex items-center gap-1">
                 <Clock className="w-3.5 h-3.5" /> Posisi Tahap:
               </span>
               <span className="font-bold text-slate-900 dark:text-white">
@@ -186,8 +186,8 @@ export default function TimelineView({ application, auditLogs = [] }: TimelineVi
       </div>
 
       {/* 2. Visual Progress Bar / Milestone Timeline (6 Tahapan Linear) */}
-      <div className="bg-white dark:bg-[#0c2b29] border border-slate-200 dark:border-emerald-800/40 rounded-2xl p-6 sm:p-8 shadow-sm dark:shadow-lg space-y-6 transition-colors">
-        <div className="flex items-center justify-between border-b border-slate-200/80 dark:border-teal-800/40 pb-3">
+      <div className="bg-white dark:bg-[#132238] border border-slate-200 dark:border-slate-800/80 rounded-2xl p-6 sm:p-8 shadow-sm dark:shadow-lg space-y-6 transition-colors">
+        <div className="flex items-center justify-between border-b border-slate-200/80 dark:border-slate-800/80 pb-3">
           <div>
             <h2 className="text-base font-bold text-slate-900 dark:text-white">
               Progres Seleksi
@@ -196,7 +196,7 @@ export default function TimelineView({ application, auditLogs = [] }: TimelineVi
               Status tahapan rekrutmen terkini.
             </p>
           </div>
-          <span className="text-xs font-semibold text-[#0F766E] dark:text-teal-300 bg-teal-50 dark:bg-teal-950 px-2.5 py-1 rounded-lg border border-teal-200/80 dark:border-teal-800/60">
+          <span className="text-xs font-semibold text-[#0F766E] dark:text-teal-300 bg-teal-50 dark:bg-teal-950 px-2.5 py-1 rounded-lg border border-teal-200/80 dark:border-slate-800/80">
             {isRejected ? "Status: Tidak Lolos" : `Tahap ${currentStageIndex} dari 6: ${getStageTitle(currentStageIndex)}`}
           </span>
         </div>
@@ -246,7 +246,7 @@ export default function TimelineView({ application, auditLogs = [] }: TimelineVi
                   <span
                     className={`inline-block text-[11px] font-bold px-2 py-0.5 rounded-md ${
                       isCompleted
-                        ? "bg-emerald-50 text-emerald-700 border border-emerald-200 dark:bg-emerald-900/60 dark:text-emerald-300 dark:border-emerald-700/50"
+                        ? "bg-emerald-50 text-emerald-700 border border-emerald-200 dark:bg-emerald-900/60 dark:text-teal-300 dark:border-emerald-700/50"
                         : isCurrent
                         ? "bg-purple-50 text-purple-700 border border-purple-200 dark:bg-purple-900/80 dark:text-purple-200 dark:border-purple-500/50"
                         : "bg-slate-50 text-slate-400 border border-slate-200 dark:bg-slate-800/60 dark:text-slate-400"
@@ -254,7 +254,7 @@ export default function TimelineView({ application, auditLogs = [] }: TimelineVi
                   >
                     {isCompleted ? "Selesai ✓" : isCurrent ? "Tahap Aktif ⚡" : "Masa Depan"}
                   </span>
-                  <p className={`text-xs sm:text-sm font-bold ${isCurrent ? "text-slate-900 dark:text-white" : isCompleted ? "text-emerald-700 dark:text-emerald-200" : "text-slate-400"}`}>
+                  <p className={`text-xs sm:text-sm font-bold ${isCurrent ? "text-slate-900 dark:text-white" : isCompleted ? "text-emerald-700 dark:text-teal-200" : "text-slate-400"}`}>
                     {stage.title}
                   </p>
                   <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-tight max-w-[170px]">
@@ -277,7 +277,7 @@ export default function TimelineView({ application, auditLogs = [] }: TimelineVi
         </div>
 
         {/* Mobile Vertical Milestone Timeline */}
-        <div className="lg:hidden space-y-5 relative pl-6 border-l-2 border-slate-200 dark:border-emerald-800/60 ml-2">
+        <div className="lg:hidden space-y-5 relative pl-6 border-l-2 border-slate-200 dark:border-slate-800/80 ml-2">
           {STAGES_CONFIG.map((stage) => {
             const isCompleted = !isRejected && stage.stageIndex < currentStageIndex;
             const isCurrent = !isRejected && stage.stageIndex === currentStageIndex;
@@ -300,14 +300,14 @@ export default function TimelineView({ application, auditLogs = [] }: TimelineVi
                 <div
                   className={`p-4 rounded-xl border transition-all ${
                     isCurrent
-                      ? "bg-slate-50 dark:bg-[#061f1d] border-slate-300 dark:border-teal-500/60 shadow-xs"
+                      ? "bg-slate-50 dark:bg-[#0B132B] border-slate-300 dark:border-teal-500/60 shadow-xs"
                       : isCompleted
-                      ? "bg-emerald-50/50 dark:bg-[#0c2b29]/80 border-emerald-200 dark:border-emerald-800/40"
-                      : "bg-slate-50/50 dark:bg-[#061f1d]/40 border-slate-200 dark:border-slate-800 text-slate-500"
+                      ? "bg-emerald-50/50 dark:bg-[#132238]/80 border-emerald-200 dark:border-slate-800/80"
+                      : "bg-slate-50/50 dark:bg-[#0B132B]/40 border-slate-200 dark:border-slate-800 text-slate-500"
                   }`}
                 >
                   <div className="flex items-center justify-between gap-2">
-                    <h3 className={`text-sm font-bold ${isCurrent ? "text-slate-900 dark:text-white" : isCompleted ? "text-emerald-700 dark:text-emerald-200" : "text-slate-400"}`}>
+                    <h3 className={`text-sm font-bold ${isCurrent ? "text-slate-900 dark:text-white" : isCompleted ? "text-emerald-700 dark:text-teal-200" : "text-slate-400"}`}>
                       {stage.title}
                     </h3>
                     <span className="text-[10px] font-semibold uppercase px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">
@@ -329,8 +329,8 @@ export default function TimelineView({ application, auditLogs = [] }: TimelineVi
       </div>
 
       {/* 3. PROMINENT SECTION: Jadwal & Detail Seleksi Terjadwal */}
-      <div className="bg-white dark:bg-[#0c2b29] border border-slate-200 dark:border-emerald-800/50 rounded-2xl p-6 sm:p-8 shadow-sm dark:shadow-xl space-y-6 transition-colors">
-        <div className="flex items-center gap-3 border-b border-slate-200/80 dark:border-teal-800/40 pb-3">
+      <div className="bg-white dark:bg-[#132238] border border-slate-200 dark:border-slate-800/80 rounded-2xl p-6 sm:p-8 shadow-sm dark:shadow-xl space-y-6 transition-colors">
+        <div className="flex items-center gap-3 border-b border-slate-200/80 dark:border-slate-800/80 pb-3">
           <div className="w-9 h-9 rounded-xl bg-purple-50 dark:bg-purple-950/80 border border-purple-200/80 dark:border-purple-800 flex items-center justify-center text-purple-700 dark:text-purple-300">
             <CalendarCheck2 className="w-4 h-4" />
           </div>
@@ -347,8 +347,8 @@ export default function TimelineView({ application, auditLogs = [] }: TimelineVi
         {scheduleDate ? (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* Box 1: Tanggal & Waktu */}
-            <div className="bg-slate-50 dark:bg-[#061f1d] border border-slate-200 dark:border-emerald-800/60 rounded-xl p-4 sm:p-5 space-y-2">
-              <span className="text-[10px] uppercase font-bold text-slate-500 dark:text-emerald-400 tracking-wider">
+            <div className="bg-slate-50 dark:bg-[#0B132B] border border-slate-200 dark:border-slate-800/80 rounded-xl p-4 sm:p-5 space-y-2">
+              <span className="text-[10px] uppercase font-bold text-slate-500 dark:text-teal-400 tracking-wider">
                 Tanggal & Waktu Pelaksanaan
               </span>
               <p className="text-base sm:text-lg font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
@@ -361,27 +361,27 @@ export default function TimelineView({ application, auditLogs = [] }: TimelineVi
             </div>
 
             {/* Box 2: Jenis Asesmen & Penilai */}
-            <div className="bg-slate-50 dark:bg-[#061f1d] border border-slate-200 dark:border-emerald-800/60 rounded-xl p-4 sm:p-5 space-y-2">
-              <span className="text-[10px] uppercase font-bold text-slate-500 dark:text-emerald-400 tracking-wider">
+            <div className="bg-slate-50 dark:bg-[#0B132B] border border-slate-200 dark:border-slate-800/80 rounded-xl p-4 sm:p-5 space-y-2">
+              <span className="text-[10px] uppercase font-bold text-slate-500 dark:text-teal-400 tracking-wider">
                 Jenis Asesmen & Tim Penilai
               </span>
               <div className="flex items-center gap-2 flex-wrap">
                 <span className="px-3 py-1 rounded-full bg-purple-100 dark:bg-purple-950 text-purple-800 dark:text-purple-300 border border-purple-300 dark:border-purple-800 text-xs font-bold">
                   {stageType || "Assessment / Tes"}
                 </span>
-                <span className="px-3 py-1 rounded-full bg-emerald-50 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800 text-xs font-semibold">
+                <span className="px-3 py-1 rounded-full bg-emerald-50 dark:bg-slate-900 text-emerald-800 dark:text-teal-300 border border-emerald-300 dark:border-slate-800 text-xs font-semibold">
                   Status: Terjadwal
                 </span>
               </div>
               <p className="text-xs font-semibold text-slate-700 dark:text-slate-200 flex items-center gap-1.5 pt-1">
-                <UserCheck className="w-4 h-4 text-slate-500 dark:text-emerald-400 shrink-0" />
+                <UserCheck className="w-4 h-4 text-slate-500 dark:text-teal-400 shrink-0" />
                 <span>Penilai: {evaluator || "Dr. Bambang / Tim Penilai & Interviewer"}</span>
               </p>
             </div>
 
             {/* Video Interview Link if provided */}
             {application.interview_link && (
-              <div className="md:col-span-2 bg-teal-50 dark:bg-teal-950/60 border border-teal-200 dark:border-teal-800/50 rounded-xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div className="md:col-span-2 bg-teal-50 dark:bg-teal-950/60 border border-teal-200 dark:border-slate-800/50 rounded-xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div className="flex items-center gap-2.5">
                   <Video className="w-5 h-5 text-teal-600 dark:text-teal-400 shrink-0" />
                   <div>
@@ -406,7 +406,7 @@ export default function TimelineView({ application, auditLogs = [] }: TimelineVi
             )}
           </div>
         ) : (
-          <div className="bg-slate-50 dark:bg-[#061f1d] border border-slate-200 dark:border-emerald-900/60 rounded-xl p-6 text-center space-y-2">
+          <div className="bg-slate-50 dark:bg-[#0B132B] border border-slate-200 dark:border-slate-800 rounded-xl p-6 text-center space-y-2">
             <Calendar className="w-8 h-8 text-slate-400 dark:text-emerald-600 mx-auto" />
             <p className="text-sm font-bold text-slate-800 dark:text-white">
               Jadwal Seleksi Sedang Dipersiapkan
@@ -419,8 +419,8 @@ export default function TimelineView({ application, auditLogs = [] }: TimelineVi
       </div>
 
       {/* 4. Special Box for HR Notes & Interview Instructions */}
-      <div className="bg-white dark:bg-gradient-to-br dark:from-[#0c2b29] dark:to-[#0a2322] border border-slate-200 dark:border-emerald-700/50 rounded-2xl p-6 sm:p-8 shadow-sm dark:shadow-xl space-y-4 transition-colors">
-        <div className="flex items-center gap-3 border-b border-slate-200 dark:border-emerald-800/40 pb-4">
+      <div className="bg-white dark:bg-gradient-to-br dark:from-[#132238] dark:to-[#0a2322] border border-slate-200 dark:border-emerald-700/50 rounded-2xl p-6 sm:p-8 shadow-sm dark:shadow-xl space-y-4 transition-colors">
+        <div className="flex items-center gap-3 border-b border-slate-200 dark:border-slate-800/80 pb-4">
           <div className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-teal-900/80 border border-slate-200 dark:border-teal-600/50 flex items-center justify-center text-slate-700 dark:text-teal-300">
             <FileText className="w-5 h-5" />
           </div>
@@ -428,13 +428,13 @@ export default function TimelineView({ application, auditLogs = [] }: TimelineVi
             <h3 className="text-base sm:text-lg font-bold text-slate-900 dark:text-white">
               Catatan & Instruksi Khusus Rekruiter (HR)
             </h3>
-            <p className="text-xs text-slate-500 dark:text-emerald-200/70">
+            <p className="text-xs text-slate-500 dark:text-teal-200/70">
               Pesan dan arahan resmi dari tim rekrutmen mengenai kelanjutan proses Anda.
             </p>
           </div>
         </div>
 
-        <div className="bg-slate-50 dark:bg-[#061f1d] rounded-xl p-4 sm:p-5 border border-slate-200 dark:border-emerald-800/40">
+        <div className="bg-slate-50 dark:bg-[#0B132B] rounded-xl p-4 sm:p-5 border border-slate-200 dark:border-slate-800/80">
           <p className="text-xs sm:text-sm text-slate-700 dark:text-slate-200 leading-relaxed whitespace-pre-line">
             {application.hr_notes || "Belum ada catatan khusus dari HR. Silakan periksa halaman ini secara berkala."}
           </p>

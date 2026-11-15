@@ -273,7 +273,7 @@ export default function JobManager({ initialJobs }: JobManagerProps) {
       )}
 
       {/* Header Banner & Publish Action Button */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-slate-200/80 dark:border-teal-800/40">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-slate-200/80 dark:border-slate-800/80">
         <div>
           <h1 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">
             Manajemen Lowongan
@@ -297,10 +297,10 @@ export default function JobManager({ initialJobs }: JobManagerProps) {
       </div>
 
       {/* Job Postings Master Table */}
-      <div className="bg-white/90 dark:bg-[#0c2b29]/90 backdrop-blur-md border border-slate-200/80 dark:border-teal-800/40 rounded-2xl p-4 sm:p-5 shadow-2xs space-y-4 transition-colors">
+      <div className="bg-white/90 dark:bg-[#132238]/90 backdrop-blur-md border border-slate-200/80 dark:border-slate-800/80 rounded-2xl p-4 sm:p-5 shadow-2xs space-y-4 transition-colors">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs text-slate-700 dark:text-slate-300">
-            <thead className="bg-slate-100 dark:bg-[#061f1d] text-slate-700 dark:text-emerald-300 uppercase font-bold text-[10px] border-b border-slate-200 dark:border-emerald-800">
+            <thead className="bg-slate-100 dark:bg-[#0B132B] text-slate-700 dark:text-teal-300 uppercase font-bold text-[10px] border-b border-slate-200 dark:border-slate-800">
               <tr>
                 <th className="px-4 py-3">Posisi Lowongan</th>
                 <th className="px-3 py-3">Tipe Kerja</th>
@@ -323,24 +323,24 @@ export default function JobManager({ initialJobs }: JobManagerProps) {
                   const isActive = job.status === "Active" && !isExpired;
 
                   return (
-                    <tr key={job.id} className="hover:bg-slate-50 dark:hover:bg-[#061f1d]/60 transition-colors group">
+                    <tr key={job.id} className="hover:bg-slate-50 dark:hover:bg-[#0B132B]/60 transition-colors group">
                       <td className="px-4 py-3 font-bold text-slate-800 dark:text-white">
                         <p className="text-xs sm:text-sm font-bold text-slate-900 dark:text-emerald-100 group-hover:text-emerald-600 dark:group-hover:text-emerald-300 transition-colors">
                           {job.title}
                         </p>
-                        <p className="text-[10px] text-slate-500 dark:text-emerald-300/70 font-normal flex items-center gap-1 mt-0.5">
-                          <MapPin className="w-3 h-3 text-slate-400 dark:text-emerald-400" />
+                        <p className="text-[10px] text-slate-500 dark:text-teal-300/70 font-normal flex items-center gap-1 mt-0.5">
+                          <MapPin className="w-3 h-3 text-slate-400 dark:text-teal-400" />
                           {job.location}
                         </p>
                       </td>
                       <td className="px-3 py-3">
-                        <span className="px-2.5 py-1 rounded-md bg-slate-100 dark:bg-emerald-900/50 text-slate-700 dark:text-emerald-200 border border-slate-200 dark:border-emerald-700/50 text-[10px] font-semibold">
+                        <span className="px-2.5 py-1 rounded-md bg-slate-100 dark:bg-emerald-900/50 text-slate-700 dark:text-teal-200 border border-slate-200 dark:border-emerald-700/50 text-[10px] font-semibold">
                           {job.type}
                         </span>
                       </td>
                       <td className="px-3 py-3 text-xs">
                         {job.deadline_date ? (
-                          <span className={`inline-flex items-center gap-1 font-semibold text-[11px] ${isExpired ? "text-rose-600 dark:text-rose-400" : "text-slate-700 dark:text-emerald-300"}`}>
+                          <span className={`inline-flex items-center gap-1 font-semibold text-[11px] ${isExpired ? "text-rose-600 dark:text-rose-400" : "text-slate-700 dark:text-teal-300"}`}>
                             <Calendar className="w-3 h-3 text-slate-400" />
                             {new Date(job.deadline_date).toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "numeric" })}
                             {isExpired && (
@@ -355,13 +355,13 @@ export default function JobManager({ initialJobs }: JobManagerProps) {
                       </td>
                       <td className="px-3 py-3 font-extrabold text-slate-800 dark:text-white text-xs">
                         <span className="inline-flex items-center gap-1">
-                          <Users className="w-3.5 h-3.5 text-slate-400 dark:text-emerald-400" />
+                          <Users className="w-3.5 h-3.5 text-slate-400 dark:text-teal-400" />
                           {job.applicant_count ?? 0} Pelamar
                         </span>
                       </td>
                       <td className="px-3 py-3">
                         {isActive ? (
-                          <span className="px-2.5 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-500/40 font-bold text-[10px] inline-flex items-center gap-1">
+                          <span className="px-2.5 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-500/20 text-emerald-700 dark:text-teal-300 border border-emerald-300 dark:border-emerald-500/40 font-bold text-[10px] inline-flex items-center gap-1">
                             <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
                             Aktif
                           </span>
@@ -403,7 +403,7 @@ export default function JobManager({ initialJobs }: JobManagerProps) {
                             className={`p-1.5 rounded-lg text-xs font-bold transition-colors cursor-pointer ${
                               job.status === "Active"
                                 ? "bg-amber-50 hover:bg-amber-100 dark:bg-amber-950/80 dark:hover:bg-amber-900 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-800"
-                                : "bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-950/80 dark:hover:bg-emerald-900 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800"
+                                : "bg-emerald-50 hover:bg-emerald-100 dark:bg-slate-900/80 dark:hover:bg-slate-800 text-emerald-700 dark:text-teal-300 border border-emerald-200 dark:border-slate-800"
                             }`}
                             title={job.status === "Active" ? "Tutup Lowongan Pekerjaan" : "Buka Kembali Lowongan"}
                           >
@@ -433,7 +433,7 @@ export default function JobManager({ initialJobs }: JobManagerProps) {
       {/* MODAL 1: Detail Lowongan */}
       {viewingJob && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in-up">
-          <div className="bg-white dark:bg-[#0c2b29] border border-slate-300 dark:border-emerald-700 rounded-3xl max-w-2xl w-full p-6 sm:p-8 shadow-2xl relative text-slate-800 dark:text-slate-100 space-y-6 max-h-[90vh] overflow-y-auto custom-scrollbar">
+          <div className="bg-white dark:bg-[#132238] border border-slate-300 dark:border-emerald-700 rounded-3xl max-w-2xl w-full p-6 sm:p-8 shadow-2xl relative text-slate-800 dark:text-slate-100 space-y-6 max-h-[90vh] overflow-y-auto custom-scrollbar">
             <button
               onClick={() => setViewingJob(null)}
               className="absolute top-5 right-5 p-1.5 rounded-xl text-slate-400 hover:text-slate-800 dark:hover:text-white transition-colors cursor-pointer"
@@ -446,34 +446,34 @@ export default function JobManager({ initialJobs }: JobManagerProps) {
                 <Briefcase className="w-6 h-6" />
               </div>
               <div>
-                <span className="px-2.5 py-0.5 rounded-full bg-slate-100 dark:bg-emerald-950 text-slate-700 dark:text-emerald-300 border border-slate-300 dark:border-emerald-800 text-xs font-semibold">
+                <span className="px-2.5 py-0.5 rounded-full bg-slate-100 dark:bg-slate-900 text-slate-700 dark:text-teal-300 border border-slate-300 dark:border-slate-800 text-xs font-semibold">
                   {viewingJob.dept} • {viewingJob.type}
                 </span>
                 <h2 className="text-xl sm:text-2xl font-extrabold text-slate-900 dark:text-white mt-1">{viewingJob.title}</h2>
-                <p className="text-xs text-slate-500 dark:text-emerald-200/70 flex items-center gap-1 mt-0.5">
-                  <MapPin className="w-3.5 h-3.5 text-slate-400 dark:text-emerald-400" />
+                <p className="text-xs text-slate-500 dark:text-teal-200/70 flex items-center gap-1 mt-0.5">
+                  <MapPin className="w-3.5 h-3.5 text-slate-400 dark:text-teal-400" />
                   {viewingJob.location}
                 </p>
               </div>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-slate-50 dark:bg-[#061f1d] border border-slate-200 dark:border-emerald-800/60 rounded-2xl p-4 text-xs">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-slate-50 dark:bg-[#0B132B] border border-slate-200 dark:border-slate-800/80 rounded-2xl p-4 text-xs">
               <div className="space-y-1">
-                <span className="text-slate-600 dark:text-emerald-400 font-semibold flex items-center gap-1">
+                <span className="text-slate-600 dark:text-teal-400 font-semibold flex items-center gap-1">
                   <DollarSign className="w-4 h-4" /> Rentang Gaji
                 </span>
                 <p className="text-slate-900 dark:text-white font-bold text-sm">{viewingJob.salary || "Sesuai Standar Perusahaan"}</p>
               </div>
 
               <div className="space-y-1">
-                <span className="text-slate-600 dark:text-emerald-400 font-semibold flex items-center gap-1">
+                <span className="text-slate-600 dark:text-teal-400 font-semibold flex items-center gap-1">
                   <GraduationCap className="w-4 h-4" /> Min. Pendidikan
                 </span>
                 <p className="text-slate-900 dark:text-white font-bold text-sm">{viewingJob.min_education || "S1"}</p>
               </div>
 
               <div className="space-y-1">
-                <span className="text-slate-600 dark:text-emerald-400 font-semibold flex items-center gap-1">
+                <span className="text-slate-600 dark:text-teal-400 font-semibold flex items-center gap-1">
                   <Calendar className="w-4 h-4" /> Batas Akhir Pendaftaran
                 </span>
                 <p className="text-slate-900 dark:text-white font-bold text-sm">
@@ -488,7 +488,7 @@ export default function JobManager({ initialJobs }: JobManagerProps) {
               </div>
 
               <div className="space-y-1">
-                <span className="text-slate-600 dark:text-emerald-400 font-semibold flex items-center gap-1">
+                <span className="text-slate-600 dark:text-teal-400 font-semibold flex items-center gap-1">
                   <Users className="w-4 h-4" /> Status & Total Pelamar
                 </span>
                 <p className="text-slate-900 dark:text-white font-bold text-sm">
@@ -498,14 +498,14 @@ export default function JobManager({ initialJobs }: JobManagerProps) {
             </div>
 
             <div className="space-y-2">
-              <h3 className="text-xs font-bold text-slate-700 dark:text-emerald-300 uppercase flex items-center gap-1">
+              <h3 className="text-xs font-bold text-slate-700 dark:text-teal-300 uppercase flex items-center gap-1">
                 <Tag className="w-4 h-4" /> Skill / Kualifikasi yang Dibutuhkan
               </h3>
               <div className="flex flex-wrap gap-2">
                 {(viewingJob.required_skills || []).map((skill) => (
                   <span
                     key={skill}
-                    className="px-3 py-1 rounded-lg bg-slate-100 dark:bg-emerald-950 border border-slate-300 dark:border-emerald-700/60 text-slate-800 dark:text-emerald-200 text-xs font-medium"
+                    className="px-3 py-1 rounded-lg bg-slate-100 dark:bg-slate-900 border border-slate-300 dark:border-emerald-700/60 text-slate-800 dark:text-teal-200 text-xs font-medium"
                   >
                     {skill}
                   </span>
@@ -514,17 +514,17 @@ export default function JobManager({ initialJobs }: JobManagerProps) {
             </div>
 
             <div className="space-y-2">
-              <h3 className="text-xs font-bold text-slate-700 dark:text-emerald-300 uppercase">Deskripsi & Ruang Lingkup Pekerjaan</h3>
-              <p className="text-xs sm:text-sm text-slate-700 dark:text-slate-300 whitespace-pre-line leading-relaxed bg-slate-50 dark:bg-[#061f1d] border border-slate-200 dark:border-emerald-800/40 p-4 rounded-2xl">
+              <h3 className="text-xs font-bold text-slate-700 dark:text-teal-300 uppercase">Deskripsi & Ruang Lingkup Pekerjaan</h3>
+              <p className="text-xs sm:text-sm text-slate-700 dark:text-slate-300 whitespace-pre-line leading-relaxed bg-slate-50 dark:bg-[#0B132B] border border-slate-200 dark:border-slate-800/80 p-4 rounded-2xl">
                 {viewingJob.description}
               </p>
             </div>
 
-            <div className="flex justify-end gap-3 pt-4 border-t border-slate-200 dark:border-emerald-800/60">
+            <div className="flex justify-end gap-3 pt-4 border-t border-slate-200 dark:border-slate-800/80">
               <button
                 type="button"
                 onClick={() => setViewingJob(null)}
-                className="px-5 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-emerald-950 dark:hover:bg-emerald-900 border border-slate-300 dark:border-emerald-700 text-slate-700 dark:text-emerald-200 text-xs font-bold transition-colors cursor-pointer"
+                className="px-5 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-900 dark:hover:bg-slate-800 border border-slate-300 dark:border-emerald-700 text-slate-700 dark:text-teal-200 text-xs font-bold transition-colors cursor-pointer"
               >
                 Tutup Ringkasan
               </button>
@@ -536,7 +536,7 @@ export default function JobManager({ initialJobs }: JobManagerProps) {
       {/* MODAL 2: Create / Edit Job Form Modal */}
       {(showCreateModal || editingJob) && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in-up">
-          <div className="bg-white dark:bg-[#0c2b29] border border-slate-300 dark:border-emerald-700 rounded-3xl max-w-2xl w-full p-6 sm:p-8 shadow-2xl relative text-slate-800 dark:text-slate-100 space-y-6 max-h-[90vh] overflow-y-auto custom-scrollbar">
+          <div className="bg-white dark:bg-[#132238] border border-slate-300 dark:border-emerald-700 rounded-3xl max-w-2xl w-full p-6 sm:p-8 shadow-2xl relative text-slate-800 dark:text-slate-100 space-y-6 max-h-[90vh] overflow-y-auto custom-scrollbar">
             <button
               onClick={() => {
                 setShowCreateModal(false);
@@ -556,7 +556,7 @@ export default function JobManager({ initialJobs }: JobManagerProps) {
                 <h2 className="text-xl font-extrabold text-slate-900 dark:text-white">
                   {editingJob ? "Edit Lowongan Pekerjaan" : "Formulir Lowongan Pekerjaan Baru"}
                 </h2>
-                <p className="text-xs text-slate-500 dark:text-emerald-200/70">
+                <p className="text-xs text-slate-500 dark:text-teal-200/70">
                   {editingJob
                     ? "Perbarui kriteria, status, dan batas akhir pendaftaran di Supabase."
                     : "Terbitkan posisi lowongan baru ke portal rekrutmen internal."}
@@ -566,24 +566,24 @@ export default function JobManager({ initialJobs }: JobManagerProps) {
 
             <form onSubmit={editingJob ? handleUpdateJob : handleCreateJob} className="space-y-4 text-xs sm:text-sm">
               <div>
-                <label className="block font-bold text-slate-700 dark:text-emerald-300 uppercase mb-1">Judul Posisi Lowongan *</label>
+                <label className="block font-bold text-slate-700 dark:text-teal-300 uppercase mb-1">Judul Posisi Lowongan *</label>
                 <input
                   type="text"
                   required
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
-                  className="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-[#061f1d] border border-slate-300 dark:border-emerald-800/60 text-slate-900 dark:text-white focus:outline-none focus:border-slate-800 dark:focus:border-emerald-500"
+                  className="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-[#0B132B] border border-slate-300 dark:border-slate-800/80 text-slate-900 dark:text-white focus:outline-none focus:border-slate-800 dark:focus:border-emerald-500"
                   placeholder="Contoh: Senior Frontend Engineer"
                 />
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block font-bold text-slate-700 dark:text-emerald-300 uppercase mb-1">Divisi / Departemen *</label>
+                  <label className="block font-bold text-slate-700 dark:text-teal-300 uppercase mb-1">Divisi / Departemen *</label>
                   <select
                     value={dept}
                     onChange={(e) => setDept(e.target.value)}
-                    className="w-full px-3 py-2.5 rounded-xl bg-slate-50 dark:bg-[#061f1d] border border-slate-300 dark:border-emerald-800/60 text-slate-900 dark:text-white focus:outline-none focus:border-slate-800 dark:focus:border-emerald-500"
+                    className="w-full px-3 py-2.5 rounded-xl bg-slate-50 dark:bg-[#0B132B] border border-slate-300 dark:border-slate-800/80 text-slate-900 dark:text-white focus:outline-none focus:border-slate-800 dark:focus:border-emerald-500"
                   >
                     <option value="Engineering">Engineering</option>
                     <option value="Human Resources">Human Resources</option>
@@ -595,11 +595,11 @@ export default function JobManager({ initialJobs }: JobManagerProps) {
                 </div>
 
                 <div>
-                  <label className="block font-bold text-slate-700 dark:text-emerald-300 uppercase mb-1">Tipe Kerja *</label>
+                  <label className="block font-bold text-slate-700 dark:text-teal-300 uppercase mb-1">Tipe Kerja *</label>
                   <select
                     value={type}
                     onChange={(e) => setType(e.target.value)}
-                    className="w-full px-3 py-2.5 rounded-xl bg-slate-50 dark:bg-[#061f1d] border border-slate-300 dark:border-emerald-800/60 text-slate-900 dark:text-white focus:outline-none focus:border-slate-800 dark:focus:border-emerald-500"
+                    className="w-full px-3 py-2.5 rounded-xl bg-slate-50 dark:bg-[#0B132B] border border-slate-300 dark:border-slate-800/80 text-slate-900 dark:text-white focus:outline-none focus:border-slate-800 dark:focus:border-emerald-500"
                   >
                     <option value="WFH">WFH (Work From Home)</option>
                     <option value="WFO">WFO (Work From Office)</option>
@@ -610,25 +610,25 @@ export default function JobManager({ initialJobs }: JobManagerProps) {
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block font-bold text-slate-700 dark:text-emerald-300 uppercase mb-1">Lokasi Perusahaan *</label>
+                  <label className="block font-bold text-slate-700 dark:text-teal-300 uppercase mb-1">Lokasi Perusahaan *</label>
                   <input
                     type="text"
                     required
                     value={location}
                     onChange={(e) => setLocation(e.target.value)}
-                    className="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-[#061f1d] border border-slate-300 dark:border-emerald-800/60 text-slate-900 dark:text-white focus:outline-none focus:border-slate-800 dark:focus:border-emerald-500"
+                    className="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-[#0B132B] border border-slate-300 dark:border-slate-800/80 text-slate-900 dark:text-white focus:outline-none focus:border-slate-800 dark:focus:border-emerald-500"
                     placeholder="Jakarta HQ / Remote"
                   />
                 </div>
 
                 <div>
-                  <label className="block font-bold text-slate-700 dark:text-emerald-300 uppercase mb-1">Rentang Gaji *</label>
+                  <label className="block font-bold text-slate-700 dark:text-teal-300 uppercase mb-1">Rentang Gaji *</label>
                   <input
                     type="text"
                     required
                     value={salary}
                     onChange={(e) => setSalary(e.target.value)}
-                    className="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-[#061f1d] border border-slate-300 dark:border-emerald-800/60 text-slate-900 dark:text-white focus:outline-none focus:border-slate-800 dark:focus:border-emerald-500"
+                    className="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-[#0B132B] border border-slate-300 dark:border-slate-800/80 text-slate-900 dark:text-white focus:outline-none focus:border-slate-800 dark:focus:border-emerald-500"
                     placeholder="Rp 15.000.000 - Rp 25.000.000 / bulan"
                   />
                 </div>
@@ -636,21 +636,21 @@ export default function JobManager({ initialJobs }: JobManagerProps) {
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block font-bold text-slate-700 dark:text-emerald-300 uppercase mb-1">Batas Akhir (Deadline)</label>
+                  <label className="block font-bold text-slate-700 dark:text-teal-300 uppercase mb-1">Batas Akhir (Deadline)</label>
                   <input
                     type="datetime-local"
                     value={deadlineDate}
                     onChange={(e) => setDeadlineDate(e.target.value)}
-                    className="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-[#061f1d] border border-slate-300 dark:border-emerald-800/60 text-slate-900 dark:text-white focus:outline-none focus:border-slate-800 dark:focus:border-emerald-500"
+                    className="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-[#0B132B] border border-slate-300 dark:border-slate-800/80 text-slate-900 dark:text-white focus:outline-none focus:border-slate-800 dark:focus:border-emerald-500"
                   />
                 </div>
 
                 <div>
-                  <label className="block font-bold text-slate-700 dark:text-emerald-300 uppercase mb-1">Syarat Min. Pendidikan *</label>
+                  <label className="block font-bold text-slate-700 dark:text-teal-300 uppercase mb-1">Syarat Min. Pendidikan *</label>
                   <select
                     value={minEducation}
                     onChange={(e) => setMinEducation(e.target.value as any)}
-                    className="w-full px-3 py-2.5 rounded-xl bg-slate-50 dark:bg-[#061f1d] border border-slate-300 dark:border-emerald-800/60 text-slate-900 dark:text-white focus:outline-none focus:border-slate-800 dark:focus:border-emerald-500"
+                    className="w-full px-3 py-2.5 rounded-xl bg-slate-50 dark:bg-[#0B132B] border border-slate-300 dark:border-slate-800/80 text-slate-900 dark:text-white focus:outline-none focus:border-slate-800 dark:focus:border-emerald-500"
                   >
                     <option value="SMA">SMA / SMK</option>
                     <option value="D3">Diploma 3 (D3)</option>
@@ -661,11 +661,11 @@ export default function JobManager({ initialJobs }: JobManagerProps) {
               </div>
 
               <div>
-                <label className="block font-bold text-slate-700 dark:text-emerald-300 uppercase mb-1">Status Publikasi Lowongan *</label>
+                <label className="block font-bold text-slate-700 dark:text-teal-300 uppercase mb-1">Status Publikasi Lowongan *</label>
                 <select
                   value={statusOption}
                   onChange={(e) => setStatusOption(e.target.value as any)}
-                  className="w-full px-3 py-2.5 rounded-xl bg-slate-50 dark:bg-[#061f1d] border border-slate-300 dark:border-emerald-800/60 text-slate-900 dark:text-white focus:outline-none focus:border-slate-800 dark:focus:border-emerald-500"
+                  className="w-full px-3 py-2.5 rounded-xl bg-slate-50 dark:bg-[#0B132B] border border-slate-300 dark:border-slate-800/80 text-slate-900 dark:text-white focus:outline-none focus:border-slate-800 dark:focus:border-emerald-500"
                 >
                   <option value="Active">Aktif (Menerima Pendaftaran Pelamar)</option>
                   <option value="Closed">Ditutup (Pendaftaran Ditutup)</option>
@@ -673,25 +673,25 @@ export default function JobManager({ initialJobs }: JobManagerProps) {
               </div>
 
               <div>
-                <label className="block font-bold text-slate-700 dark:text-emerald-300 uppercase mb-1">Required Skills (Pisahkan Koma) *</label>
+                <label className="block font-bold text-slate-700 dark:text-teal-300 uppercase mb-1">Required Skills (Pisahkan Koma) *</label>
                 <input
                   type="text"
                   required
                   value={requiredSkillsInput}
                   onChange={(e) => setRequiredSkillsInput(e.target.value)}
-                  className="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-[#061f1d] border border-slate-300 dark:border-emerald-800/60 text-slate-900 dark:text-white focus:outline-none focus:border-slate-800 dark:focus:border-emerald-500"
+                  className="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-[#0B132B] border border-slate-300 dark:border-slate-800/80 text-slate-900 dark:text-white focus:outline-none focus:border-slate-800 dark:focus:border-emerald-500"
                   placeholder="React.js, Next.js, TypeScript, PostgreSQL"
                 />
               </div>
 
               <div>
-                <label className="block font-bold text-slate-700 dark:text-emerald-300 uppercase mb-1">Deskripsi Pekerjaan *</label>
+                <label className="block font-bold text-slate-700 dark:text-teal-300 uppercase mb-1">Deskripsi Pekerjaan *</label>
                 <textarea
                   rows={4}
                   required
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
-                  className="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-[#061f1d] border border-slate-300 dark:border-emerald-800/60 text-slate-900 dark:text-white focus:outline-none focus:border-slate-800 dark:focus:border-emerald-500 resize-none"
+                  className="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-[#0B132B] border border-slate-300 dark:border-slate-800/80 text-slate-900 dark:text-white focus:outline-none focus:border-slate-800 dark:focus:border-emerald-500 resize-none"
                   placeholder="Tulis deskripsi tugas utama, tanggung jawab, dan kualifikasi yang dibutuhkan..."
                 />
               </div>
@@ -704,7 +704,7 @@ export default function JobManager({ initialJobs }: JobManagerProps) {
                     setEditingJob(null);
                     resetForm();
                   }}
-                  className="flex-1 py-2.5 bg-slate-100 hover:bg-slate-200 dark:bg-[#061f1d] dark:hover:bg-emerald-950 border border-slate-300 dark:border-emerald-800 text-slate-700 dark:text-slate-300 font-bold rounded-xl transition-colors cursor-pointer"
+                  className="flex-1 py-2.5 bg-slate-100 hover:bg-slate-200 dark:bg-[#0B132B] dark:hover:bg-slate-800 border border-slate-300 dark:border-slate-800 text-slate-700 dark:text-slate-300 font-bold rounded-xl transition-colors cursor-pointer"
                 >
                   Batal
                 </button>
@@ -725,7 +725,7 @@ export default function JobManager({ initialJobs }: JobManagerProps) {
       {/* MODAL 3: Confirm Delete Modal */}
       {deletingJobId && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in-up">
-          <div className="bg-white dark:bg-[#0c2b29] border border-rose-300 dark:border-rose-800/60 rounded-3xl max-w-md w-full p-6 shadow-2xl relative text-slate-800 dark:text-slate-100 space-y-4">
+          <div className="bg-white dark:bg-[#132238] border border-rose-300 dark:border-rose-800/60 rounded-3xl max-w-md w-full p-6 shadow-2xl relative text-slate-800 dark:text-slate-100 space-y-4">
             <div className="w-12 h-12 rounded-2xl bg-rose-50 dark:bg-rose-950 border border-rose-200 dark:border-rose-700/60 text-rose-600 dark:text-rose-400 flex items-center justify-center font-bold mx-auto">
               <AlertTriangle className="w-6 h-6" />
             </div>
@@ -741,7 +741,7 @@ export default function JobManager({ initialJobs }: JobManagerProps) {
               <button
                 type="button"
                 onClick={() => setDeletingJobId(null)}
-                className="flex-1 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-[#061f1d] dark:hover:bg-emerald-950 border border-slate-300 dark:border-emerald-800 text-slate-700 dark:text-slate-300 text-xs font-bold transition-colors cursor-pointer"
+                className="flex-1 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-[#0B132B] dark:hover:bg-slate-800 border border-slate-300 dark:border-slate-800 text-slate-700 dark:text-slate-300 text-xs font-bold transition-colors cursor-pointer"
               >
                 Batal
               </button>

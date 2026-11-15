@@ -62,20 +62,21 @@ export default function AdminSidebar({
   };
 
   return (
-    <aside className="w-64 h-full bg-white/95 dark:bg-[#0c2b29]/95 backdrop-blur-md border-r border-slate-200/80 dark:border-teal-800/40 flex flex-col justify-between p-4 text-slate-800 dark:text-slate-100 overflow-y-auto custom-scrollbar transition-colors shadow-sm">
+    <aside className="w-64 h-full bg-white/95 dark:bg-[#132238]/95 backdrop-blur-md border-r border-slate-200/80 dark:border-slate-800/80 flex flex-col justify-between p-4 text-slate-800 dark:text-slate-100 overflow-y-auto custom-scrollbar transition-colors shadow-sm">
       <div className="space-y-4">
         {/* Brand Logo & Mobile Close Button */}
         <div className="flex items-center justify-between px-1">
           <Link
             href={isInterviewer ? "/admin/evaluations" : "/admin"}
+            prefetch={true}
             className="flex items-center gap-2.5 group"
           >
             {/* Nexora Digital Official Logo */}
-            <div className="h-10 w-10 rounded-xl overflow-hidden bg-white p-1 border border-slate-200/80 dark:border-teal-800/40 shadow-xs group-hover:scale-105 transition-transform shrink-0 flex items-center justify-center">
+            <div className="h-10 w-10 rounded-xl overflow-hidden bg-white p-1 border border-slate-200/80 dark:border-slate-800/80 shadow-xs group-hover:scale-105 transition-transform shrink-0 flex items-center justify-center">
               <img
-                src="/nexora-logo.jpg"
-                alt="Nexora Digital Logo"
-                className="h-full w-full object-contain"
+                src="/nexora-icon-trans.png"
+                alt="Nexora Digital"
+                className="w-full h-full object-contain"
               />
             </div>
             <div className="min-w-0">
@@ -105,7 +106,7 @@ export default function AdminSidebar({
         </div>
 
         {/* Navigation Items */}
-        <nav className="space-y-1 pt-3 border-t border-slate-100 dark:border-teal-800/40">
+        <nav className="space-y-1 pt-3 border-t border-slate-100 dark:border-slate-800/80">
           {NAV_ITEMS.map((item) => {
             const Icon = item.icon;
             const active = isLinkActive(item.href);
@@ -114,10 +115,11 @@ export default function AdminSidebar({
               <Link
                 key={item.href}
                 href={item.href}
+                prefetch={true}
                 className={`flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all ${
                   active
                     ? "bg-[#0F766E] text-white shadow-2xs font-bold"
-                    : "text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-[#061f1d]"
+                    : "text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-[#0B132B]"
                 }`}
               >
                 <div className="flex items-center gap-2.5 truncate">
@@ -135,7 +137,7 @@ export default function AdminSidebar({
                     className={`ml-2 px-2 py-0.5 rounded-full text-[10px] font-extrabold ${
                       active
                         ? "bg-white text-[#0F766E]"
-                        : "bg-teal-50 dark:bg-teal-950 text-[#0F766E] dark:text-teal-300 border border-teal-200/80 dark:border-teal-800/60"
+                        : "bg-teal-50 dark:bg-teal-950 text-[#0F766E] dark:text-teal-300 border border-teal-200/80 dark:border-slate-800/80"
                     }`}
                     title={`${item.badgeCount} kandidat aktif`}
                   >
@@ -149,8 +151,8 @@ export default function AdminSidebar({
       </div>
 
       {/* Footer Role & SignOut */}
-      <div className="space-y-2.5 pt-3 border-t border-slate-100 dark:border-teal-800/40">
-        <div className="bg-slate-50/80 dark:bg-[#061f1d] p-2.5 rounded-xl border border-slate-200/80 dark:border-teal-800/40 flex items-center gap-2.5">
+      <div className="space-y-2.5 pt-3 border-t border-slate-100 dark:border-slate-800/80">
+        <div className="bg-slate-50/80 dark:bg-[#0B132B] p-2.5 rounded-xl border border-slate-200/80 dark:border-slate-800/80 flex items-center gap-2.5">
           {isInterviewer ? (
             <Award className="w-4 h-4 text-amber-500 shrink-0" />
           ) : (

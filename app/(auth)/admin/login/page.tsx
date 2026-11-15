@@ -51,7 +51,7 @@ export default function AdminLoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#061f1d] text-slate-100 flex flex-col justify-center items-center p-4 sm:p-6 relative overflow-hidden font-sans">
+    <div className="min-h-screen bg-[#0B132B] text-slate-100 flex flex-col justify-center items-center p-4 sm:p-6 relative overflow-hidden font-sans">
       {/* Decorative background glow */}
       <div className="absolute top-1/4 -left-32 w-96 h-96 bg-emerald-600/10 rounded-full blur-3xl pointer-events-none" />
       <div className="absolute bottom-1/4 -right-32 w-96 h-96 bg-teal-500/10 rounded-full blur-3xl pointer-events-none" />
@@ -60,15 +60,15 @@ export default function AdminLoginPage() {
         {/* Brand Header */}
         <div className="text-center space-y-3">
           <div className="flex justify-center mb-1">
-            <div className="h-14 w-14 rounded-2xl overflow-hidden bg-white p-1.5 border border-emerald-700/60 shadow-xl flex items-center justify-center">
+            <div className="h-14 w-14 rounded-2xl overflow-hidden bg-white p-1.5 border border-slate-700 shadow-xl flex items-center justify-center">
               <img
-                src="/nexora-logo.jpg"
-                alt="Nexora Digital Logo"
-                className="h-full w-full object-contain"
+                src="/nexora-icon-trans.png"
+                alt="Nexora Digital"
+                className="w-full h-full object-contain"
               />
             </div>
           </div>
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#0c2b29] border border-emerald-700/60 shadow-lg">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#132238] border border-emerald-700/60 shadow-lg">
             <ShieldCheck className="w-4 h-4 text-teal-400" />
             <span className="text-xs font-bold text-teal-300 uppercase tracking-wider">
               Nexora Digital · Portal Staf
@@ -85,7 +85,7 @@ export default function AdminLoginPage() {
         </div>
 
         {/* Login Card */}
-        <div className="bg-[#0c2b29] border border-emerald-800/60 rounded-3xl p-6 sm:p-8 shadow-2xl space-y-6">
+        <div className="bg-[#132238] border border-emerald-800/60 rounded-3xl p-6 sm:p-8 shadow-2xl space-y-6">
           {state && !state.success && (
             <div className="p-4 rounded-xl bg-rose-950/80 border border-rose-500/50 text-rose-200 text-xs flex items-start gap-3 animate-shake">
               <AlertCircle className="w-5 h-5 text-rose-400 shrink-0 mt-0.5" />
@@ -122,7 +122,7 @@ export default function AdminLoginPage() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="muhzhrii atau penilai@talenthub.com"
-                  className="w-full pl-11 pr-4 py-3 rounded-xl bg-[#061f1d] border border-emerald-800 text-white placeholder-slate-500 text-sm focus:outline-none focus:border-emerald-500 transition-colors"
+                  className="w-full pl-11 pr-4 py-3 rounded-xl bg-[#0B132B] border border-emerald-800 text-white placeholder-slate-500 text-sm focus:outline-none focus:border-emerald-500 transition-colors"
                 />
               </div>
               <p className="text-[11px] text-slate-400 mt-1">
@@ -143,7 +143,7 @@ export default function AdminLoginPage() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
-                  className="w-full pl-11 pr-4 py-3 rounded-xl bg-[#061f1d] border border-emerald-800 text-white placeholder-slate-500 text-sm focus:outline-none focus:border-emerald-500 transition-colors"
+                  className="w-full pl-11 pr-4 py-3 rounded-xl bg-[#0B132B] border border-emerald-800 text-white placeholder-slate-500 text-sm focus:outline-none focus:border-emerald-500 transition-colors"
                 />
               </div>
             </div>
@@ -177,7 +177,7 @@ export default function AdminLoginPage() {
               <button
                 type="button"
                 onClick={() => handleFillCredentials("muhzhrii", "")}
-                className="p-2 rounded-xl bg-[#061f1d] hover:bg-emerald-900/40 border border-emerald-700/60 text-left transition-colors flex flex-col justify-between"
+                className="p-2 rounded-xl bg-[#0B132B] hover:bg-emerald-900/40 border border-emerald-700/60 text-left transition-colors flex flex-col justify-between"
               >
                 <div className="flex items-center gap-1 text-amber-300 font-bold text-[10px]">
                   <User className="w-3 h-3 shrink-0" />
@@ -190,7 +190,7 @@ export default function AdminLoginPage() {
               <button
                 type="button"
                 onClick={() => handleFillCredentials("penilai@talenthub.com", "Penilai123!")}
-                className="p-2 rounded-xl bg-[#061f1d] hover:bg-emerald-900/40 border border-emerald-700/60 text-left transition-colors flex flex-col justify-between"
+                className="p-2 rounded-xl bg-[#0B132B] hover:bg-emerald-900/40 border border-emerald-700/60 text-left transition-colors flex flex-col justify-between"
               >
                 <div className="flex items-center gap-1 text-emerald-300 font-bold text-[10px]">
                   <ClipboardCheck className="w-3 h-3 shrink-0" />
@@ -203,7 +203,7 @@ export default function AdminLoginPage() {
               <button
                 type="button"
                 onClick={() => handleFillCredentials("admin@talenthub.com", "Admin123!")}
-                className="p-2 rounded-xl bg-[#061f1d] hover:bg-emerald-900/40 border border-emerald-700/60 text-left transition-colors flex flex-col justify-between"
+                className="p-2 rounded-xl bg-[#0B132B] hover:bg-emerald-900/40 border border-emerald-700/60 text-left transition-colors flex flex-col justify-between"
               >
                 <div className="flex items-center gap-1 text-teal-300 font-bold text-[10px]">
                   <Briefcase className="w-3 h-3 shrink-0" />

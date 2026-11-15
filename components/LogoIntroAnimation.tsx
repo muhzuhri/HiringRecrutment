@@ -76,7 +76,7 @@ export default function LogoIntroAnimation({ onComplete }: { onComplete: () => v
         background:
           phase === "fly"
             ? "transparent"
-            : "linear-gradient(135deg, #061f1d 0%, #0c2b29 60%, #0f3d2e 100%)",
+            : "linear-gradient(135deg, #0B132B 0%, #132238 60%, #0f3d2e 100%)",
         transition: "background 0.8s cubic-bezier(0.4, 0, 0.2, 1)",
       }}
     >
@@ -85,7 +85,7 @@ export default function LogoIntroAnimation({ onComplete }: { onComplete: () => v
         style={{
           position: "absolute",
           inset: 0,
-          background: "linear-gradient(135deg, #061f1d 0%, #0c2b29 60%, #0f3d2e 100%)",
+          background: "linear-gradient(135deg, #0B132B 0%, #132238 60%, #0f3d2e 100%)",
           opacity: phase === "fly" ? 0 : 1,
           transition: "opacity 0.9s cubic-bezier(0.4, 0, 0.2, 1)",
           pointerEvents: "none",
@@ -141,9 +141,9 @@ export default function LogoIntroAnimation({ onComplete }: { onComplete: () => v
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src="/img/logo.png"
-            alt="TalentHub Logo"
-            style={{ width: "100%", height: "100%", objectFit: "cover" }}
+            src="/nexora-icon-trans.png"
+            alt="Nexora Digital"
+            className="w-full h-full object-contain p-2"
           />
         </div>
       </div>

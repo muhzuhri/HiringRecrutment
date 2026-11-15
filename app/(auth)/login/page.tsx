@@ -174,7 +174,7 @@ function LoginFormContent() {
           type="submit"
           disabled={isPending}
           className="btn-primary w-full py-3.5 text-base shadow-lg shadow-emerald-900/20 disabled:opacity-60 disabled:cursor-not-allowed transition-all"
-          style={{ background: "#0c2b29" }}
+          style={{ background: "#132238" }}
         >
           {isPending ? (
             <span className="flex items-center justify-center gap-2">
@@ -232,23 +232,23 @@ export default function LoginPage() {
         {/* Logo & Header */}
         <div className="text-center mb-8">
           <Link href="/" className="inline-flex items-center gap-3 mb-5 group">
-            <div className="h-12 w-12 rounded-2xl overflow-hidden bg-white p-1 border border-teal-800/20 shadow-md transition-transform group-hover:scale-105 flex items-center justify-center">
+            <div className="h-12 w-12 rounded-2xl overflow-hidden bg-white p-1 border border-slate-700/40 shadow-md transition-transform group-hover:scale-105 flex items-center justify-center">
               <img
-                src="/nexora-logo.jpg"
-                alt="Nexora Digital Logo"
-                className="h-full w-full object-contain"
+                src="/nexora-icon-trans.png"
+                alt="Nexora Digital"
+                className="w-full h-full object-contain"
               />
             </div>
             <span
               className="text-2xl font-extrabold tracking-tight"
-              style={{ fontFamily: "var(--font-display, sans-serif)", color: "#0c2b29" }}
+              style={{ fontFamily: "var(--font-display, sans-serif)", color: "#132238" }}
             >
               Nexora<span style={{ color: "#0F766E" }}> Digital</span>
             </span>
           </Link>
           <h1
             className="text-3xl font-extrabold tracking-tight mb-2"
-            style={{ fontFamily: "var(--font-display, sans-serif)", color: "#0c2b29" }}
+            style={{ fontFamily: "var(--font-display, sans-serif)", color: "#132238" }}
           >
             Selamat Datang Kembali
           </h1>

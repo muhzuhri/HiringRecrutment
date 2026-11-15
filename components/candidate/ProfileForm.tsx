@@ -584,7 +584,7 @@ export default function ProfileForm({ initialProfile }: ProfileFormProps) {
     <div className="space-y-6">
       
       {/* 1. Header Profile Banner & Completeness Indicator */}
-      <div className="bg-white dark:bg-[#0c2b29] border border-slate-200 dark:border-emerald-800/50 rounded-2xl p-6 sm:p-8 shadow-sm dark:shadow-xl relative overflow-hidden transition-colors">
+      <div className="bg-white dark:bg-[#132238] border border-slate-200 dark:border-slate-800/80 rounded-2xl p-6 sm:p-8 shadow-sm dark:shadow-xl relative overflow-hidden transition-colors">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 relative z-10">
           
           <div className="flex items-start sm:items-center gap-4">
@@ -632,25 +632,25 @@ export default function ProfileForm({ initialProfile }: ProfileFormProps) {
                 {fullName || "Profil Kandidat"}
               </h1>
 
-              <p className="text-slate-500 dark:text-emerald-200/80 text-xs sm:text-sm">
+              <p className="text-slate-500 dark:text-teal-200/80 text-xs sm:text-sm">
                 {headline || "Lengkapi profil terstruktur Anda untuk memperbesar peluang lolos seleksi HR."}
               </p>
             </div>
           </div>
 
           {/* Completeness Bar Card */}
-          <div className="bg-slate-50 dark:bg-[#061f1d] border border-slate-200 dark:border-emerald-800/60 rounded-xl p-4 sm:p-5 w-full md:w-80 shrink-0 space-y-2.5 shadow-xs">
+          <div className="bg-slate-50 dark:bg-[#0B132B] border border-slate-200 dark:border-slate-800/80 rounded-xl p-4 sm:p-5 w-full md:w-80 shrink-0 space-y-2.5 shadow-xs">
             <div className="flex justify-between items-center text-xs font-bold">
               <span className="text-slate-700 dark:text-slate-200 flex items-center gap-1.5">
-                <CheckCircle2 className={`w-4 h-4 ${completenessScore === 100 ? "text-emerald-600 dark:text-emerald-400" : "text-amber-500"}`} />
+                <CheckCircle2 className={`w-4 h-4 ${completenessScore === 100 ? "text-emerald-600 dark:text-teal-400" : "text-amber-500"}`} />
                 Kelengkapan Profil
               </span>
-              <span className={`font-black text-sm ${completenessScore === 100 ? "text-emerald-600 dark:text-emerald-400" : "text-amber-600 dark:text-amber-400"}`}>
+              <span className={`font-black text-sm ${completenessScore === 100 ? "text-emerald-600 dark:text-teal-400" : "text-amber-600 dark:text-amber-400"}`}>
                 {completenessScore}%
               </span>
             </div>
 
-            <div className="w-full h-2.5 bg-slate-200 dark:bg-emerald-950 rounded-full overflow-hidden border border-slate-300 dark:border-emerald-900">
+            <div className="w-full h-2.5 bg-slate-200 dark:bg-slate-900 rounded-full overflow-hidden border border-slate-300 dark:border-slate-800">
               <div
                 className={`h-full rounded-full transition-all duration-500 ${
                   completenessScore === 100
@@ -662,7 +662,7 @@ export default function ProfileForm({ initialProfile }: ProfileFormProps) {
             </div>
 
             {completenessScore === 100 ? (
-              <p className="text-[11px] text-emerald-700 dark:text-emerald-300 font-semibold leading-snug">
+              <p className="text-[11px] text-emerald-700 dark:text-teal-300 font-semibold leading-snug">
                 ✓ Profil 100% lengkap! Anda memenuhi syarat untuk melamar pekerjaan.
               </p>
             ) : (
@@ -687,12 +687,12 @@ export default function ProfileForm({ initialProfile }: ProfileFormProps) {
         <div
           className={`p-4 rounded-xl border text-xs sm:text-sm flex items-center gap-3 animate-fade-in-up ${
             statusMsg.type === "success"
-              ? "bg-emerald-50 border-emerald-300 text-emerald-800 dark:bg-emerald-950/90 dark:border-emerald-500/60 dark:text-emerald-200"
+              ? "bg-emerald-50 border-emerald-300 text-emerald-800 dark:bg-slate-900/90 dark:border-emerald-500/60 dark:text-teal-200"
               : "bg-rose-50 border-rose-300 text-rose-800 dark:bg-rose-950/90 dark:border-rose-500/60 dark:text-rose-200"
           }`}
         >
           {statusMsg.type === "success" ? (
-            <CheckCircle2 className="w-5 h-5 text-emerald-600 dark:text-emerald-400 shrink-0" />
+            <CheckCircle2 className="w-5 h-5 text-emerald-600 dark:text-teal-400 shrink-0" />
           ) : (
             <AlertCircle className="w-5 h-5 text-rose-600 dark:text-rose-400 shrink-0" />
           )}
@@ -701,7 +701,7 @@ export default function ProfileForm({ initialProfile }: ProfileFormProps) {
       )}
 
       {/* 3. Section Navigation Tabs */}
-      <div className="flex items-center gap-2 border-b border-slate-200 dark:border-emerald-800/40 pb-2 overflow-x-auto">
+      <div className="flex items-center gap-2 border-b border-slate-200 dark:border-slate-800/80 pb-2 overflow-x-auto">
         {[
           { id: "personal", label: "Pribadi & Kontak", icon: User },
           { id: "education", label: `Pendidikan (${educationList.length})`, icon: GraduationCap },
@@ -721,10 +721,10 @@ export default function ProfileForm({ initialProfile }: ProfileFormProps) {
               className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition-all whitespace-nowrap cursor-pointer ${
                 isActive
                   ? "bg-slate-900 dark:bg-emerald-600 text-white shadow-sm"
-                  : "bg-white dark:bg-[#0c2b29] text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white border border-slate-200 dark:border-emerald-900/40"
+                  : "bg-white dark:bg-[#132238] text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white border border-slate-200 dark:border-slate-800/40"
               }`}
             >
-              <Icon className={`w-4 h-4 ${isActive ? "text-white" : "text-slate-500 dark:text-emerald-400"}`} />
+              <Icon className={`w-4 h-4 ${isActive ? "text-white" : "text-slate-500 dark:text-teal-400"}`} />
               <span>{tab.label}</span>
             </button>
           );
@@ -736,16 +736,16 @@ export default function ProfileForm({ initialProfile }: ProfileFormProps) {
         
         {/* TAB 1: INFORMASI PRIBADI & KONTAK */}
         {activeTab === "personal" && (
-          <div className="bg-white dark:bg-[#0c2b29] border border-slate-200 dark:border-emerald-800/40 rounded-2xl p-6 sm:p-8 space-y-6 shadow-sm dark:shadow-xl transition-colors">
-            <div className="flex items-center gap-3 border-b border-slate-200 dark:border-emerald-800/40 pb-4">
-              <div className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-emerald-900/60 border border-slate-200 dark:border-emerald-700/50 flex items-center justify-center text-slate-700 dark:text-emerald-300">
+          <div className="bg-white dark:bg-[#132238] border border-slate-200 dark:border-slate-800/80 rounded-2xl p-6 sm:p-8 space-y-6 shadow-sm dark:shadow-xl transition-colors">
+            <div className="flex items-center gap-3 border-b border-slate-200 dark:border-slate-800/80 pb-4">
+              <div className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-emerald-900/60 border border-slate-200 dark:border-emerald-700/50 flex items-center justify-center text-slate-700 dark:text-teal-300">
                 <User className="w-5 h-5" />
               </div>
               <div>
                 <h2 className="text-base sm:text-lg font-bold text-slate-900 dark:text-white">
                   Informasi Pribadi & Kontak Komprehensif
                 </h2>
-                <p className="text-xs text-slate-500 dark:text-emerald-200/70">
+                <p className="text-xs text-slate-500 dark:text-teal-200/70">
                   Sesuai standar MagangHub untuk verifikasi identitas resmi dan mempermudah kontak awal oleh HR Recruiter.
                 </p>
               </div>
@@ -753,7 +753,7 @@ export default function ProfileForm({ initialProfile }: ProfileFormProps) {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5 text-sm">
               {/* FOTO PROFIL KANDIDAT */}
-              <div className="md:col-span-2 bg-slate-50 dark:bg-[#061f1d]/90 border border-slate-200 dark:border-emerald-800/60 rounded-xl p-4 sm:p-5 flex flex-col sm:flex-row items-center justify-between gap-4">
+              <div className="md:col-span-2 bg-slate-50 dark:bg-[#0B132B]/90 border border-slate-200 dark:border-slate-800/80 rounded-xl p-4 sm:p-5 flex flex-col sm:flex-row items-center justify-between gap-4">
                 <div className="flex items-center gap-4">
                   <div className="relative group shrink-0">
                     {avatarUrl ? (
@@ -763,14 +763,14 @@ export default function ProfileForm({ initialProfile }: ProfileFormProps) {
                         className="w-14 h-14 rounded-2xl object-cover border-2 border-slate-300 dark:border-emerald-500/60 shadow-sm"
                       />
                     ) : (
-                      <div className="w-14 h-14 rounded-2xl bg-slate-900 dark:bg-emerald-900/60 text-white dark:text-emerald-300 flex items-center justify-center font-extrabold text-xl border border-slate-300 dark:border-emerald-700/60">
+                      <div className="w-14 h-14 rounded-2xl bg-slate-900 dark:bg-emerald-900/60 text-white dark:text-teal-300 flex items-center justify-center font-extrabold text-xl border border-slate-300 dark:border-emerald-700/60">
                         {fullName ? fullName.charAt(0).toUpperCase() : "K"}
                       </div>
                     )}
                   </div>
                   <div className="space-y-0.5 text-center sm:text-left">
                     <h3 className="text-xs font-bold text-slate-900 dark:text-white uppercase tracking-wider flex items-center justify-center sm:justify-start gap-1.5">
-                      <Camera className="w-4 h-4 text-slate-700 dark:text-emerald-400" />
+                      <Camera className="w-4 h-4 text-slate-700 dark:text-teal-400" />
                       Foto Profil Kandidat
                     </h3>
                     <p className="text-[11px] text-slate-500 dark:text-slate-400">
@@ -810,35 +810,35 @@ export default function ProfileForm({ initialProfile }: ProfileFormProps) {
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-700 dark:text-emerald-300 uppercase tracking-wider mb-2">
+                <label className="block text-xs font-semibold text-slate-700 dark:text-teal-300 uppercase tracking-wider mb-2">
                   Nama Lengkap *
                 </label>
                 <div className="relative">
-                  <User className="w-4 h-4 text-slate-400 dark:text-emerald-400 absolute left-3.5 top-3" />
+                  <User className="w-4 h-4 text-slate-400 dark:text-teal-400 absolute left-3.5 top-3" />
                   <input
                     type="text"
                     required
                     value={fullName}
                     onChange={(e) => setFullName(e.target.value)}
-                    className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-50 dark:bg-[#061f1d] border border-slate-300 dark:border-emerald-800/60 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-slate-800 dark:focus:border-emerald-500 transition-colors"
+                    className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-50 dark:bg-[#0B132B] border border-slate-300 dark:border-slate-800/80 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-slate-800 dark:focus:border-emerald-500 transition-colors"
                     placeholder="Contoh: Ahmad Rizky"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-700 dark:text-emerald-300 uppercase tracking-wider mb-2">
+                <label className="block text-xs font-semibold text-slate-700 dark:text-teal-300 uppercase tracking-wider mb-2">
                   NIK (Nomor Induk Kependudukan - 16 Digit) *
                 </label>
                 <div className="relative">
-                  <IdCard className="w-4 h-4 text-slate-400 dark:text-emerald-400 absolute left-3.5 top-3" />
+                  <IdCard className="w-4 h-4 text-slate-400 dark:text-teal-400 absolute left-3.5 top-3" />
                   <input
                     type="text"
                     maxLength={16}
                     required
                     value={nik}
                     onChange={(e) => setNik(e.target.value.replace(/[^0-9]/g, ""))}
-                    className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-50 dark:bg-[#061f1d] border border-slate-300 dark:border-emerald-800/60 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-slate-800 dark:focus:border-emerald-500 transition-colors"
+                    className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-50 dark:bg-[#0B132B] border border-slate-300 dark:border-slate-800/80 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-slate-800 dark:focus:border-emerald-500 transition-colors"
                     placeholder="3171012345678900"
                   />
                 </div>
@@ -848,11 +848,11 @@ export default function ProfileForm({ initialProfile }: ProfileFormProps) {
               </div>
 
               {/* DOKUMEN / FOTO KTP */}
-              <div className="md:col-span-2 bg-slate-50 dark:bg-[#061f1d]/90 border border-slate-200 dark:border-emerald-800/60 rounded-xl p-4 sm:p-5 space-y-3">
+              <div className="md:col-span-2 bg-slate-50 dark:bg-[#0B132B]/90 border border-slate-200 dark:border-slate-800/80 rounded-xl p-4 sm:p-5 space-y-3">
                 <div className="flex items-center justify-between flex-wrap gap-2">
                   <div className="space-y-0.5">
-                    <label className="block text-xs font-bold text-slate-900 dark:text-emerald-300 uppercase tracking-wider flex items-center gap-1.5">
-                      <IdCard className="w-4 h-4 text-slate-700 dark:text-emerald-400" />
+                    <label className="block text-xs font-bold text-slate-900 dark:text-teal-300 uppercase tracking-wider flex items-center gap-1.5">
+                      <IdCard className="w-4 h-4 text-slate-700 dark:text-teal-400" />
                       Unggah Dokumen / Foto KTP (Wajib untuk Verifikasi & 100% Profil) *
                     </label>
                     <p className="text-[11px] text-slate-500 dark:text-slate-400">
@@ -860,17 +860,17 @@ export default function ProfileForm({ initialProfile }: ProfileFormProps) {
                     </p>
                   </div>
                   {ktpUrl && (
-                    <span className="px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 text-[11px] font-bold border border-emerald-300 dark:border-emerald-700/60 flex items-center gap-1">
-                      <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+                    <span className="px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-800 dark:bg-slate-900 dark:text-teal-300 text-[11px] font-bold border border-emerald-300 dark:border-emerald-700/60 flex items-center gap-1">
+                      <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 dark:text-teal-400" />
                       KTP Terunggah
                     </span>
                   )}
                 </div>
 
                 {ktpUrl ? (
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3.5 bg-white dark:bg-[#0c2b29] border border-slate-200 dark:border-emerald-700/50 rounded-xl">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3.5 bg-white dark:bg-[#132238] border border-slate-200 dark:border-emerald-700/50 rounded-xl">
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-lg bg-emerald-50 dark:bg-emerald-900/40 text-emerald-600 dark:text-emerald-300 flex items-center justify-center shrink-0 border border-emerald-200 dark:border-emerald-700">
+                      <div className="w-10 h-10 rounded-lg bg-emerald-50 dark:bg-emerald-900/40 text-emerald-600 dark:text-teal-300 flex items-center justify-center shrink-0 border border-emerald-200 dark:border-emerald-700">
                         <FileCheck className="w-5 h-5" />
                       </div>
                       <div>
@@ -888,7 +888,7 @@ export default function ProfileForm({ initialProfile }: ProfileFormProps) {
                         href={ktpUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-[#061f1d] hover:bg-slate-200 dark:hover:bg-emerald-900/60 text-slate-700 dark:text-emerald-300 text-xs font-semibold border border-slate-200 dark:border-emerald-800 transition-colors"
+                        className="px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-[#0B132B] hover:bg-slate-200 dark:hover:bg-slate-800/80 text-slate-700 dark:text-teal-300 text-xs font-semibold border border-slate-200 dark:border-slate-800 transition-colors"
                       >
                         Lihat Berkas KTP
                       </a>
@@ -904,7 +904,7 @@ export default function ProfileForm({ initialProfile }: ProfileFormProps) {
                   </div>
                 ) : (
                   <div className="flex flex-col sm:flex-row items-center gap-3">
-                    <label className="flex-1 w-full border-2 border-dashed border-slate-300 dark:border-emerald-800/80 hover:border-slate-400 dark:hover:border-emerald-500 rounded-xl p-4 text-center cursor-pointer transition-colors bg-white dark:bg-[#0c2b29]">
+                    <label className="flex-1 w-full border-2 border-dashed border-slate-300 dark:border-slate-800/80 hover:border-slate-400 dark:hover:border-emerald-500 rounded-xl p-4 text-center cursor-pointer transition-colors bg-white dark:bg-[#132238]">
                       <input
                         type="file"
                         accept="image/png,image/jpeg,image/jpg,image/webp,application/pdf"
@@ -914,9 +914,9 @@ export default function ProfileForm({ initialProfile }: ProfileFormProps) {
                       />
                       <div className="flex flex-col items-center gap-1.5">
                         {uploadingKtp ? (
-                          <Loader2 className="w-6 h-6 text-slate-600 dark:text-emerald-400 animate-spin" />
+                          <Loader2 className="w-6 h-6 text-slate-600 dark:text-teal-400 animate-spin" />
                         ) : (
-                          <Upload className="w-6 h-6 text-slate-500 dark:text-emerald-400" />
+                          <Upload className="w-6 h-6 text-slate-500 dark:text-teal-400" />
                         )}
                         <span className="text-xs font-bold text-slate-800 dark:text-white">
                           {uploadingKtp ? "Mengunggah Berkas KTP..." : "Pilih atau Seret Foto/Scan KTP"}
@@ -931,105 +931,105 @@ export default function ProfileForm({ initialProfile }: ProfileFormProps) {
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-700 dark:text-emerald-300 uppercase tracking-wider mb-2">
+                <label className="block text-xs font-semibold text-slate-700 dark:text-teal-300 uppercase tracking-wider mb-2">
                   Nomor Telepon Seluler
                 </label>
                 <div className="relative">
-                  <Phone className="w-4 h-4 text-slate-400 dark:text-emerald-400 absolute left-3.5 top-3" />
+                  <Phone className="w-4 h-4 text-slate-400 dark:text-teal-400 absolute left-3.5 top-3" />
                   <input
                     type="tel"
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
-                    className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-50 dark:bg-[#061f1d] border border-slate-300 dark:border-emerald-800/60 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-slate-800 dark:focus:border-emerald-500 transition-colors"
+                    className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-50 dark:bg-[#0B132B] border border-slate-300 dark:border-slate-800/80 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-slate-800 dark:focus:border-emerald-500 transition-colors"
                     placeholder="081234567890"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-700 dark:text-emerald-300 uppercase tracking-wider mb-2">
+                <label className="block text-xs font-semibold text-slate-700 dark:text-teal-300 uppercase tracking-wider mb-2">
                   Nomor WhatsApp Aktif *
                 </label>
                 <div className="relative">
-                  <MessageSquare className="w-4 h-4 text-slate-400 dark:text-emerald-400 absolute left-3.5 top-3" />
+                  <MessageSquare className="w-4 h-4 text-slate-400 dark:text-teal-400 absolute left-3.5 top-3" />
                   <input
                     type="tel"
                     required
                     value={whatsapp}
                     onChange={(e) => setWhatsapp(e.target.value)}
-                    className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-50 dark:bg-[#061f1d] border border-slate-300 dark:border-emerald-800/60 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-slate-800 dark:focus:border-emerald-500 transition-colors"
+                    className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-50 dark:bg-[#0B132B] border border-slate-300 dark:border-slate-800/80 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-slate-800 dark:focus:border-emerald-500 transition-colors"
                     placeholder="081234567890"
                   />
                 </div>
               </div>
 
               <div className="md:col-span-2">
-                <label className="block text-xs font-semibold text-slate-700 dark:text-emerald-300 uppercase tracking-wider mb-2">
+                <label className="block text-xs font-semibold text-slate-700 dark:text-teal-300 uppercase tracking-wider mb-2">
                   Alamat Domisili Lengkap *
                 </label>
                 <div className="relative">
-                  <MapPin className="w-4 h-4 text-slate-400 dark:text-emerald-400 absolute left-3.5 top-3" />
+                  <MapPin className="w-4 h-4 text-slate-400 dark:text-teal-400 absolute left-3.5 top-3" />
                   <input
                     type="text"
                     required
                     value={address}
                     onChange={(e) => setAddress(e.target.value)}
-                    className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-50 dark:bg-[#061f1d] border border-slate-300 dark:border-emerald-800/60 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-slate-800 dark:focus:border-emerald-500 transition-colors"
+                    className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-50 dark:bg-[#0B132B] border border-slate-300 dark:border-slate-800/80 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-slate-800 dark:focus:border-emerald-500 transition-colors"
                     placeholder="Jl. Sudirman No. 12, Jakarta Selatan, DKI Jakarta"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-700 dark:text-emerald-300 uppercase tracking-wider mb-2">
+                <label className="block text-xs font-semibold text-slate-700 dark:text-teal-300 uppercase tracking-wider mb-2">
                   Tautan Profil LinkedIn
                 </label>
                 <div className="relative">
-                  <LinkIcon className="w-4 h-4 text-slate-400 dark:text-emerald-400 absolute left-3.5 top-3" />
+                  <LinkIcon className="w-4 h-4 text-slate-400 dark:text-teal-400 absolute left-3.5 top-3" />
                   <input
                     type="url"
                     value={linkedinUrl}
                     onChange={(e) => setLinkedinUrl(e.target.value)}
-                    className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-50 dark:bg-[#061f1d] border border-slate-300 dark:border-emerald-800/60 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-slate-800 dark:focus:border-emerald-500 transition-colors"
+                    className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-50 dark:bg-[#0B132B] border border-slate-300 dark:border-slate-800/80 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-slate-800 dark:focus:border-emerald-500 transition-colors"
                     placeholder="https://linkedin.com/in/username"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-700 dark:text-emerald-300 uppercase tracking-wider mb-2">
+                <label className="block text-xs font-semibold text-slate-700 dark:text-teal-300 uppercase tracking-wider mb-2">
                   Tautan Profil GitHub
                 </label>
                 <div className="relative">
-                  <Globe className="w-4 h-4 text-slate-400 dark:text-emerald-400 absolute left-3.5 top-3" />
+                  <Globe className="w-4 h-4 text-slate-400 dark:text-teal-400 absolute left-3.5 top-3" />
                   <input
                     type="url"
                     value={githubUrl}
                     onChange={(e) => setGithubUrl(e.target.value)}
-                    className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-50 dark:bg-[#061f1d] border border-slate-300 dark:border-emerald-800/60 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-slate-800 dark:focus:border-emerald-500 transition-colors"
+                    className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-50 dark:bg-[#0B132B] border border-slate-300 dark:border-slate-800/80 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-slate-800 dark:focus:border-emerald-500 transition-colors"
                     placeholder="https://github.com/username"
                   />
                 </div>
               </div>
 
               <div className="md:col-span-2">
-                <label className="block text-xs font-semibold text-slate-700 dark:text-emerald-300 uppercase tracking-wider mb-2">
+                <label className="block text-xs font-semibold text-slate-700 dark:text-teal-300 uppercase tracking-wider mb-2">
                   Tautan Portofolio Web / Website Pribadi
                 </label>
                 <div className="relative">
-                  <Globe className="w-4 h-4 text-slate-400 dark:text-emerald-400 absolute left-3.5 top-3" />
+                  <Globe className="w-4 h-4 text-slate-400 dark:text-teal-400 absolute left-3.5 top-3" />
                   <input
                     type="url"
                     value={portfolioUrl}
                     onChange={(e) => setPortfolioUrl(e.target.value)}
-                    className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-50 dark:bg-[#061f1d] border border-slate-300 dark:border-emerald-800/60 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-slate-800 dark:focus:border-emerald-500 transition-colors"
+                    className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-50 dark:bg-[#0B132B] border border-slate-300 dark:border-slate-800/80 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-slate-800 dark:focus:border-emerald-500 transition-colors"
                     placeholder="https://myportfolio.com"
                   />
                 </div>
               </div>
 
               <div className="md:col-span-2">
-                <label className="block text-xs font-semibold text-slate-700 dark:text-emerald-300 uppercase tracking-wider mb-2">
+                <label className="block text-xs font-semibold text-slate-700 dark:text-teal-300 uppercase tracking-wider mb-2">
                   Headline Profesional *
                 </label>
                 <input
@@ -1037,13 +1037,13 @@ export default function ProfileForm({ initialProfile }: ProfileFormProps) {
                   required
                   value={headline}
                   onChange={(e) => setHeadline(e.target.value)}
-                  className="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-[#061f1d] border border-slate-300 dark:border-emerald-800/60 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-slate-800 dark:focus:border-emerald-500 transition-colors"
+                  className="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-[#0B132B] border border-slate-300 dark:border-slate-800/80 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-slate-800 dark:focus:border-emerald-500 transition-colors"
                   placeholder="Contoh: Frontend Engineer | Ex-Tech Intern at MagangHub"
                 />
               </div>
 
               <div className="md:col-span-2">
-                <label className="block text-xs font-semibold text-slate-700 dark:text-emerald-300 uppercase tracking-wider mb-2">
+                <label className="block text-xs font-semibold text-slate-700 dark:text-teal-300 uppercase tracking-wider mb-2">
                   Bio & Ringkasan Kualifikasi Diri *
                 </label>
                 <textarea
@@ -1051,7 +1051,7 @@ export default function ProfileForm({ initialProfile }: ProfileFormProps) {
                   required
                   value={bio}
                   onChange={(e) => setBio(e.target.value)}
-                  className="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-[#061f1d] border border-slate-300 dark:border-emerald-800/60 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-slate-800 dark:focus:border-emerald-500 transition-colors resize-none text-xs sm:text-sm"
+                  className="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-[#0B132B] border border-slate-300 dark:border-slate-800/80 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-slate-800 dark:focus:border-emerald-500 transition-colors resize-none text-xs sm:text-sm"
                   placeholder="Tuliskan perkenalan singkat, latar belakang pendidikan, dan ambisi karier Anda..."
                 />
               </div>
@@ -1061,7 +1061,7 @@ export default function ProfileForm({ initialProfile }: ProfileFormProps) {
 
         {/* TAB 2: RIWAYAT PENDIDIKAN */}
         {activeTab === "education" && (
-          <div className="bg-[#0c2b29] border border-emerald-800/40 rounded-2xl p-6 sm:p-8 space-y-6 shadow-xl">
+          <div className="bg-[#132238] border border-emerald-800/40 rounded-2xl p-6 sm:p-8 space-y-6 shadow-xl">
             <div className="flex items-center justify-between border-b border-emerald-800/40 pb-4">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-xl bg-emerald-900/60 border border-emerald-700/50 flex items-center justify-center text-emerald-300">
@@ -1084,7 +1084,7 @@ export default function ProfileForm({ initialProfile }: ProfileFormProps) {
             </div>
 
             {educationList.length === 0 ? (
-              <div className="p-8 text-center bg-[#061f1d]/60 border border-dashed border-emerald-800/60 rounded-xl text-slate-400 text-xs space-y-2">
+              <div className="p-8 text-center bg-[#0B132B]/60 border border-dashed border-emerald-800/60 rounded-xl text-slate-400 text-xs space-y-2">
                 <GraduationCap className="w-8 h-8 text-emerald-500 mx-auto" />
                 <p className="font-semibold text-slate-300">Belum Ada Riwayat Pendidikan</p>
                 <p>Klik tombol "+ Tambah Pendidikan" di atas untuk memasukkan riwayat akademik Anda.</p>
@@ -1094,7 +1094,7 @@ export default function ProfileForm({ initialProfile }: ProfileFormProps) {
                 {educationList.map((edu, idx) => (
                   <div
                     key={edu.id || idx}
-                    className="bg-[#061f1d] border border-emerald-800/50 rounded-xl p-4 sm:p-5 space-y-4 relative"
+                    className="bg-[#0B132B] border border-emerald-800/50 rounded-xl p-4 sm:p-5 space-y-4 relative"
                   >
                     <div className="flex items-center justify-between">
                       <span className="text-xs font-bold px-2.5 py-0.5 rounded bg-emerald-950 text-emerald-300 border border-emerald-800">
@@ -1119,7 +1119,7 @@ export default function ProfileForm({ initialProfile }: ProfileFormProps) {
                         <select
                           value={edu.level}
                           onChange={(e) => handleEducationChange(edu.id, "level", e.target.value)}
-                          className="w-full px-3 py-2 rounded-lg bg-[#0c2b29] border border-emerald-800/60 text-white text-xs focus:outline-none focus:border-emerald-500"
+                          className="w-full px-3 py-2 rounded-lg bg-[#132238] border border-emerald-800/60 text-white text-xs focus:outline-none focus:border-emerald-500"
                         >
                           <option value="SMA/SMK">SMA / SMK / Sederajat</option>
                           <option value="D3">Diploma 3 (D3)</option>
@@ -1138,7 +1138,7 @@ export default function ProfileForm({ initialProfile }: ProfileFormProps) {
                           required
                           value={edu.school}
                           onChange={(e) => handleEducationChange(edu.id, "school", e.target.value)}
-                          className="w-full px-3 py-2 rounded-lg bg-[#0c2b29] border border-emerald-800/60 text-white text-xs focus:outline-none focus:border-emerald-500 placeholder-slate-500"
+                          className="w-full px-3 py-2 rounded-lg bg-[#132238] border border-emerald-800/60 text-white text-xs focus:outline-none focus:border-emerald-500 placeholder-slate-500"
                           placeholder="Universitas Indonesia"
                         />
                       </div>
@@ -1152,7 +1152,7 @@ export default function ProfileForm({ initialProfile }: ProfileFormProps) {
                           required
                           value={edu.major}
                           onChange={(e) => handleEducationChange(edu.id, "major", e.target.value)}
-                          className="w-full px-3 py-2 rounded-lg bg-[#0c2b29] border border-emerald-800/60 text-white text-xs focus:outline-none focus:border-emerald-500 placeholder-slate-500"
+                          className="w-full px-3 py-2 rounded-lg bg-[#132238] border border-emerald-800/60 text-white text-xs focus:outline-none focus:border-emerald-500 placeholder-slate-500"
                           placeholder="Teknik Informatika"
                         />
                       </div>
@@ -1165,7 +1165,7 @@ export default function ProfileForm({ initialProfile }: ProfileFormProps) {
                           type="text"
                           value={edu.gpa || ""}
                           onChange={(e) => handleEducationChange(edu.id, "gpa", e.target.value)}
-                          className="w-full px-3 py-2 rounded-lg bg-[#0c2b29] border border-emerald-800/60 text-white text-xs focus:outline-none focus:border-emerald-500 placeholder-slate-500"
+                          className="w-full px-3 py-2 rounded-lg bg-[#132238] border border-emerald-800/60 text-white text-xs focus:outline-none focus:border-emerald-500 placeholder-slate-500"
                           placeholder="3.85 / 4.00"
                         />
                       </div>
@@ -1178,7 +1178,7 @@ export default function ProfileForm({ initialProfile }: ProfileFormProps) {
                           <select
                             value={edu.startYear}
                             onChange={(e) => handleEducationChange(edu.id, "startYear", e.target.value)}
-                            className="px-2 py-2 rounded-lg bg-[#0c2b29] border border-emerald-800/60 text-white text-xs"
+                            className="px-2 py-2 rounded-lg bg-[#132238] border border-emerald-800/60 text-white text-xs"
                           >
                             {YEARS.map((y) => (
                               <option key={y} value={y}>
@@ -1189,7 +1189,7 @@ export default function ProfileForm({ initialProfile }: ProfileFormProps) {
                           <select
                             value={edu.endYear}
                             onChange={(e) => handleEducationChange(edu.id, "endYear", e.target.value)}
-                            className="px-2 py-2 rounded-lg bg-[#0c2b29] border border-emerald-800/60 text-white text-xs"
+                            className="px-2 py-2 rounded-lg bg-[#132238] border border-emerald-800/60 text-white text-xs"
                           >
                             {YEARS.map((y) => (
                               <option key={y} value={y}>
@@ -1211,7 +1211,7 @@ export default function ProfileForm({ initialProfile }: ProfileFormProps) {
                           type="text"
                           value={edu.coursework || ""}
                           onChange={(e) => handleEducationChange(edu.id, "coursework", e.target.value)}
-                          className="w-full px-3 py-2 rounded-lg bg-[#0c2b29] border border-emerald-800/60 text-white text-xs focus:outline-none focus:border-emerald-500 placeholder-slate-500"
+                          className="w-full px-3 py-2 rounded-lg bg-[#132238] border border-emerald-800/60 text-white text-xs focus:outline-none focus:border-emerald-500 placeholder-slate-500"
                           placeholder="Pengembangan Aplikasi Web, Sistem Basis Data, UI/UX..."
                         />
                       </div>
@@ -1224,7 +1224,7 @@ export default function ProfileForm({ initialProfile }: ProfileFormProps) {
                           type="text"
                           value={edu.thesis || ""}
                           onChange={(e) => handleEducationChange(edu.id, "thesis", e.target.value)}
-                          className="w-full px-3 py-2 rounded-lg bg-[#0c2b29] border border-emerald-800/60 text-white text-xs focus:outline-none focus:border-emerald-500 placeholder-slate-500"
+                          className="w-full px-3 py-2 rounded-lg bg-[#132238] border border-emerald-800/60 text-white text-xs focus:outline-none focus:border-emerald-500 placeholder-slate-500"
                           placeholder="Rancang Bangun Aplikasi Monitoring..."
                         />
                       </div>
@@ -1285,7 +1285,7 @@ export default function ProfileForm({ initialProfile }: ProfileFormProps) {
 
         {/* TAB 3: SERTIFIKASI & PELATIHAN */}
         {activeTab === "certifications" && (
-          <div className="bg-[#0c2b29] border border-emerald-800/40 rounded-2xl p-6 sm:p-8 space-y-6 shadow-xl">
+          <div className="bg-[#132238] border border-emerald-800/40 rounded-2xl p-6 sm:p-8 space-y-6 shadow-xl">
             <div className="flex items-center justify-between border-b border-emerald-800/40 pb-4">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-xl bg-emerald-900/60 border border-emerald-700/50 flex items-center justify-center text-emerald-300">
@@ -1308,7 +1308,7 @@ export default function ProfileForm({ initialProfile }: ProfileFormProps) {
             </div>
 
             {certificationsList.length === 0 ? (
-              <div className="p-8 text-center bg-[#061f1d]/60 border border-dashed border-emerald-800/60 rounded-xl text-slate-400 text-xs space-y-2">
+              <div className="p-8 text-center bg-[#0B132B]/60 border border-dashed border-emerald-800/60 rounded-xl text-slate-400 text-xs space-y-2">
                 <Award className="w-8 h-8 text-emerald-500 mx-auto" />
                 <p className="font-semibold text-slate-300">Belum Ada Sertifikasi</p>
                 <p>Klik tombol "+ Tambah Sertifikasi" di atas untuk menyertakan kredensial Anda.</p>
@@ -1318,7 +1318,7 @@ export default function ProfileForm({ initialProfile }: ProfileFormProps) {
                 {certificationsList.map((cert, idx) => (
                   <div
                     key={cert.id || idx}
-                    className="bg-[#061f1d] border border-emerald-800/50 rounded-xl p-4 sm:p-5 space-y-4 relative"
+                    className="bg-[#0B132B] border border-emerald-800/50 rounded-xl p-4 sm:p-5 space-y-4 relative"
                   >
                     <div className="flex items-center justify-between">
                       <span className="text-xs font-bold px-2.5 py-0.5 rounded bg-emerald-950 text-emerald-300 border border-emerald-800">
@@ -1345,7 +1345,7 @@ export default function ProfileForm({ initialProfile }: ProfileFormProps) {
                           required
                           value={cert.title}
                           onChange={(e) => handleCertChange(cert.id, "title", e.target.value)}
-                          className="w-full px-3 py-2 rounded-lg bg-[#0c2b29] border border-emerald-800/60 text-white text-xs focus:outline-none focus:border-emerald-500 placeholder-slate-500"
+                          className="w-full px-3 py-2 rounded-lg bg-[#132238] border border-emerald-800/60 text-white text-xs focus:outline-none focus:border-emerald-500 placeholder-slate-500"
                           placeholder="AWS Certified Solutions Architect"
                         />
                       </div>
@@ -1359,7 +1359,7 @@ export default function ProfileForm({ initialProfile }: ProfileFormProps) {
                           list={`cert-types-${idx}`}
                           value={cert.certType || ""}
                           onChange={(e) => handleCertChange(cert.id, "certType", e.target.value)}
-                          className="w-full px-3 py-2 rounded-lg bg-[#0c2b29] border border-emerald-800/60 text-white text-xs focus:outline-none focus:border-emerald-500 placeholder-slate-500"
+                          className="w-full px-3 py-2 rounded-lg bg-[#132238] border border-emerald-800/60 text-white text-xs focus:outline-none focus:border-emerald-500 placeholder-slate-500"
                           placeholder="Ketik tipe (misal: Certificate of Completion)"
                         />
                         <datalist id={`cert-types-${idx}`}>
@@ -1378,7 +1378,7 @@ export default function ProfileForm({ initialProfile }: ProfileFormProps) {
                           required
                           value={cert.issuer}
                           onChange={(e) => handleCertChange(cert.id, "issuer", e.target.value)}
-                          className="w-full px-3 py-2 rounded-lg bg-[#0c2b29] border border-emerald-800/60 text-white text-xs focus:outline-none focus:border-emerald-500 placeholder-slate-500"
+                          className="w-full px-3 py-2 rounded-lg bg-[#132238] border border-emerald-800/60 text-white text-xs focus:outline-none focus:border-emerald-500 placeholder-slate-500"
                           placeholder="Amazon Web Services / Dicoding"
                         />
                       </div>
@@ -1394,7 +1394,7 @@ export default function ProfileForm({ initialProfile }: ProfileFormProps) {
                           <select
                             value={cert.issueMonth || "Januari"}
                             onChange={(e) => handleCertChange(cert.id, "issueMonth", e.target.value)}
-                            className="px-2.5 py-2 rounded-lg bg-[#0c2b29] border border-emerald-800/60 text-white text-xs focus:outline-none focus:border-emerald-500"
+                            className="px-2.5 py-2 rounded-lg bg-[#132238] border border-emerald-800/60 text-white text-xs focus:outline-none focus:border-emerald-500"
                           >
                             {MONTHS.map((m) => (
                               <option key={m} value={m}>
@@ -1406,7 +1406,7 @@ export default function ProfileForm({ initialProfile }: ProfileFormProps) {
                           <select
                             value={cert.issueYear || CURRENT_YEAR.toString()}
                             onChange={(e) => handleCertChange(cert.id, "issueYear", e.target.value)}
-                            className="px-2.5 py-2 rounded-lg bg-[#0c2b29] border border-emerald-800/60 text-white text-xs focus:outline-none focus:border-emerald-500"
+                            className="px-2.5 py-2 rounded-lg bg-[#132238] border border-emerald-800/60 text-white text-xs focus:outline-none focus:border-emerald-500"
                           >
                             {YEARS.map((y) => (
                               <option key={y} value={y}>
@@ -1439,7 +1439,7 @@ export default function ProfileForm({ initialProfile }: ProfileFormProps) {
                             <select
                               value={cert.expiryMonth || "Desember"}
                               onChange={(e) => handleCertChange(cert.id, "expiryMonth", e.target.value)}
-                              className="px-2.5 py-2 rounded-lg bg-[#0c2b29] border border-emerald-800/60 text-white text-xs focus:outline-none focus:border-emerald-500"
+                              className="px-2.5 py-2 rounded-lg bg-[#132238] border border-emerald-800/60 text-white text-xs focus:outline-none focus:border-emerald-500"
                             >
                               {MONTHS.map((m) => (
                                 <option key={m} value={m}>
@@ -1451,7 +1451,7 @@ export default function ProfileForm({ initialProfile }: ProfileFormProps) {
                             <select
                               value={cert.expiryYear || (CURRENT_YEAR + 3).toString()}
                               onChange={(e) => handleCertChange(cert.id, "expiryYear", e.target.value)}
-                              className="px-2.5 py-2 rounded-lg bg-[#0c2b29] border border-emerald-800/60 text-white text-xs focus:outline-none focus:border-emerald-500"
+                              className="px-2.5 py-2 rounded-lg bg-[#132238] border border-emerald-800/60 text-white text-xs focus:outline-none focus:border-emerald-500"
                             >
                               {EXPIRY_YEARS.map((y) => (
                                 <option key={y} value={y}>
@@ -1477,7 +1477,7 @@ export default function ProfileForm({ initialProfile }: ProfileFormProps) {
                           type="url"
                           value={cert.credentialUrl || ""}
                           onChange={(e) => handleCertChange(cert.id, "credentialUrl", e.target.value)}
-                          className="w-full px-3 py-2 rounded-lg bg-[#0c2b29] border border-emerald-800/60 text-white text-xs focus:outline-none focus:border-emerald-500 placeholder-slate-500"
+                          className="w-full px-3 py-2 rounded-lg bg-[#132238] border border-emerald-800/60 text-white text-xs focus:outline-none focus:border-emerald-500 placeholder-slate-500"
                           placeholder="https://credential.net/..."
                         />
                       </div>
@@ -1538,7 +1538,7 @@ export default function ProfileForm({ initialProfile }: ProfileFormProps) {
 
         {/* TAB 4: RIWAYAT PENGALAMAN KERJA / MAGANG */}
         {activeTab === "experience" && (
-          <div className="bg-[#0c2b29] border border-emerald-800/40 rounded-2xl p-6 sm:p-8 space-y-6 shadow-xl">
+          <div className="bg-[#132238] border border-emerald-800/40 rounded-2xl p-6 sm:p-8 space-y-6 shadow-xl">
             <div className="flex items-center justify-between border-b border-emerald-800/40 pb-4">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-xl bg-emerald-900/60 border border-emerald-700/50 flex items-center justify-center text-emerald-300">
@@ -1561,7 +1561,7 @@ export default function ProfileForm({ initialProfile }: ProfileFormProps) {
             </div>
 
             {experienceStateList.length === 0 ? (
-              <div className="p-8 text-center bg-[#061f1d]/60 border border-dashed border-emerald-800/60 rounded-xl text-slate-400 text-xs space-y-2">
+              <div className="p-8 text-center bg-[#0B132B]/60 border border-dashed border-emerald-800/60 rounded-xl text-slate-400 text-xs space-y-2">
                 <Briefcase className="w-8 h-8 text-emerald-500 mx-auto" />
                 <p className="font-semibold text-slate-300">Belum Ada Riwayat Pengalaman Kerja</p>
                 <p>Klik tombol "+ Tambah Pengalaman" untuk melengkapi riwayat profesional Anda.</p>
@@ -1571,7 +1571,7 @@ export default function ProfileForm({ initialProfile }: ProfileFormProps) {
                 {experienceStateList.map((exp, idx) => (
                   <div
                     key={exp.id}
-                    className="bg-[#061f1d] border border-emerald-800/50 rounded-xl p-5 space-y-4 relative"
+                    className="bg-[#0B132B] border border-emerald-800/50 rounded-xl p-5 space-y-4 relative"
                   >
                     <div className="flex items-center justify-between">
                       <span className="text-xs font-bold px-2.5 py-0.5 rounded bg-emerald-950 text-emerald-300 border border-emerald-800">
@@ -1598,7 +1598,7 @@ export default function ProfileForm({ initialProfile }: ProfileFormProps) {
                           required
                           value={exp.company}
                           onChange={(e) => handleExpFieldChange(exp.id, "company", e.target.value)}
-                          className="w-full px-3 py-2 rounded-lg bg-[#0c2b29] border border-emerald-800/60 text-white text-xs focus:outline-none focus:border-emerald-500 placeholder-slate-500"
+                          className="w-full px-3 py-2 rounded-lg bg-[#132238] border border-emerald-800/60 text-white text-xs focus:outline-none focus:border-emerald-500 placeholder-slate-500"
                           placeholder="BPJS Kesehatan / Universitas Sriwijaya"
                         />
                       </div>
@@ -1612,13 +1612,13 @@ export default function ProfileForm({ initialProfile }: ProfileFormProps) {
                           required
                           value={exp.position}
                           onChange={(e) => handleExpFieldChange(exp.id, "position", e.target.value)}
-                          className="w-full px-3 py-2 rounded-lg bg-[#0c2b29] border border-emerald-800/60 text-white text-xs focus:outline-none focus:border-emerald-500 placeholder-slate-500"
+                          className="w-full px-3 py-2 rounded-lg bg-[#132238] border border-emerald-800/60 text-white text-xs focus:outline-none focus:border-emerald-500 placeholder-slate-500"
                           placeholder="Software Engineer Intern"
                         />
                       </div>
 
                       {/* Interactive Month & Year Picker */}
-                      <div className="sm:col-span-2 bg-[#0c2b29]/90 border border-emerald-800/60 rounded-xl p-4 space-y-3">
+                      <div className="sm:col-span-2 bg-[#132238]/90 border border-emerald-800/60 rounded-xl p-4 space-y-3">
                         <p className="text-xs font-semibold text-emerald-300 flex items-center gap-1.5">
                           <Calendar className="w-3.5 h-3.5 text-emerald-400" />
                           Periode Waktu Kerja (Pemilih Bulan & Tahun Interaktif)
@@ -1632,7 +1632,7 @@ export default function ProfileForm({ initialProfile }: ProfileFormProps) {
                               <select
                                 value={exp.startMonth}
                                 onChange={(e) => handleExpFieldChange(exp.id, "startMonth", e.target.value)}
-                                className="px-2.5 py-1.5 rounded-lg bg-[#061f1d] border border-emerald-800/60 text-white text-xs focus:outline-none focus:border-emerald-500"
+                                className="px-2.5 py-1.5 rounded-lg bg-[#0B132B] border border-emerald-800/60 text-white text-xs focus:outline-none focus:border-emerald-500"
                               >
                                 {MONTHS.map((m) => (
                                   <option key={m} value={m}>
@@ -1644,7 +1644,7 @@ export default function ProfileForm({ initialProfile }: ProfileFormProps) {
                               <select
                                 value={exp.startYear}
                                 onChange={(e) => handleExpFieldChange(exp.id, "startYear", e.target.value)}
-                                className="px-2.5 py-1.5 rounded-lg bg-[#061f1d] border border-emerald-800/60 text-white text-xs focus:outline-none focus:border-emerald-500"
+                                className="px-2.5 py-1.5 rounded-lg bg-[#0B132B] border border-emerald-800/60 text-white text-xs focus:outline-none focus:border-emerald-500"
                               >
                                 {YEARS.map((y) => (
                                   <option key={y} value={y}>
@@ -1662,7 +1662,7 @@ export default function ProfileForm({ initialProfile }: ProfileFormProps) {
                               <select
                                 value={exp.endMonth}
                                 onChange={(e) => handleExpFieldChange(exp.id, "endMonth", e.target.value)}
-                                className="px-2.5 py-1.5 rounded-lg bg-[#061f1d] border border-emerald-800/60 text-white text-xs focus:outline-none focus:border-emerald-500"
+                                className="px-2.5 py-1.5 rounded-lg bg-[#0B132B] border border-emerald-800/60 text-white text-xs focus:outline-none focus:border-emerald-500"
                               >
                                 {MONTHS.map((m) => (
                                   <option key={m} value={m}>
@@ -1674,7 +1674,7 @@ export default function ProfileForm({ initialProfile }: ProfileFormProps) {
                               <select
                                 value={exp.endYear}
                                 onChange={(e) => handleExpFieldChange(exp.id, "endYear", e.target.value)}
-                                className="px-2.5 py-1.5 rounded-lg bg-[#061f1d] border border-emerald-800/60 text-white text-xs focus:outline-none focus:border-emerald-500"
+                                className="px-2.5 py-1.5 rounded-lg bg-[#0B132B] border border-emerald-800/60 text-white text-xs focus:outline-none focus:border-emerald-500"
                               >
                                 {YEARS.map((y) => (
                                   <option key={y} value={y}>
@@ -1695,7 +1695,7 @@ export default function ProfileForm({ initialProfile }: ProfileFormProps) {
                           rows={2}
                           value={exp.description}
                           onChange={(e) => handleExpFieldChange(exp.id, "description", e.target.value)}
-                          className="w-full px-3 py-2 rounded-lg bg-[#0c2b29] border border-emerald-800/60 text-white focus:outline-none focus:border-emerald-500 placeholder-slate-500 text-xs resize-none"
+                          className="w-full px-3 py-2 rounded-lg bg-[#132238] border border-emerald-800/60 text-white focus:outline-none focus:border-emerald-500 placeholder-slate-500 text-xs resize-none"
                           placeholder="Jelaskan peran utama, teknologi yang digunakan, serta pencapaian kunci..."
                         />
                       </div>
@@ -1756,7 +1756,7 @@ export default function ProfileForm({ initialProfile }: ProfileFormProps) {
 
         {/* TAB 5: KEAHLIAN & KETERAMPILAN (SKILLS) */}
         {activeTab === "skills" && (
-          <div className="bg-[#0c2b29] border border-emerald-800/40 rounded-2xl p-6 sm:p-8 space-y-6 shadow-xl">
+          <div className="bg-[#132238] border border-emerald-800/40 rounded-2xl p-6 sm:p-8 space-y-6 shadow-xl">
             <div className="flex items-center gap-3 border-b border-emerald-800/40 pb-4">
               <div className="w-10 h-10 rounded-xl bg-emerald-900/60 border border-emerald-700/50 flex items-center justify-center text-emerald-300">
                 <Layers className="w-5 h-5" />
@@ -1779,7 +1779,7 @@ export default function ProfileForm({ initialProfile }: ProfileFormProps) {
                       handleAddSkill();
                     }
                   }}
-                  className="flex-1 px-4 py-2.5 rounded-xl bg-[#061f1d] border border-emerald-800/60 text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500 text-xs sm:text-sm"
+                  className="flex-1 px-4 py-2.5 rounded-xl bg-[#0B132B] border border-emerald-800/60 text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500 text-xs sm:text-sm"
                   placeholder="Ketik nama skill (contoh: React, Python, Project Management) lalu tekan Tambah"
                 />
                 <button
@@ -1809,7 +1809,7 @@ export default function ProfileForm({ initialProfile }: ProfileFormProps) {
                         className={`px-2.5 py-1 rounded-lg text-xs font-medium transition-all ${
                           isAdded
                             ? "bg-emerald-950 text-emerald-400 border border-emerald-800/80 cursor-default opacity-70"
-                            : "bg-[#061f1d] hover:bg-emerald-900/60 text-slate-300 hover:text-white border border-emerald-800/40"
+                            : "bg-[#0B132B] hover:bg-emerald-900/60 text-slate-300 hover:text-white border border-emerald-800/40"
                         }`}
                       >
                         {isAdded ? `✓ ${tag}` : `+ ${tag}`}
@@ -1829,7 +1829,7 @@ export default function ProfileForm({ initialProfile }: ProfileFormProps) {
                     {skillsList.map((skill) => (
                       <span
                         key={skill}
-                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#061f1d] border border-emerald-700/60 text-emerald-200 text-xs font-semibold shadow-sm animate-fade-in"
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#0B132B] border border-emerald-700/60 text-emerald-200 text-xs font-semibold shadow-sm animate-fade-in"
                       >
                         <span>{skill}</span>
                         <button
@@ -1862,7 +1862,7 @@ export default function ProfileForm({ initialProfile }: ProfileFormProps) {
                       rows={3}
                       value={hardSkills}
                       onChange={(e) => setHardSkills(e.target.value)}
-                      className="w-full px-3 py-2 rounded-xl bg-[#061f1d] border border-emerald-800/60 text-white text-xs focus:outline-none focus:border-emerald-500 placeholder-slate-500"
+                      className="w-full px-3 py-2 rounded-xl bg-[#0B132B] border border-emerald-800/60 text-white text-xs focus:outline-none focus:border-emerald-500 placeholder-slate-500"
                       placeholder="Data Analysis (SQL, Power BI), Web Development (Laravel, React, Next.js), Python..."
                     />
                   </div>
@@ -1875,7 +1875,7 @@ export default function ProfileForm({ initialProfile }: ProfileFormProps) {
                       rows={3}
                       value={softSkills}
                       onChange={(e) => setSoftSkills(e.target.value)}
-                      className="w-full px-3 py-2 rounded-xl bg-[#061f1d] border border-emerald-800/60 text-white text-xs focus:outline-none focus:border-emerald-500 placeholder-slate-500"
+                      className="w-full px-3 py-2 rounded-xl bg-[#0B132B] border border-emerald-800/60 text-white text-xs focus:outline-none focus:border-emerald-500 placeholder-slate-500"
                       placeholder="Pemecahan Masalah, Berpikir Kritis, Kerja Tim, Manajemen Waktu..."
                     />
                   </div>
@@ -1888,7 +1888,7 @@ export default function ProfileForm({ initialProfile }: ProfileFormProps) {
                       rows={3}
                       value={languages}
                       onChange={(e) => setLanguages(e.target.value)}
-                      className="w-full px-3 py-2 rounded-xl bg-[#061f1d] border border-emerald-800/60 text-white text-xs focus:outline-none focus:border-emerald-500 placeholder-slate-500"
+                      className="w-full px-3 py-2 rounded-xl bg-[#0B132B] border border-emerald-800/60 text-white text-xs focus:outline-none focus:border-emerald-500 placeholder-slate-500"
                       placeholder="Indonesia (fluent), English (intermediate)..."
                     />
                   </div>

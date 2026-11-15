@@ -74,12 +74,12 @@ export default function CandidateHeader({ profile, userEmail }: CandidateHeaderP
                 <Menu className="w-5 h-5" />
               </button>
 
-              <Link href="/dashboard" className="flex items-center gap-3 group" id="candidate-logo-link">
-                <div className="h-10 w-10 sm:h-11 sm:w-11 rounded-xl overflow-hidden bg-white p-1 border border-teal-800/40 shadow-md group-hover:scale-105 transition-transform shrink-0 flex items-center justify-center">
+              <Link href="/dashboard" prefetch={true} className="flex items-center gap-3 group" id="candidate-logo-link">
+                <div className="h-10 w-10 sm:h-11 sm:w-11 rounded-xl overflow-hidden bg-white p-1 border border-slate-700/60 shadow-md group-hover:scale-105 transition-transform shrink-0 flex items-center justify-center">
                   <img
-                    src="/nexora-logo.jpg"
-                    alt="Nexora Digital Logo"
-                    className="h-full w-full object-contain"
+                    src="/nexora-icon-trans.png"
+                    alt="Nexora Digital"
+                    className="w-full h-full object-contain"
                   />
                 </div>
                 <div className="flex flex-col">
@@ -108,6 +108,7 @@ export default function CandidateHeader({ profile, userEmail }: CandidateHeaderP
                   <Link
                     key={item.href}
                     href={item.href}
+                    prefetch={true}
                     className={`relative flex items-center gap-2 px-4 py-2 rounded-full text-xs sm:text-sm font-bold transition-all duration-200 ${
                       active
                         ? "bg-[#0d9488] text-white shadow-md shadow-teal-950/50"
@@ -175,11 +176,11 @@ export default function CandidateHeader({ profile, userEmail }: CandidateHeaderP
           />
 
           {/* Drawer Sidebar */}
-          <div className="relative w-80 bg-white dark:bg-[#0c2b29] border-r border-slate-200 dark:border-emerald-800/60 p-6 text-slate-900 dark:text-slate-100 flex flex-col justify-between h-full z-10 shadow-2xl overflow-y-auto transition-colors">
+          <div className="relative w-80 bg-white dark:bg-[#132238] border-r border-slate-200 dark:border-slate-800/80 p-6 text-slate-900 dark:text-slate-100 flex flex-col justify-between h-full z-10 shadow-2xl overflow-y-auto transition-colors">
             <div className="space-y-6">
               
               {/* Mobile Header */}
-              <div className="flex items-center justify-between pb-4 border-b border-slate-200 dark:border-emerald-800/50">
+              <div className="flex items-center justify-between pb-4 border-b border-slate-200 dark:border-slate-800/80">
                 <div className="flex items-center gap-3">
                   {profile?.avatar_url ? (
                     <img
@@ -194,8 +195,8 @@ export default function CandidateHeader({ profile, userEmail }: CandidateHeaderP
                   )}
                   <div>
                     <h3 className="font-extrabold text-slate-900 dark:text-white text-sm">{fullName}</h3>
-                    <p className="text-[10px] text-slate-500 dark:text-emerald-400 flex items-center gap-1">
-                      <Sparkles className="w-3 h-3 text-emerald-600 dark:text-emerald-400" /> Portal Kandidat
+                    <p className="text-[10px] text-slate-500 dark:text-teal-400 flex items-center gap-1">
+                      <Sparkles className="w-3 h-3 text-emerald-600 dark:text-teal-400" /> Portal Kandidat
                     </p>
                   </div>
                 </div>
@@ -203,7 +204,7 @@ export default function CandidateHeader({ profile, userEmail }: CandidateHeaderP
                 <button
                   type="button"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="p-1.5 rounded-lg text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-emerald-900/40 transition-colors"
+                  className="p-1.5 rounded-lg text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800/80 transition-colors"
                   aria-label="Tutup Menu"
                 >
                   <X className="w-5 h-5" />
@@ -211,12 +212,12 @@ export default function CandidateHeader({ profile, userEmail }: CandidateHeaderP
               </div>
 
               {/* Theme Switcher in Mobile Drawer */}
-              <div className="flex items-center justify-between p-3 rounded-xl bg-slate-100 dark:bg-[#061f1d] border border-slate-200 dark:border-emerald-800/60">
-                <span className="text-xs font-semibold text-slate-700 dark:text-emerald-300">Tema Tampilan</span>
+              <div className="flex items-center justify-between p-3 rounded-xl bg-slate-100 dark:bg-[#0B132B] border border-slate-200 dark:border-slate-800/80">
+                <span className="text-xs font-semibold text-slate-700 dark:text-teal-300">Tema Tampilan</span>
                 <button
                   type="button"
                   onClick={toggleTheme}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white dark:bg-[#0c2b29] border border-slate-300 dark:border-emerald-700/60 text-xs font-bold text-slate-800 dark:text-white"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white dark:bg-[#132238] border border-slate-300 dark:border-emerald-700/60 text-xs font-bold text-slate-800 dark:text-white"
                 >
                   {theme === "light" ? (
                     <>
@@ -234,7 +235,7 @@ export default function CandidateHeader({ profile, userEmail }: CandidateHeaderP
 
               {/* Mobile Navigation Links */}
               <nav className="space-y-1.5">
-                <p className="text-[11px] font-bold text-slate-500 dark:text-emerald-400 uppercase tracking-wider px-3 mb-2">
+                <p className="text-[11px] font-bold text-slate-500 dark:text-teal-400 uppercase tracking-wider px-3 mb-2">
                   Navigasi Utama
                 </p>
                 {navItems.map((item) => {
@@ -249,10 +250,10 @@ export default function CandidateHeader({ profile, userEmail }: CandidateHeaderP
                       className={`flex items-center gap-3 px-3.5 py-3 rounded-xl text-xs font-bold transition-all ${
                         active
                           ? "bg-slate-900 text-white dark:bg-emerald-600 dark:text-white shadow-sm"
-                          : "text-slate-600 hover:text-slate-900 hover:bg-slate-100 dark:text-slate-300 dark:hover:text-white dark:hover:bg-[#061f1d]"
+                          : "text-slate-600 hover:text-slate-900 hover:bg-slate-100 dark:text-slate-300 dark:hover:text-white dark:hover:bg-[#0B132B]"
                       }`}
                     >
-                      <Icon className={`w-4 h-4 ${active ? "text-white" : "text-slate-500 dark:text-emerald-400"}`} />
+                      <Icon className={`w-4 h-4 ${active ? "text-white" : "text-slate-500 dark:text-teal-400"}`} />
                       <span>{item.label}</span>
                     </Link>
                   );
@@ -275,14 +276,14 @@ export default function CandidateHeader({ profile, userEmail }: CandidateHeaderP
             </div>
 
             {/* Mobile Footer & User Account Logout */}
-            <div className="pt-6 border-t border-slate-200 dark:border-emerald-800/50 space-y-3">
-              <div className="bg-slate-50 dark:bg-[#061f1d] p-3.5 rounded-xl border border-slate-200 dark:border-emerald-800/50 text-xs flex items-center gap-3">
-                <div className="w-9 h-9 rounded-xl bg-slate-200 dark:bg-emerald-900 border border-slate-300 dark:border-emerald-600/50 flex items-center justify-center font-bold text-slate-800 dark:text-emerald-200 shrink-0">
+            <div className="pt-6 border-t border-slate-200 dark:border-slate-800/80 space-y-3">
+              <div className="bg-slate-50 dark:bg-[#0B132B] p-3.5 rounded-xl border border-slate-200 dark:border-slate-800/80 text-xs flex items-center gap-3">
+                <div className="w-9 h-9 rounded-xl bg-slate-200 dark:bg-emerald-900 border border-slate-300 dark:border-emerald-600/50 flex items-center justify-center font-bold text-slate-800 dark:text-teal-200 shrink-0">
                   {userInitials}
                 </div>
                 <div className="overflow-hidden">
                   <p className="font-bold text-slate-900 dark:text-white truncate">{fullName}</p>
-                  <p className="text-[10px] text-slate-500 dark:text-emerald-300/80 truncate">{userEmail}</p>
+                  <p className="text-[10px] text-slate-500 dark:text-teal-300/80 truncate">{userEmail}</p>
                 </div>
               </div>
 

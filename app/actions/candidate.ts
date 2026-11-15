@@ -1,13 +1,15 @@
 "use server";
 
+import { cache } from "react";
 import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
 import { CandidateProfile, JobApplication, CandidateAuditLog } from "@/types/candidate";
 
 /**
  * Fetch candidate profile from Supabase profiles table, fallback to user metadata if empty.
+ * Wrapped in React cache() for request-level deduplication (faster transitions).
  */
-export async function getCandidateProfile(): Promise<{ profile: CandidateProfile | null; error?: string }> {
+export const getCandidateProfile = cache(async (): Promise<{ profile: CandidateProfile | null; error?: string }> => {
   try {
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
@@ -32,12 +34,26 @@ export async function getCandidateProfile(): Promise<{ profile: CandidateProfile
     let experience = data?.experience && Array.isArray(data.experience) ? data.experience : [];
     let skills = data?.skills && Array.isArray(data.skills) ? data.skills : [];
 
-    // Fallback query to relational tables if profiles JSONB is empty
-    try {
-      if (education.length === 0) {
-        const { data: eduDb } = await supabase.from("educations").select("*").eq("user_id", user.id);
-        if (eduDb && eduDb.length > 0) {
-          education = eduDb.map((e: any) => ({
+    // Fallback parallel query to relational tables if profiles JSONB is empty
+    if (education.length === 0 || certifications.length === 0 || experience.length === 0 || skills.length === 0) {
+      try {
+        const [eduRes, certRes, expRes, skillRes] = await Promise.all([
+          education.length === 0
+            ? supabase.from("educations").select("*").eq("user_id", user.id)
+            : Promise.resolve({ data: [] }),
+          certifications.length === 0
+            ? supabase.from("certifications").select("*").eq("user_id", user.id)
+            : Promise.resolve({ data: [] }),
+          experience.length === 0
+            ? supabase.from("experiences").select("*").eq("user_id", user.id)
+            : Promise.resolve({ data: [] }),
+          skills.length === 0
+            ? supabase.from("skills").select("name").eq("user_id", user.id)
+            : Promise.resolve({ data: [] }),
+        ]);
+
+        if (education.length === 0 && eduRes.data && eduRes.data.length > 0) {
+          education = eduRes.data.map((e: any) => ({
             id: e.id,
             level: e.level || "S1",
             school: e.school || "",
@@ -49,12 +65,9 @@ export async function getCandidateProfile(): Promise<{ profile: CandidateProfile
             mediaName: e.media_name || "",
           }));
         }
-      }
 
-      if (certifications.length === 0) {
-        const { data: certDb } = await supabase.from("certifications").select("*").eq("user_id", user.id);
-        if (certDb && certDb.length > 0) {
-          certifications = certDb.map((c: any) => ({
+        if (certifications.length === 0 && certRes.data && certRes.data.length > 0) {
+          certifications = certRes.data.map((c: any) => ({
             id: c.id,
             title: c.title || c.cert_name || "",
             certType: c.cert_type || "",
@@ -69,12 +82,9 @@ export async function getCandidateProfile(): Promise<{ profile: CandidateProfile
             mediaName: c.media_name || "",
           }));
         }
-      }
 
-      if (experience.length === 0) {
-        const { data: expDb } = await supabase.from("experiences").select("*").eq("user_id", user.id);
-        if (expDb && expDb.length > 0) {
-          experience = expDb.map((ex: any) => ({
+        if (experience.length === 0 && expRes.data && expRes.data.length > 0) {
+          experience = expRes.data.map((ex: any) => ({
             id: ex.id,
             company: ex.company || "",
             position: ex.position || "",
@@ -89,17 +99,29 @@ export async function getCandidateProfile(): Promise<{ profile: CandidateProfile
             mediaName: ex.media_name || "",
           }));
         }
-      }
 
-      if (skills.length === 0) {
-        const { data: skillDb } = await supabase.from("skills").select("name").eq("user_id", user.id);
-        if (skillDb && skillDb.length > 0) {
-          skills = skillDb.map((s: any) => s.name);
+        if (skills.length === 0 && skillRes.data && skillRes.data.length > 0) {
+          skills = skillRes.data.map((s: any) => s.name);
         }
+      } catch (fallbackErr) {
+        console.log("Relational tables fallback notice:", fallbackErr);
       }
-    } catch (fallbackErr) {
-      console.log("Relational tables fallback notice:", fallbackErr);
     }
+
+    // Hitung realtime kelengkapan profil secara dinamis
+    let calculatedScore = 0;
+    if (fullName.trim()) calculatedScore += 10;
+    const cleanNik = (data?.nik || user.user_metadata?.nik || "").trim();
+    if (cleanNik.length === 16) calculatedScore += 15;
+    if ((data?.ktp_url || user.user_metadata?.ktp_url || "").trim()) calculatedScore += 15;
+    if ((data?.phone || data?.whatsapp || user.user_metadata?.phone || user.user_metadata?.whatsapp || "").trim()) calculatedScore += 10;
+    if ((data?.address || user.user_metadata?.address || "").trim()) calculatedScore += 10;
+    if ((data?.headline || data?.bio || "").trim()) calculatedScore += 10;
+    if (education.length > 0) calculatedScore += 15;
+    if (experience.length > 0) calculatedScore += 10;
+    if (skills.length > 0) calculatedScore += 5;
+    if ((data?.resume_url || user.user_metadata?.resume_url || "").trim()) calculatedScore += 10;
+    const finalScore = Math.min(Math.max(calculatedScore, data?.profile_score || 0), 100);
 
     const profile: CandidateProfile = {
       id: user.id,
@@ -127,8 +149,8 @@ export async function getCandidateProfile(): Promise<{ profile: CandidateProfile
       experience,
       resume_url: data?.resume_url || user.user_metadata?.resume_url || "",
       resume_name: data?.resume_name || user.user_metadata?.resume_name || "",
-      profile_completed: data?.profile_completed ?? false,
-      profile_score: data?.profile_score ?? 0,
+      profile_completed: finalScore >= 100,
+      profile_score: finalScore,
       created_at: data?.created_at || new Date().toISOString(),
       updated_at: data?.updated_at || new Date().toISOString(),
     };
@@ -137,7 +159,7 @@ export async function getCandidateProfile(): Promise<{ profile: CandidateProfile
   } catch (err: any) {
     return { profile: null, error: err.message || "Gagal mengambil data profil" };
   }
-}
+});
 
 /**
  * Save / Update Candidate Profile in Supabase with strict NIK uniqueness & graceful schema fallback
@@ -891,8 +913,9 @@ export async function deleteResumeFile(): Promise<{ success: boolean; error?: st
 
 /**
  * CASE 3: Fetch Candidate Applications (Confidential internal HR notes & assessment test details hidden from candidate)
+ * Wrapped in React cache() for request-level deduplication.
  */
-export async function getCandidateApplications(): Promise<{ applications: JobApplication[]; error?: string }> {
+export const getCandidateApplications = cache(async (): Promise<{ applications: JobApplication[]; error?: string }> => {
   try {
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
@@ -913,36 +936,32 @@ export async function getCandidateApplications(): Promise<{ applications: JobApp
       let auditLogsMap: Record<string, any[]> = {};
 
       if (appIds.length > 0) {
-        // Query scheduled assessments/interviews with correct schema: id, application_id, type, scheduled_at, evaluator_name, score, notes, status
+        // Query scheduled assessments and audit logs in parallel for high performance
         try {
-          const { data: assessData } = await supabase
-            .from("assessments_and_interviews")
-            .select("id, application_id, type, scheduled_at, evaluator_name, score, notes, status, created_at")
-            .in("application_id", appIds)
-            .order("scheduled_at", { ascending: false });
+          const [assessRes, logsRes] = await Promise.all([
+            supabase
+              .from("assessments_and_interviews")
+              .select("id, application_id, type, scheduled_at, evaluator_name, score, notes, status, created_at")
+              .in("application_id", appIds)
+              .order("scheduled_at", { ascending: false }),
+            supabase
+              .from("audit_logs")
+              .select("id, application_id, old_status, new_status, stage_detail, reason, created_at")
+              .in("application_id", appIds)
+              .order("created_at", { ascending: false }),
+          ]);
 
-          if (assessData) {
-            assessData.forEach((item: any) => {
+          if (assessRes.data) {
+            assessRes.data.forEach((item: any) => {
               if (!assessmentsMap[item.application_id]) {
                 assessmentsMap[item.application_id] = [];
               }
               assessmentsMap[item.application_id].push(item);
             });
           }
-        } catch (assessErr) {
-          console.warn("assessments query notice:", assessErr);
-        }
 
-        // Query audit logs to detect any scheduled events
-        try {
-          const { data: logsData } = await supabase
-            .from("audit_logs")
-            .select("id, application_id, old_status, new_status, stage_detail, reason, created_at")
-            .in("application_id", appIds)
-            .order("created_at", { ascending: false });
-
-          if (logsData) {
-            logsData.forEach((l: any) => {
+          if (logsRes.data) {
+            logsRes.data.forEach((l: any) => {
               if (l.application_id) {
                 if (!auditLogsMap[l.application_id]) {
                   auditLogsMap[l.application_id] = [];
@@ -951,7 +970,9 @@ export async function getCandidateApplications(): Promise<{ applications: JobApp
               }
             });
           }
-        } catch {}
+        } catch (fetchErr) {
+          console.warn("parallel assessments/logs fetch notice:", fetchErr);
+        }
       }
 
       const formatted = data.map((app) => {
@@ -1056,7 +1077,7 @@ export async function getCandidateApplications(): Promise<{ applications: JobApp
   } catch (err: any) {
     return { applications: [] };
   }
-}
+});
 
 /**
  * CASE 3: Fetch Single Application Detail for Candidate Self-Tracking (Internal notes & score breakdown hidden)

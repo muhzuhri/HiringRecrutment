@@ -69,9 +69,9 @@ export default function AdminHeader({
             >
               <div className="h-8 w-8 rounded-lg overflow-hidden bg-white p-0.5 border border-slate-700 shadow-md shrink-0 flex items-center justify-center">
                 <img
-                  src="/nexora-logo.jpg"
-                  alt="Nexora Digital Logo"
-                  className="h-full w-full object-contain"
+                  src="/nexora-icon-trans.png"
+                  alt="Nexora Digital"
+                  className="w-full h-full object-contain"
                 />
               </div>
               <span className="font-extrabold text-base tracking-tight text-white">

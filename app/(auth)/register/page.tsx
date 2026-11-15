@@ -90,7 +90,7 @@ export default function RegisterPage() {
           <Link href="/" className="inline-flex items-center gap-2.5 mb-5 group">
             <div
               className="w-11 h-11 rounded-xl flex items-center justify-center shadow-lg transition-transform group-hover:scale-105"
-              style={{ background: "linear-gradient(135deg, #15803d 0%, #0c2b29 100%)" }}
+              style={{ background: "linear-gradient(135deg, #15803d 0%, #132238 100%)" }}
             >
               <svg className="w-6 h-6 text-emerald-300" fill="currentColor" viewBox="0 0 24 24">
                 <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
@@ -98,7 +98,7 @@ export default function RegisterPage() {
             </div>
             <span
               className="text-2xl font-bold tracking-tight"
-              style={{ fontFamily: "var(--font-display, sans-serif)", color: "#0c2b29" }}
+              style={{ fontFamily: "var(--font-display, sans-serif)", color: "#132238" }}
             >
               Talent<span style={{ color: "#15803d" }}>Hub</span>
             </span>
@@ -106,7 +106,7 @@ export default function RegisterPage() {
 
           <h1
             className="text-3xl font-extrabold tracking-tight mb-2"
-            style={{ fontFamily: "var(--font-display, sans-serif)", color: "#0c2b29" }}
+            style={{ fontFamily: "var(--font-display, sans-serif)", color: "#132238" }}
           >
             Buat Akun Kandidat
           </h1>
@@ -326,7 +326,7 @@ export default function RegisterPage() {
               type="submit"
               disabled={isPending}
               className="btn-primary w-full py-3.5 text-base shadow-lg shadow-emerald-900/20 disabled:opacity-60 disabled:cursor-not-allowed transition-all"
-              style={{ background: "#0c2b29" }}
+              style={{ background: "#132238" }}
             >
               {isPending ? (
                 <span className="flex items-center justify-center gap-2">

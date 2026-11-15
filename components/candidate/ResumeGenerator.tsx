@@ -119,7 +119,7 @@ export default function ResumeGenerator({ profile }: ResumeGeneratorProps) {
     <div className="space-y-6">
       
       {/* 1. Header Toolbar */}
-      <div className="bg-[#0c2b29] border border-emerald-800/50 rounded-2xl p-6 shadow-xl flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="bg-[#132238] border border-emerald-800/50 rounded-2xl p-6 shadow-xl flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-950 border border-emerald-700/50 text-xs font-semibold text-emerald-300 mb-2">
             <Sparkles className="w-3.5 h-3.5 text-emerald-400" />

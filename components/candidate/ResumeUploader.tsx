@@ -70,7 +70,7 @@ export default function ResumeUploader({ currentResumeUrl, currentResumeName }: 
   };
 
   return (
-    <div className="bg-[#0c2b29] border border-emerald-800/40 rounded-2xl p-6 sm:p-8 space-y-6">
+    <div className="bg-[#132238] border border-emerald-800/40 rounded-2xl p-6 sm:p-8 space-y-6">
       <div className="flex items-center justify-between border-b border-emerald-800/40 pb-4">
         <div>
           <h2 className="text-lg font-bold text-white flex items-center gap-2">
@@ -105,7 +105,7 @@ export default function ResumeUploader({ currentResumeUrl, currentResumeName }: 
 
       {/* Existing Uploaded File Manager */}
       {resumeUrl ? (
-        <div className="bg-[#061f1d] border border-emerald-700/50 rounded-xl p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="bg-[#0B132B] border border-emerald-700/50 rounded-xl p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <div className="w-12 h-12 rounded-xl bg-emerald-900/60 border border-emerald-600/50 flex items-center justify-center text-emerald-300">
               <FileText className="w-6 h-6" />
@@ -144,7 +144,7 @@ export default function ResumeUploader({ currentResumeUrl, currentResumeName }: 
         </div>
       ) : (
         <form onSubmit={handleUpload} className="space-y-4">
-          <div className="border-2 border-dashed border-emerald-800/80 rounded-2xl p-6 sm:p-8 text-center bg-[#061f1d]/60 hover:bg-[#061f1d] hover:border-emerald-500/60 transition-all cursor-pointer">
+          <div className="border-2 border-dashed border-emerald-800/80 rounded-2xl p-6 sm:p-8 text-center bg-[#0B132B]/60 hover:bg-[#0B132B] hover:border-emerald-500/60 transition-all cursor-pointer">
             <input
               type="file"
               accept=".pdf,application/pdf"

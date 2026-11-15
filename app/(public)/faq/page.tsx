@@ -17,7 +17,7 @@ function AccordionItem({ question, answer, id }: { question: string; answer: str
         <span className={`font-semibold text-sm leading-snug transition-colors ${open ? "text-emerald-900" : "text-gray-800"}`}>
           {question}
         </span>
-        <div className={`w-7 h-7 rounded-full flex items-center justify-center shrink-0 transition-all duration-200 ${open ? "bg-[#0c2b29] rotate-45 text-white" : "bg-emerald-50 text-emerald-900"}`}>
+        <div className={`w-7 h-7 rounded-full flex items-center justify-center shrink-0 transition-all duration-200 ${open ? "bg-[#132238] rotate-45 text-white" : "bg-emerald-50 text-emerald-900"}`}>
           <svg className={`w-4 h-4 transition-colors ${open ? "text-white" : "text-emerald-900"}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" />
           </svg>

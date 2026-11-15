@@ -14,7 +14,7 @@ export default async function AdminDashboardPage() {
   return (
     <div className="space-y-6">
       {/* Clean Minimalist Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-slate-200/80 dark:border-teal-800/40">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-slate-200/80 dark:border-slate-800/80">
         <div>
           <h1 className="text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight">
             Dashboard & Analitik
@@ -35,7 +35,7 @@ export default async function AdminDashboardPage() {
 
           <Link
             href="/admin/jobs"
-            className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-white dark:bg-[#0c2b29] hover:bg-slate-50 dark:hover:bg-[#061f1d] border border-slate-200 dark:border-teal-800/60 text-slate-700 dark:text-slate-200 font-semibold text-xs transition-all shadow-2xs"
+            className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-white dark:bg-[#132238] hover:bg-slate-50 dark:hover:bg-[#0B132B] border border-slate-200 dark:border-slate-800/80 text-slate-700 dark:text-slate-200 font-semibold text-xs transition-all shadow-2xs"
           >
             <Briefcase className="w-3.5 h-3.5" />
             <span>Lowongan</span>

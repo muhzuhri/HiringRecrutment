@@ -76,9 +76,9 @@ export default function CandidateDetailModal({ data, onClose }: CandidateDetailM
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in">
-      <div className="bg-white dark:bg-[#0c2b29] border border-slate-200/90 dark:border-teal-700 rounded-3xl max-w-2xl w-full p-6 sm:p-7 space-y-5 text-slate-800 dark:text-slate-100 shadow-2xl max-h-[90vh] overflow-y-auto custom-scrollbar">
+      <div className="bg-white dark:bg-[#132238] border border-slate-200/90 dark:border-teal-700 rounded-3xl max-w-2xl w-full p-6 sm:p-7 space-y-5 text-slate-800 dark:text-slate-100 shadow-2xl max-h-[90vh] overflow-y-auto custom-scrollbar">
         {/* Header with Avatar and Basic Info */}
-        <div className="flex items-start justify-between border-b border-slate-100 dark:border-teal-800/60 pb-4">
+        <div className="flex items-start justify-between border-b border-slate-100 dark:border-slate-800/80 pb-4">
           <div className="flex items-center gap-3.5">
             {data.candidate_avatar_url ? (
               <img
@@ -97,7 +97,7 @@ export default function CandidateDetailModal({ data, onClose }: CandidateDetailM
                   {data.candidate_name}
                 </h3>
                 {data.candidate_nik && (
-                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-teal-50 dark:bg-teal-950 text-[#0F766E] dark:text-teal-300 border border-teal-200 dark:border-teal-800 text-[10px] font-bold">
+                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-teal-50 dark:bg-teal-950 text-[#0F766E] dark:text-teal-300 border border-teal-200 dark:border-slate-800 text-[10px] font-bold">
                     <ShieldCheck className="w-3 h-3 text-[#0F766E] dark:text-teal-400" />
                     <span>NIK: {data.candidate_nik}</span>
                   </span>
@@ -126,7 +126,7 @@ export default function CandidateDetailModal({ data, onClose }: CandidateDetailM
         {/* Content Body */}
         <div className="space-y-4 text-xs">
           {/* 1. Kontak & Dokumen Identitas (KTP) */}
-          <div className="bg-slate-50 dark:bg-[#061f1d] p-3.5 sm:p-4 rounded-2xl border border-slate-200/80 dark:border-teal-800/40 space-y-2.5">
+          <div className="bg-slate-50 dark:bg-[#0B132B] p-3.5 sm:p-4 rounded-2xl border border-slate-200/80 dark:border-slate-800/80 space-y-2.5">
             <h4 className="font-bold text-slate-800 dark:text-white uppercase tracking-wider text-[11px] flex items-center gap-1.5">
               <User className="w-3.5 h-3.5 text-[#0F766E] dark:text-teal-400" />
               Kontak & Dokumen Identitas (KTP)
@@ -160,7 +160,7 @@ export default function CandidateDetailModal({ data, onClose }: CandidateDetailM
                   href={data.candidate_ktp_url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1 px-3 py-1 rounded-lg bg-teal-50 dark:bg-teal-950 text-[#0F766E] dark:text-teal-300 border border-teal-200 dark:border-teal-800 text-[11px] font-bold hover:underline"
+                  className="inline-flex items-center gap-1 px-3 py-1 rounded-lg bg-teal-50 dark:bg-teal-950 text-[#0F766E] dark:text-teal-300 border border-teal-200 dark:border-slate-800 text-[11px] font-bold hover:underline"
                 >
                   <span>Lihat KTP</span>
                   <ExternalLink className="w-3 h-3" />
@@ -173,7 +173,7 @@ export default function CandidateDetailModal({ data, onClose }: CandidateDetailM
 
           {/* 2. Ringkasan Bio / Tentang Saya */}
           {data.candidate_bio && (
-            <div className="bg-slate-50 dark:bg-[#061f1d] p-3.5 sm:p-4 rounded-2xl border border-slate-200/80 dark:border-teal-800/40 space-y-1">
+            <div className="bg-slate-50 dark:bg-[#0B132B] p-3.5 sm:p-4 rounded-2xl border border-slate-200/80 dark:border-slate-800/80 space-y-1">
               <h4 className="font-bold text-slate-800 dark:text-white uppercase tracking-wider text-[11px]">
                 Tentang Pelamar
               </h4>
@@ -186,7 +186,7 @@ export default function CandidateDetailModal({ data, onClose }: CandidateDetailM
           {/* 3. Pendidikan & Pengalaman */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {/* Pendidikan */}
-            <div className="bg-slate-50 dark:bg-[#061f1d] p-3.5 rounded-2xl border border-slate-200/80 dark:border-teal-800/40 space-y-2">
+            <div className="bg-slate-50 dark:bg-[#0B132B] p-3.5 rounded-2xl border border-slate-200/80 dark:border-slate-800/80 space-y-2">
               <h4 className="font-bold text-slate-800 dark:text-white uppercase tracking-wider text-[11px] flex items-center gap-1.5">
                 <GraduationCap className="w-3.5 h-3.5 text-[#0F766E] dark:text-teal-400" />
                 Pendidikan Terstruktur
@@ -210,7 +210,7 @@ export default function CandidateDetailModal({ data, onClose }: CandidateDetailM
             </div>
 
             {/* Pengalaman */}
-            <div className="bg-slate-50 dark:bg-[#061f1d] p-3.5 rounded-2xl border border-slate-200/80 dark:border-teal-800/40 space-y-2">
+            <div className="bg-slate-50 dark:bg-[#0B132B] p-3.5 rounded-2xl border border-slate-200/80 dark:border-slate-800/80 space-y-2">
               <h4 className="font-bold text-slate-800 dark:text-white uppercase tracking-wider text-[11px] flex items-center gap-1.5">
                 <Briefcase className="w-3.5 h-3.5 text-[#0F766E] dark:text-teal-400" />
                 Pengalaman Kerja
@@ -233,7 +233,7 @@ export default function CandidateDetailModal({ data, onClose }: CandidateDetailM
           </div>
 
           {/* 4. Keahlian & Keterampilan */}
-          <div className="bg-slate-50 dark:bg-[#061f1d] p-3.5 rounded-2xl border border-slate-200/80 dark:border-teal-800/40 space-y-2">
+          <div className="bg-slate-50 dark:bg-[#0B132B] p-3.5 rounded-2xl border border-slate-200/80 dark:border-slate-800/80 space-y-2">
             <h4 className="font-bold text-slate-800 dark:text-white uppercase tracking-wider text-[11px] flex items-center gap-1.5">
               <Sparkles className="w-3.5 h-3.5 text-[#0F766E] dark:text-teal-400" />
               Keahlian & Skills
@@ -243,7 +243,7 @@ export default function CandidateDetailModal({ data, onClose }: CandidateDetailM
                 data.skills.map((skill) => (
                   <span
                     key={skill}
-                    className="px-2.5 py-0.5 rounded-full bg-white dark:bg-[#0c2b29] text-slate-700 dark:text-teal-200 border border-slate-200 dark:border-teal-800/60 font-semibold text-[10px]"
+                    className="px-2.5 py-0.5 rounded-full bg-white dark:bg-[#132238] text-slate-700 dark:text-teal-200 border border-slate-200 dark:border-slate-800/80 font-semibold text-[10px]"
                   >
                     {skill}
                   </span>
@@ -255,13 +255,13 @@ export default function CandidateDetailModal({ data, onClose }: CandidateDetailM
           </div>
 
           {/* 5. Riwayat Nilai & Evaluasi Seleksi */}
-          <div className="bg-slate-50 dark:bg-[#061f1d] p-3.5 rounded-2xl border border-slate-200/80 dark:border-teal-800/40 space-y-2">
+          <div className="bg-slate-50 dark:bg-[#0B132B] p-3.5 rounded-2xl border border-slate-200/80 dark:border-slate-800/80 space-y-2">
             <h4 className="font-bold text-slate-800 dark:text-white uppercase tracking-wider text-[11px] flex items-center gap-1.5">
               <Award className="w-3.5 h-3.5 text-[#0F766E] dark:text-teal-400" />
               Rekapitulasi Nilai Seleksi
             </h4>
             <div className="grid grid-cols-3 gap-2 text-center">
-              <div className="p-2.5 rounded-xl bg-white dark:bg-[#0c2b29] border border-slate-200 dark:border-teal-800/60">
+              <div className="p-2.5 rounded-xl bg-white dark:bg-[#132238] border border-slate-200 dark:border-slate-800/80">
                 <p className="text-[10px] text-slate-500 font-semibold uppercase">1. Asesmen/Tes</p>
                 <p className="text-base font-black text-purple-600 dark:text-purple-400 mt-0.5">
                   {data.test_score !== null && data.test_score !== undefined ? `${data.test_score}/100` : "-"}
@@ -269,7 +269,7 @@ export default function CandidateDetailModal({ data, onClose }: CandidateDetailM
                 <p className="text-[9px] text-slate-400 truncate">{data.test_evaluator || "Penilai"}</p>
               </div>
 
-              <div className="p-2.5 rounded-xl bg-white dark:bg-[#0c2b29] border border-slate-200 dark:border-teal-800/60">
+              <div className="p-2.5 rounded-xl bg-white dark:bg-[#132238] border border-slate-200 dark:border-slate-800/80">
                 <p className="text-[10px] text-slate-500 font-semibold uppercase">2. Interview HR</p>
                 <p className="text-base font-black text-indigo-600 dark:text-indigo-400 mt-0.5">
                   {data.hr_interview_score !== null && data.hr_interview_score !== undefined ? `${data.hr_interview_score}/100` : "-"}
@@ -277,7 +277,7 @@ export default function CandidateDetailModal({ data, onClose }: CandidateDetailM
                 <p className="text-[9px] text-slate-400 truncate">{data.hr_interview_evaluator || "HR"}</p>
               </div>
 
-              <div className="p-2.5 rounded-xl bg-white dark:bg-[#0c2b29] border border-slate-200 dark:border-teal-800/60">
+              <div className="p-2.5 rounded-xl bg-white dark:bg-[#132238] border border-slate-200 dark:border-slate-800/80">
                 <p className="text-[10px] text-slate-500 font-semibold uppercase">3. Interview User</p>
                 <p className="text-base font-black text-cyan-600 dark:text-cyan-400 mt-0.5">
                   {data.user_interview_score !== null && data.user_interview_score !== undefined ? `${data.user_interview_score}/100` : "-"}
@@ -288,7 +288,7 @@ export default function CandidateDetailModal({ data, onClose }: CandidateDetailM
           </div>
 
           {/* 6. Dokumen CV PDF */}
-          <div className="p-3.5 sm:p-4 rounded-2xl bg-white dark:bg-[#0c2b29] border border-slate-200/90 dark:border-teal-800/60 flex items-center justify-between gap-3">
+          <div className="p-3.5 sm:p-4 rounded-2xl bg-white dark:bg-[#132238] border border-slate-200/90 dark:border-slate-800/80 flex items-center justify-between gap-3">
             <div className="flex items-center gap-2.5 min-w-0">
               <FileText className="w-5 h-5 text-[#0F766E] dark:text-teal-400 shrink-0" />
               <div className="min-w-0">
@@ -316,7 +316,7 @@ export default function CandidateDetailModal({ data, onClose }: CandidateDetailM
         </div>
 
         {/* Footer Actions */}
-        <div className="pt-2 border-t border-slate-100 dark:border-teal-800/60 flex items-center justify-between gap-3">
+        <div className="pt-2 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between gap-3">
           <Link
             href={`/admin/candidates/${data.id}`}
             className="inline-flex items-center gap-1.5 text-xs font-bold text-[#0F766E] hover:underline dark:text-teal-300"

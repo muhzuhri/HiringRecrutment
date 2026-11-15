@@ -39,7 +39,7 @@ export default function StatusBadge({ status, size = "md" }: StatusBadgeProps) {
   } else if (s === "diterima" || s === "offered" || s === "hired") {
     // 6. Emerald - Diterima
     badgeStyles =
-      "bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-500/15 dark:text-emerald-300 dark:border-emerald-500/40";
+      "bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-500/15 dark:text-teal-300 dark:border-emerald-500/40";
     iconSymbol = "🎉";
   } else if (s === "ditolak" || s === "rejected") {
     // Rose - Ditolak

@@ -110,10 +110,10 @@ export default function CandidateJobBoard({ profile, existingApplications, jobsL
       )}
 
       {/* 1. Header Banner */}
-      <div className="bg-white/90 dark:bg-[#0c2b29]/90 backdrop-blur-md border border-slate-200/80 dark:border-teal-800/40 rounded-3xl p-6 sm:p-8 shadow-xs relative overflow-hidden transition-all">
+      <div className="bg-white/90 dark:bg-[#132238]/90 backdrop-blur-md border border-slate-200/80 dark:border-slate-800/80 rounded-3xl p-6 sm:p-8 shadow-xs relative overflow-hidden transition-all">
         <div className="absolute top-0 right-0 w-80 h-80 bg-teal-400/10 dark:bg-teal-500/10 rounded-full blur-3xl pointer-events-none -z-0" />
         <div className="relative z-10 max-w-2xl space-y-2.5">
-          <span className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-teal-50 dark:bg-teal-950 text-xs font-bold text-teal-800 dark:text-teal-200 border border-teal-200/80 dark:border-teal-800/60 shadow-2xs">
+          <span className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-teal-50 dark:bg-teal-950 text-xs font-bold text-teal-800 dark:text-teal-200 border border-teal-200/80 dark:border-slate-800/80 shadow-2xs">
             <span className="w-2 h-2 rounded-full bg-[#0F766E] dark:bg-teal-400 animate-pulse" />
             <span>Portal Lowongan Kerja Kandidat</span>
           </span>
@@ -170,16 +170,16 @@ export default function CandidateJobBoard({ profile, existingApplications, jobsL
       ) : null}
 
       {/* 3. Filter & Search Bar */}
-      <div className="bg-white dark:bg-[#0c2b29] border border-slate-200 dark:border-emerald-800/40 rounded-2xl p-4 sm:p-5 shadow-sm transition-colors space-y-4">
+      <div className="bg-white dark:bg-[#132238] border border-slate-200 dark:border-slate-800/80 rounded-2xl p-4 sm:p-5 shadow-sm transition-colors space-y-4">
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
           {/* Search Input */}
           <div className="relative sm:col-span-1">
-            <Search className="w-4 h-4 text-slate-400 dark:text-emerald-400 absolute left-3.5 top-3.5" />
+            <Search className="w-4 h-4 text-slate-400 dark:text-teal-400 absolute left-3.5 top-3.5" />
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-50 dark:bg-[#061f1d] border border-slate-300 dark:border-emerald-800/60 text-slate-900 dark:text-white placeholder-slate-400 text-xs sm:text-sm focus:outline-none focus:border-slate-800 dark:focus:border-emerald-500 transition-colors"
+              className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-50 dark:bg-[#0B132B] border border-slate-300 dark:border-slate-800/80 text-slate-900 dark:text-white placeholder-slate-400 text-xs sm:text-sm focus:outline-none focus:border-slate-800 dark:focus:border-emerald-500 transition-colors"
               placeholder="Cari posisi pekerjaan atau skill..."
             />
           </div>
@@ -189,7 +189,7 @@ export default function CandidateJobBoard({ profile, existingApplications, jobsL
             <select
               value={selectedDept}
               onChange={(e) => setSelectedDept(e.target.value)}
-              className="w-full px-3 py-2.5 rounded-xl bg-slate-50 dark:bg-[#061f1d] border border-slate-300 dark:border-emerald-800/60 text-slate-900 dark:text-white text-xs sm:text-sm focus:outline-none focus:border-slate-800 dark:focus:border-emerald-500 transition-colors cursor-pointer"
+              className="w-full px-3 py-2.5 rounded-xl bg-slate-50 dark:bg-[#0B132B] border border-slate-300 dark:border-slate-800/80 text-slate-900 dark:text-white text-xs sm:text-sm focus:outline-none focus:border-slate-800 dark:focus:border-emerald-500 transition-colors cursor-pointer"
             >
               {departments.map((dept) => (
                 <option key={dept} value={dept}>
@@ -204,7 +204,7 @@ export default function CandidateJobBoard({ profile, existingApplications, jobsL
             <select
               value={selectedType}
               onChange={(e) => setSelectedType(e.target.value)}
-              className="w-full px-3 py-2.5 rounded-xl bg-slate-50 dark:bg-[#061f1d] border border-slate-300 dark:border-emerald-800/60 text-slate-900 dark:text-white text-xs sm:text-sm focus:outline-none focus:border-slate-800 dark:focus:border-emerald-500 transition-colors cursor-pointer"
+              className="w-full px-3 py-2.5 rounded-xl bg-slate-50 dark:bg-[#0B132B] border border-slate-300 dark:border-slate-800/80 text-slate-900 dark:text-white text-xs sm:text-sm focus:outline-none focus:border-slate-800 dark:focus:border-emerald-500 transition-colors cursor-pointer"
             >
               <option value="Semua">Tipe Kerja: Semua</option>
               <option value="Hybrid">Hybrid</option>
@@ -218,7 +218,7 @@ export default function CandidateJobBoard({ profile, existingApplications, jobsL
       {/* Jobs Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-5 sm:gap-6">
         {filteredJobs.length === 0 ? (
-          <div className="col-span-2 bg-white dark:bg-[#0c2b29] border border-slate-200 dark:border-emerald-800/40 rounded-2xl p-12 text-center text-slate-500 dark:text-slate-400 space-y-3 shadow-sm transition-colors">
+          <div className="col-span-2 bg-white dark:bg-[#132238] border border-slate-200 dark:border-slate-800/80 rounded-2xl p-12 text-center text-slate-500 dark:text-slate-400 space-y-3 shadow-sm transition-colors">
             <Briefcase className="w-12 h-12 text-slate-400 dark:text-emerald-600 mx-auto" />
             <p className="text-base font-bold text-slate-900 dark:text-white">Tidak ada posisi pekerjaan yang cocok.</p>
             <p className="text-xs">Coba ubah kata kunci atau filter departemen Anda.</p>
@@ -231,14 +231,14 @@ export default function CandidateJobBoard({ profile, existingApplications, jobsL
             return (
               <div
                 key={job.id}
-                className="bg-white dark:bg-[#0c2b29] border border-slate-200 dark:border-emerald-800/50 hover:border-slate-300 dark:hover:border-emerald-500/50 rounded-2xl p-5 sm:p-6 shadow-sm hover:shadow-md transition-all duration-300 flex flex-col justify-between space-y-4"
+                className="bg-white dark:bg-[#132238] border border-slate-200 dark:border-slate-800/80 hover:border-slate-300 dark:hover:border-emerald-500/50 rounded-2xl p-5 sm:p-6 shadow-sm hover:shadow-md transition-all duration-300 flex flex-col justify-between space-y-4"
               >
                 <div className="space-y-3">
                   <div className="flex items-center justify-between gap-2 flex-wrap">
-                    <span className="px-3 py-0.5 rounded-full bg-slate-100 dark:bg-emerald-950 text-slate-700 dark:text-emerald-300 border border-slate-200 dark:border-emerald-700/40 text-xs font-semibold">
+                    <span className="px-3 py-0.5 rounded-full bg-slate-100 dark:bg-slate-900 text-slate-700 dark:text-teal-300 border border-slate-200 dark:border-emerald-700/40 text-xs font-semibold">
                       {job.dept}
                     </span>
-                    <span className="px-3 py-0.5 rounded-full bg-slate-100 dark:bg-emerald-950/60 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-emerald-800/40 text-xs font-semibold">
+                    <span className="px-3 py-0.5 rounded-full bg-slate-100 dark:bg-slate-900/80 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-800/80 text-xs font-semibold">
                       {job.type}
                     </span>
                   </div>
@@ -251,31 +251,31 @@ export default function CandidateJobBoard({ profile, existingApplications, jobsL
                     {job.description}
                   </p>
 
-                  <div className="space-y-1.5 pt-2 text-xs text-slate-600 dark:text-emerald-200/80">
+                  <div className="space-y-1.5 pt-2 text-xs text-slate-600 dark:text-teal-200/80">
                     <div className="flex items-center gap-2">
-                      <MapPin className="w-3.5 h-3.5 text-slate-400 dark:text-emerald-400" />
+                      <MapPin className="w-3.5 h-3.5 text-slate-400 dark:text-teal-400" />
                       <span>{job.location}</span>
                     </div>
                     <div className="flex items-center gap-2">
-                      <DollarSign className="w-3.5 h-3.5 text-slate-400 dark:text-emerald-400" />
+                      <DollarSign className="w-3.5 h-3.5 text-slate-400 dark:text-teal-400" />
                       <span className="font-semibold text-slate-900 dark:text-white">{job.salary}</span>
                     </div>
                     <div className="flex items-center gap-2 text-slate-500 dark:text-slate-400">
-                      <Clock className="w-3.5 h-3.5 text-slate-400 dark:text-emerald-400" />
+                      <Clock className="w-3.5 h-3.5 text-slate-400 dark:text-teal-400" />
                       <span>Batas Akhir: {job.deadline}</span>
                     </div>
                   </div>
                 </div>
 
                 {/* Bottom Actions */}
-                <div className="pt-4 border-t border-slate-100 dark:border-emerald-800/40">
+                <div className="pt-4 border-t border-slate-100 dark:border-slate-800/80">
                   {hasApplied ? (
                     <div className="space-y-3 w-full">
                       {/* Action buttons (Detail Lowongan & Lacak Progress) */}
                       <div className="flex items-center justify-between gap-2">
                         <Link
                           href={`/dashboard/jobs/${job.id}`}
-                          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-[#061f1d] dark:hover:bg-emerald-900/60 text-slate-700 hover:text-slate-900 dark:text-emerald-300 dark:hover:text-white border border-slate-200 dark:border-emerald-800/80 font-bold text-xs transition-colors"
+                          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-[#0B132B] dark:hover:bg-slate-800/80 text-slate-700 hover:text-slate-900 dark:text-teal-300 dark:hover:text-white border border-slate-200 dark:border-slate-800/80 font-bold text-xs transition-colors"
                         >
                           <Eye className="w-3.5 h-3.5" />
                           <span>Detail Lowongan</span>
@@ -283,7 +283,7 @@ export default function CandidateJobBoard({ profile, existingApplications, jobsL
                         {appliedRecord && (
                           <Link
                             href={`/dashboard/applications/${appliedRecord.id}`}
-                            className="inline-flex items-center gap-1 text-xs font-bold text-slate-900 dark:text-emerald-400 hover:underline transition-colors"
+                            className="inline-flex items-center gap-1 text-xs font-bold text-slate-900 dark:text-teal-400 hover:underline transition-colors"
                           >
                             <span>Lacak Progress</span>
                             <ArrowRight className="w-3.5 h-3.5" />
@@ -292,7 +292,7 @@ export default function CandidateJobBoard({ profile, existingApplications, jobsL
                       </div>
 
                       {/* Status Sudah Dilamar ditaruh paling bawah sekali */}
-                      <div className="pt-2 border-t border-slate-100 dark:border-emerald-800/30">
+                      <div className="pt-2 border-t border-slate-100 dark:border-slate-800/30">
                         <span className="w-full flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl bg-amber-50 dark:bg-amber-500/20 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-500/40 text-xs font-bold shadow-xs">
                           <CheckCircle2 className="w-4 h-4 text-amber-600 dark:text-amber-400" />
                           <span>Sudah Dilamar oleh Kandidat</span>
@@ -303,7 +303,7 @@ export default function CandidateJobBoard({ profile, existingApplications, jobsL
                     <div className="grid grid-cols-2 gap-2.5 w-full">
                       <Link
                         href={`/dashboard/jobs/${job.id}`}
-                        className="py-2 px-3 bg-slate-100 hover:bg-slate-200 dark:bg-[#061f1d] dark:hover:bg-emerald-900/60 text-slate-700 hover:text-slate-900 dark:text-emerald-300 dark:hover:text-white border border-slate-200 dark:border-emerald-800/80 font-bold text-xs sm:text-sm rounded-xl transition-all flex items-center justify-center gap-1.5"
+                        className="py-2 px-3 bg-slate-100 hover:bg-slate-200 dark:bg-[#0B132B] dark:hover:bg-slate-800/80 text-slate-700 hover:text-slate-900 dark:text-teal-300 dark:hover:text-white border border-slate-200 dark:border-slate-800/80 font-bold text-xs sm:text-sm rounded-xl transition-all flex items-center justify-center gap-1.5"
                       >
                         <Eye className="w-4 h-4" />
                         <span>Detail Lowongan</span>
@@ -323,7 +323,7 @@ export default function CandidateJobBoard({ profile, existingApplications, jobsL
                     <div className="grid grid-cols-2 gap-2.5 w-full">
                       <Link
                         href={`/dashboard/jobs/${job.id}`}
-                        className="py-2 px-3 bg-slate-100 hover:bg-slate-200 dark:bg-[#061f1d] dark:hover:bg-emerald-900/60 text-slate-700 hover:text-slate-900 dark:text-emerald-300 dark:hover:text-white border border-slate-200 dark:border-emerald-800/80 font-bold text-xs sm:text-sm rounded-xl transition-all flex items-center justify-center gap-1.5"
+                        className="py-2 px-3 bg-slate-100 hover:bg-slate-200 dark:bg-[#0B132B] dark:hover:bg-slate-800/80 text-slate-700 hover:text-slate-900 dark:text-teal-300 dark:hover:text-white border border-slate-200 dark:border-slate-800/80 font-bold text-xs sm:text-sm rounded-xl transition-all flex items-center justify-center gap-1.5"
                       >
                         <Eye className="w-4 h-4" />
                         <span>Detail Lowongan</span>
@@ -342,7 +342,7 @@ export default function CandidateJobBoard({ profile, existingApplications, jobsL
                     <div className="grid grid-cols-2 gap-2.5 w-full">
                       <Link
                         href={`/dashboard/jobs/${job.id}`}
-                        className="py-2 px-3 bg-slate-100 hover:bg-slate-200 dark:bg-[#061f1d] dark:hover:bg-emerald-900/60 text-slate-700 hover:text-slate-900 dark:text-emerald-300 dark:hover:text-white border border-slate-200 dark:border-emerald-800/80 font-bold text-xs sm:text-sm rounded-xl transition-all flex items-center justify-center gap-1.5"
+                        className="py-2 px-3 bg-slate-100 hover:bg-slate-200 dark:bg-[#0B132B] dark:hover:bg-slate-800/80 text-slate-700 hover:text-slate-900 dark:text-teal-300 dark:hover:text-white border border-slate-200 dark:border-slate-800/80 font-bold text-xs sm:text-sm rounded-xl transition-all flex items-center justify-center gap-1.5"
                       >
                         <Eye className="w-4 h-4" />
                         <span>Detail Lowongan</span>

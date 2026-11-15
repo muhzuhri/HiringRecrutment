@@ -9,7 +9,7 @@ export default function AutoTagBadge({ tag }: AutoTagBadgeProps) {
   const isDanger = tag.toLowerCase().includes("bawah minimum") || tag.toLowerCase().includes("kurang");
   const isWarning = tag.toLowerCase().includes("pertimbangan") || tag.toLowerCase().includes("pending");
 
-  let tagStyles = "bg-emerald-50 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-300 border-emerald-300 dark:border-emerald-600/50";
+  let tagStyles = "bg-emerald-50 dark:bg-slate-900/80 text-emerald-700 dark:text-teal-300 border-emerald-300 dark:border-emerald-600/50";
   let Icon = CheckCircle;
 
   if (isDanger) {

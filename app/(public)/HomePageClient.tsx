@@ -54,24 +54,23 @@ export default function HomePageClient({ jobs = [] }: HomePageClientProps) {
             <div className="flex justify-center mb-8 animate-fade-in-up">
               <div className="relative">
                 <div
-                  className="w-24 h-24 rounded-full overflow-hidden shadow-2xl"
+                  className="w-24 h-24 rounded-full overflow-hidden shadow-2xl bg-white p-3.5 flex items-center justify-center border-2 border-teal-500/30"
                   style={{
-                    boxShadow: "0 0 40px rgba(16,185,129,0.3), 0 8px 32px rgba(12,43,41,0.4)",
-                    animation: "heroLogoSpin 12s linear infinite",
+                    boxShadow: "0 0 40px rgba(20,184,166,0.35), 0 8px 32px rgba(11,19,43,0.4)",
                   }}
                 >
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
-                    src="/img/logo.png"
+                    src="/nexora-icon-trans.png"
                     alt="Nexora Digital"
-                    style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                    className="w-full h-full object-contain"
                   />
                 </div>
                 {/* Subtle glow ring */}
                 <div
                   className="absolute inset-0 rounded-full"
                   style={{
-                    boxShadow: "0 0 0 4px rgba(16,185,129,0.2), 0 0 0 8px rgba(16,185,129,0.1)",
+                    boxShadow: "0 0 0 4px rgba(20,184,166,0.25), 0 0 0 8px rgba(0,242,254,0.15)",
                     animation: "heroPulseRing 2.5s ease-in-out infinite",
                   }}
                 />
@@ -97,7 +96,7 @@ export default function HomePageClient({ jobs = [] }: HomePageClientProps) {
               <span
                 className="block"
                 style={{
-                  background: "linear-gradient(135deg, #0c2b29 0%, #047857 100%)",
+                  background: "linear-gradient(135deg, #132238 0%, #047857 100%)",
                   WebkitBackgroundClip: "text",
                   WebkitTextFillColor: "transparent",
                   backgroundClip: "text",
@@ -139,7 +138,7 @@ export default function HomePageClient({ jobs = [] }: HomePageClientProps) {
         </section>
 
         {/* ===== STATS SECTION ===== */}
-        <section className="py-16 relative bg-[#0c2b29] text-white border-y border-emerald-800/40">
+        <section className="py-16 relative bg-[#132238] text-white border-y border-emerald-800/40">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
               {stats.map((stat) => (
@@ -293,7 +292,7 @@ export default function HomePageClient({ jobs = [] }: HomePageClientProps) {
         {/* ===== CTA BANNER ===== */}
         <section
           className="py-20 relative overflow-hidden text-white"
-          style={{ background: "linear-gradient(135deg, #061f1d 0%, #0c2b29 100%)" }}
+          style={{ background: "linear-gradient(135deg, #0B132B 0%, #132238 100%)" }}
         >
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
             <h2

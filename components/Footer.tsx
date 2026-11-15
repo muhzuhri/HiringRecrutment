@@ -21,17 +21,17 @@ const footerLinks = {
 
 export default function Footer() {
   return (
-    <footer className="bg-[#061f1d] border-t border-emerald-900/60 text-slate-200">
+    <footer className="bg-[#0B132B] border-t border-emerald-900/60 text-slate-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-10">
           {/* Brand */}
           <div className="md:col-span-1">
             <Link href="/" className="flex items-center gap-3 mb-4">
-              <div className="h-10 w-10 rounded-xl overflow-hidden bg-white p-1 border border-teal-800/40 shadow-md shrink-0 flex items-center justify-center">
+              <div className="h-10 w-10 rounded-xl overflow-hidden bg-white p-1 border border-slate-700 shadow-md shrink-0 flex items-center justify-center">
                 <img
-                  src="/nexora-logo.jpg"
-                  alt="Nexora Digital Logo"
-                  className="h-full w-full object-contain"
+                  src="/nexora-icon-trans.png"
+                  alt="Nexora Digital"
+                  className="w-full h-full object-contain"
                 />
               </div>
               <span className="text-white font-extrabold text-xl tracking-tight">Nexora<span className="text-teal-400"> Digital</span></span>

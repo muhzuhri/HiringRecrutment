@@ -33,11 +33,17 @@ export async function getHRAnalytics(): Promise<{ analytics: HRAnalyticsSummary 
 
     const [{ data: apps }, { data: jobs }] = await Promise.all([
       supabase.from("applications").select("id, status, job_id, job_title, department, created_at, hired_at"),
-      supabase.from("jobs").select("id, title, dept, status"),
+      supabase.from("jobs").select("id, title, dept, status, deadline_date"),
     ]);
 
+    const now = new Date();
     const totalApps = apps?.length || 0;
-    const activeJobs = jobs?.filter((j) => j.status === "Active").length || 0;
+    // Lowongan aktif hanya yang berstatus Active DAN belum melewati batas akhir (deadline_date)
+    const activeJobs = jobs?.filter((j) => {
+      const isStatusActive = j.status === "Active";
+      const isExpired = Boolean(j.deadline_date && new Date(j.deadline_date) < now);
+      return isStatusActive && !isExpired;
+    }).length || 0;
     const interviewCount = apps?.filter((a) => a.status === "Interview").length || 0;
     const hiredApps = apps?.filter((a) => (a.status === "Diterima" || a.status === "Hired") && a.hired_at) || [];
     const hiredCount = hiredApps.length;

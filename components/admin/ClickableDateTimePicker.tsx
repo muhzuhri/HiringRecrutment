@@ -89,7 +89,7 @@ export default function ClickableDateTimePicker({
   };
 
   return (
-    <div className="space-y-3 bg-slate-50 dark:bg-[#061f1d] p-3.5 sm:p-4 rounded-2xl border border-slate-200/80 dark:border-teal-800/40 text-xs">
+    <div className="space-y-3 bg-slate-50 dark:bg-[#0B132B] p-3.5 sm:p-4 rounded-2xl border border-slate-200/80 dark:border-slate-800/80 text-xs">
       <div className="flex items-center justify-between">
         <label className="font-bold text-slate-800 dark:text-teal-200 uppercase tracking-wider text-[11px] flex items-center gap-1.5">
           <CalendarIcon className="w-3.5 h-3.5 text-[#0F766E] dark:text-teal-400" />
@@ -118,7 +118,7 @@ export default function ClickableDateTimePicker({
                 }
               } catch {}
             }}
-            className="w-full px-3 py-2 rounded-xl bg-white dark:bg-[#0c2b29] border border-slate-200 dark:border-teal-800/60 text-slate-800 dark:text-white font-medium text-xs focus:outline-none focus:border-[#0F766E] dark:focus:border-teal-400 cursor-pointer shadow-2xs transition-all"
+            className="w-full px-3 py-2 rounded-xl bg-white dark:bg-[#132238] border border-slate-200 dark:border-slate-800/80 text-slate-800 dark:text-white font-medium text-xs focus:outline-none focus:border-[#0F766E] dark:focus:border-teal-400 cursor-pointer shadow-2xs transition-all"
           />
         </div>
 
@@ -139,14 +139,14 @@ export default function ClickableDateTimePicker({
                   }
                 } catch {}
               }}
-              className="w-full px-3 py-2 rounded-xl bg-white dark:bg-[#0c2b29] border border-slate-200 dark:border-teal-800/60 text-slate-800 dark:text-white font-medium text-xs focus:outline-none focus:border-[#0F766E] dark:focus:border-teal-400 cursor-pointer shadow-2xs transition-all"
+              className="w-full px-3 py-2 rounded-xl bg-white dark:bg-[#132238] border border-slate-200 dark:border-slate-800/80 text-slate-800 dark:text-white font-medium text-xs focus:outline-none focus:border-[#0F766E] dark:focus:border-teal-400 cursor-pointer shadow-2xs transition-all"
             />
           </div>
         </div>
       </div>
 
       {/* Clean Live Schedule Preview Banner */}
-      <div className="p-2.5 rounded-xl bg-white dark:bg-[#0c2b29] border border-slate-200/80 dark:border-teal-800/60 flex items-center gap-2">
+      <div className="p-2.5 rounded-xl bg-white dark:bg-[#132238] border border-slate-200/80 dark:border-slate-800/80 flex items-center gap-2">
         <Check className="w-4 h-4 text-[#0F766E] dark:text-teal-400 shrink-0" />
         <div className="min-w-0">
           <p className="text-[10px] text-slate-400 dark:text-slate-400 font-semibold uppercase">
