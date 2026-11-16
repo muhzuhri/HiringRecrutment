@@ -16,7 +16,12 @@ import {
   Check,
   Star,
   Building2,
-  Calendar
+  Calendar,
+  AlertCircle,
+  XCircle,
+  X,
+  Users,
+  Sparkles,
 } from "lucide-react";
 
 interface CandidateJobDetailClientProps {
@@ -31,10 +36,23 @@ export default function CandidateJobDetailClient({
   existingApplications,
 }: CandidateJobDetailClientProps) {
   const [selectedJobForModal, setSelectedJobForModal] = useState<Job | null>(null);
+  const [showRejectedAlert, setShowRejectedAlert] = useState<boolean>(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   const appliedRecord = existingApplications.find((app) => app.job_id === job.id);
-  const hasApplied = Boolean(appliedRecord);
+  const isRejected = Boolean(
+    appliedRecord &&
+    ((appliedRecord.status || "").toLowerCase() === "ditolak" ||
+     (appliedRecord.status || "").toLowerCase() === "rejected")
+  );
+
+  // Periksa apakah lowongan ini telah dibuka kembali setelah penolakan sebelumnya
+  const jobReopenedTime = new Date(job.reopened_at || job.posted_date || job.updated_at || 0).getTime();
+  const rejectionTime = appliedRecord ? new Date(appliedRecord.updated_at || appliedRecord.created_at || 0).getTime() : 0;
+  const isNewPeriod = Boolean(isRejected && jobReopenedTime > rejectionTime);
+
+  const isRejectedCurrentPeriod = Boolean(isRejected && !isNewPeriod);
+  const hasApplied = Boolean(appliedRecord) && !isRejectedCurrentPeriod;
 
   const handleApplySuccess = (jobId: string, message: string) => {
     setToastMessage(message);
@@ -89,12 +107,46 @@ export default function CandidateJobDetailClient({
                 <Clock className="w-4 h-4 text-slate-400 dark:text-teal-400 shrink-0" />
                 <span>Batas Akhir: {job.deadline}</span>
               </div>
+              <div className="flex items-center gap-2 text-slate-700 dark:text-teal-200">
+                <Users className="w-4 h-4 text-[#0F766E] dark:text-teal-400 shrink-0" />
+                <span>Pelamar: <strong className="font-extrabold">{job.applicant_count || 0}</strong> orang</span>
+              </div>
+              <div className="flex items-center gap-2 text-[#0F766E] dark:text-teal-300 font-medium">
+                <Sparkles className="w-4 h-4 text-teal-500 shrink-0" />
+                <span>Kuota Penerimaan: <strong className="font-extrabold">{job.quota || 5}</strong> posisi</span>
+              </div>
             </div>
           </div>
 
           {/* Action Area in Header */}
           <div className="shrink-0 space-y-3 w-full md:w-auto">
-            {hasApplied ? (
+            {isRejectedCurrentPeriod ? (
+              <div className="space-y-3">
+                <button
+                  type="button"
+                  onClick={() => setShowRejectedAlert(true)}
+                  className="w-full inline-flex items-center justify-between gap-3 px-5 py-3 rounded-2xl bg-rose-50 hover:bg-rose-100/90 dark:bg-rose-950/40 dark:hover:bg-rose-900/60 text-rose-700 dark:text-rose-300 border border-rose-300 dark:border-rose-800/80 text-xs sm:text-sm font-bold shadow-xs transition-all cursor-pointer group"
+                  title="Klik untuk melihat informasi penolakan periode ini"
+                >
+                  <span className="flex items-center gap-2">
+                    <XCircle className="w-5 h-5 text-rose-600 dark:text-rose-400 shrink-0" />
+                    <span>Ditolak pada Periode Ini</span>
+                  </span>
+                  <span className="w-5 h-5 rounded-full bg-rose-200 dark:bg-rose-900/80 flex items-center justify-center text-rose-800 dark:text-rose-200 text-xs font-black shadow-2xs group-hover:scale-110 transition-transform">
+                    !
+                  </span>
+                </button>
+                {appliedRecord && (
+                  <Link
+                    href={`/dashboard/applications/${appliedRecord.id}`}
+                    className="w-full inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-[#0B132B] dark:hover:bg-slate-800 text-slate-700 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white border border-slate-200 dark:border-slate-800 font-bold text-xs sm:text-sm transition-all"
+                  >
+                    <span>Lihat Riwayat Lamaran</span>
+                    <ArrowRight className="w-4 h-4" />
+                  </Link>
+                )}
+              </div>
+            ) : hasApplied ? (
               <div className="space-y-3">
                 <span className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-2xl bg-amber-50 dark:bg-amber-500/20 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-500/40 text-xs sm:text-sm font-bold w-full">
                   <CheckCircle2 className="w-5 h-5 text-amber-600 dark:text-amber-400" />
@@ -196,7 +248,20 @@ export default function CandidateJobDetailClient({
             Batas waktu pendaftaran hingga <strong>{job.deadline}</strong>.
           </div>
 
-          {hasApplied ? (
+          {isRejectedCurrentPeriod ? (
+            <button
+              type="button"
+              onClick={() => setShowRejectedAlert(true)}
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-6 py-3 rounded-xl bg-rose-50 hover:bg-rose-100/90 dark:bg-rose-950/40 dark:hover:bg-rose-900/60 text-rose-700 dark:text-rose-300 border border-rose-300 dark:border-rose-800/80 text-xs sm:text-sm font-bold shadow-xs transition-all cursor-pointer group"
+              title="Klik untuk melihat informasi penolakan periode ini"
+            >
+              <XCircle className="w-4 h-4 text-rose-600 dark:text-rose-400 shrink-0" />
+              <span>Ditolak pada Periode Ini</span>
+              <span className="w-5 h-5 rounded-full bg-rose-200 dark:bg-rose-900/80 flex items-center justify-center text-rose-800 dark:text-rose-200 text-xs font-black shadow-2xs group-hover:scale-110 transition-transform">
+                !
+              </span>
+            </button>
+          ) : hasApplied ? (
             <span className="w-full sm:w-auto text-center px-6 py-2.5 rounded-xl bg-amber-50 dark:bg-amber-500/20 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-500/40 text-xs sm:text-sm font-bold">
               Sudah Dilamar oleh Kandidat
             </span>
@@ -212,6 +277,72 @@ export default function CandidateJobDetailClient({
           )}
         </div>
       </div>
+
+      {/* Alert Modal: Ditolak pada Periode Ini */}
+      {showRejectedAlert && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/60 backdrop-blur-xs animate-fade-in">
+          <div className="bg-white dark:bg-[#132238] border border-slate-200 dark:border-slate-800 rounded-2xl p-4 sm:p-5 max-w-sm sm:max-w-md w-full shadow-2xl relative space-y-3 text-center animate-scale-up max-h-[90vh] overflow-y-auto">
+            <button
+              type="button"
+              onClick={() => setShowRejectedAlert(false)}
+              className="absolute top-3.5 right-3.5 p-1.5 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+              title="Tutup"
+            >
+              <X className="w-4 h-4" />
+            </button>
+
+            <div className="w-10 h-10 rounded-xl bg-rose-100 dark:bg-rose-950/60 border border-rose-300 dark:border-rose-800/80 flex items-center justify-center mx-auto text-rose-600 dark:text-rose-400 shadow-2xs">
+              <AlertCircle className="w-5 h-5" />
+            </div>
+
+            <div className="space-y-1">
+              <span className="inline-block px-2.5 py-0.5 rounded-full bg-rose-50 dark:bg-rose-950/80 border border-rose-200 dark:border-rose-800/80 text-[10px] font-bold text-rose-700 dark:text-rose-300">
+                Informasi Periode Seleksi
+              </span>
+              <h3 className="text-base sm:text-lg font-black text-slate-900 dark:text-white leading-snug">
+                {job.title}
+              </h3>
+              <p className="text-[11px] font-semibold text-slate-500 dark:text-slate-400">
+                {job.dept} • {job.location}
+              </p>
+            </div>
+
+            <div className="p-3 rounded-xl bg-rose-50/70 dark:bg-rose-950/30 border border-rose-200 dark:border-rose-800/50 text-left space-y-2">
+              <p className="text-xs font-semibold text-rose-900 dark:text-rose-200 leading-snug">
+                Lamaran Anda untuk posisi ini telah dinyatakan <strong>Gugur / Ditolak</strong> pada periode seleksi saat ini.
+              </p>
+              <p className="text-[11px] text-slate-600 dark:text-slate-300 leading-relaxed">
+                Sesuai ketentuan rekrutmen, kandidat <strong>tidak dapat melamar kembali</strong> pada posisi yang sama selama periode ini masih berjalan.
+              </p>
+              <div className="p-2.5 rounded-lg bg-white/90 dark:bg-[#0B132B]/90 border border-rose-200/70 dark:border-rose-900/60 text-[11px] text-slate-700 dark:text-slate-300 space-y-0.5">
+                <p className="font-bold text-rose-700 dark:text-rose-300 flex items-center gap-1">
+                  <span>💡</span>
+                  <span>Kapan bisa mendaftar lagi?</span>
+                </p>
+                <p className="leading-relaxed text-slate-600 dark:text-slate-400">
+                  Anda dapat mendaftar kembali apabila lowongan ini telah <strong>ditutup / expired</strong> dan <strong>dibuka kembali</strong> oleh HR pada batch berikutnya.
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2 pt-1">
+              <Link
+                href="/dashboard/applications"
+                className="flex-1 py-2 px-3 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-[#0B132B] dark:hover:bg-slate-800 text-slate-800 dark:text-white font-bold text-xs transition-colors text-center"
+              >
+                Riwayat Lamaran
+              </Link>
+              <button
+                type="button"
+                onClick={() => setShowRejectedAlert(false)}
+                className="flex-1 py-2 px-3 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs transition-colors shadow-xs"
+              >
+                Saya Mengerti
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Quick Apply Modal */}
       {selectedJobForModal && (

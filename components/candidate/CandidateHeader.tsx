@@ -249,7 +249,7 @@ export default function CandidateHeader({ profile, userEmail }: CandidateHeaderP
                       onClick={() => setMobileMenuOpen(false)}
                       className={`flex items-center gap-3 px-3.5 py-3 rounded-xl text-xs font-bold transition-all ${
                         active
-                          ? "bg-slate-900 text-white dark:bg-emerald-600 dark:text-white shadow-sm"
+                          ? "bg-[#0d9488] text-white shadow-md shadow-teal-950/40"
                           : "text-slate-600 hover:text-slate-900 hover:bg-slate-100 dark:text-slate-300 dark:hover:text-white dark:hover:bg-[#0B132B]"
                       }`}
                     >

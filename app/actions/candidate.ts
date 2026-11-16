@@ -4,6 +4,7 @@ import { cache } from "react";
 import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
 import { CandidateProfile, JobApplication, CandidateAuditLog } from "@/types/candidate";
+import { extractQuota, cleanJobDescription } from "@/data/jobs";
 
 /**
  * Fetch candidate profile from Supabase profiles table, fallback to user metadata if empty.
@@ -108,7 +109,13 @@ export const getCandidateProfile = cache(async (): Promise<{ profile: CandidateP
       }
     }
 
-    // Hitung realtime kelengkapan profil secara dinamis
+    // Filter ghost / blank items (tanpa nama institusi, tanpa judul, tanpa nama perusahaan)
+    const validEducations = education.filter((e: any) => Boolean(e && e.school && e.school.trim()));
+    const validCertifications = certifications.filter((c: any) => Boolean(c && c.title && c.title.trim()));
+    const validExperiences = experience.filter((ex: any) => Boolean(ex && ex.company && ex.company.trim()));
+    const validSkills = skills.filter((s: any) => Boolean(s && typeof s === "string" && s.trim()));
+
+    // Hitung realtime kelengkapan profil secara dinamis berdasarkan data valid tersimpan
     let calculatedScore = 0;
     if (fullName.trim()) calculatedScore += 10;
     const cleanNik = (data?.nik || user.user_metadata?.nik || "").trim();
@@ -117,11 +124,11 @@ export const getCandidateProfile = cache(async (): Promise<{ profile: CandidateP
     if ((data?.phone || data?.whatsapp || user.user_metadata?.phone || user.user_metadata?.whatsapp || "").trim()) calculatedScore += 10;
     if ((data?.address || user.user_metadata?.address || "").trim()) calculatedScore += 10;
     if ((data?.headline || data?.bio || "").trim()) calculatedScore += 10;
-    if (education.length > 0) calculatedScore += 15;
-    if (experience.length > 0) calculatedScore += 10;
-    if (skills.length > 0) calculatedScore += 5;
+    if (validEducations.length > 0) calculatedScore += 15;
+    if (validExperiences.length > 0) calculatedScore += 10;
+    if (validSkills.length > 0) calculatedScore += 5;
     if ((data?.resume_url || user.user_metadata?.resume_url || "").trim()) calculatedScore += 10;
-    const finalScore = Math.min(Math.max(calculatedScore, data?.profile_score || 0), 100);
+    const finalScore = Math.min(calculatedScore, 100);
 
     const profile: CandidateProfile = {
       id: user.id,
@@ -140,13 +147,13 @@ export const getCandidateProfile = cache(async (): Promise<{ profile: CandidateP
       bio: data?.bio || "",
       avatar_url: data?.avatar_url || "",
       role: data?.role || "candidate",
-      education,
-      certifications,
-      skills,
+      education: validEducations,
+      certifications: validCertifications,
+      skills: validSkills,
       hard_skills: data?.hard_skills || user.user_metadata?.hard_skills || "",
       soft_skills: data?.soft_skills || user.user_metadata?.soft_skills || "",
       languages: data?.languages || user.user_metadata?.languages || "",
-      experience,
+      experience: validExperiences,
       resume_url: data?.resume_url || user.user_metadata?.resume_url || "",
       resume_name: data?.resume_name || user.user_metadata?.resume_name || "",
       profile_completed: finalScore >= 100,
@@ -238,7 +245,21 @@ export async function updateCandidateProfile(formData: {
       if (existingProfile?.ktp_url) existingKtpUrl = existingProfile.ktp_url;
     } catch {}
 
-    // 3. Kalkulasi Skor Kelengkapan Profil (0 - 100%)
+    // 3. Bersihkan data kosong (ghost items) sebelum kalkulasi skor dan penyimpanan
+    const cleanEducation = (formData.education || []).filter(
+      (e: any) => Boolean(e && e.school && e.school.trim())
+    );
+    const cleanCertifications = (formData.certifications || []).filter(
+      (c: any) => Boolean(c && c.title && c.title.trim())
+    );
+    const cleanExperience = (formData.experience || []).filter(
+      (ex: any) => Boolean(ex && ex.company && ex.company.trim())
+    );
+    const cleanSkills = (formData.skills || []).filter(
+      (s: any) => Boolean(s && typeof s === "string" && s.trim())
+    );
+
+    // Kalkulasi Skor Kelengkapan Profil (0 - 100%) strictly dari data valid
     let score = 0;
     if (formData.full_name?.trim()) score += 10;
     if (cleanNik.length === 16) score += 15;
@@ -246,9 +267,9 @@ export async function updateCandidateProfile(formData: {
     if (formData.phone?.trim() || formData.whatsapp?.trim()) score += 10;
     if (formData.address?.trim()) score += 10;
     if (formData.headline?.trim() || formData.bio?.trim()) score += 10;
-    if (formData.education && formData.education.length > 0) score += 15;
-    if (formData.experience && formData.experience.length > 0) score += 10;
-    if (formData.skills && formData.skills.length > 0) score += 5;
+    if (cleanEducation.length > 0) score += 15;
+    if (cleanExperience.length > 0) score += 10;
+    if (cleanSkills.length > 0) score += 5;
     if (existingResumeUrl?.trim()) score += 10;
 
     const finalScore = Math.min(score, 100);
@@ -278,7 +299,7 @@ export async function updateCandidateProfile(formData: {
       console.warn("Auth metadata update notice:", authMetaErr);
     }
 
-    // 5. Payload lengkap dengan seluruh kolom
+    // 5. Payload lengkap dengan data yang sudah bersih
     const fullPayload: any = {
       id: user.id,
       email: user.email,
@@ -295,13 +316,13 @@ export async function updateCandidateProfile(formData: {
       portfolio_url: formData.portfolio_url,
       headline: formData.headline,
       bio: formData.bio,
-      education: formData.education,
-      certifications: formData.certifications || [],
-      skills: formData.skills,
+      education: cleanEducation,
+      certifications: cleanCertifications,
+      skills: cleanSkills,
       hard_skills: formData.hard_skills || "",
       soft_skills: formData.soft_skills || "",
       languages: formData.languages || "",
-      experience: formData.experience,
+      experience: cleanExperience,
       profile_completed: isComplete,
       profile_score: finalScore,
       updated_at: new Date().toISOString(),
@@ -329,11 +350,12 @@ export async function updateCandidateProfile(formData: {
         portfolio_url: formData.portfolio_url,
         headline: formData.headline,
         bio: formData.bio,
-        education: formData.education,
-        certifications: formData.certifications || [],
-        skills: formData.skills,
-        experience: formData.experience,
+        education: cleanEducation,
+        certifications: cleanCertifications,
+        skills: cleanSkills,
+        experience: cleanExperience,
         profile_completed: isComplete,
+        profile_score: finalScore,
         updated_at: new Date().toISOString(),
       };
 
@@ -357,8 +379,8 @@ export async function updateCandidateProfile(formData: {
     try {
       // 1. Sync Educations table
       await supabase.from("educations").delete().eq("user_id", user.id);
-      if (formData.education && formData.education.length > 0) {
-        const eduRows = formData.education.map((e) => ({
+      if (cleanEducation.length > 0) {
+        const eduRows = cleanEducation.map((e: any) => ({
           user_id: user.id,
           level: e.level || "S1",
           school: e.school || "",
@@ -374,8 +396,8 @@ export async function updateCandidateProfile(formData: {
 
       // 2. Sync Certifications table
       await supabase.from("certifications").delete().eq("user_id", user.id);
-      if (formData.certifications && formData.certifications.length > 0) {
-        const certRows = formData.certifications.map((c) => ({
+      if (cleanCertifications.length > 0) {
+        const certRows = cleanCertifications.map((c: any) => ({
           user_id: user.id,
           title: c.title || "",
           cert_name: c.title || "",
@@ -395,8 +417,8 @@ export async function updateCandidateProfile(formData: {
 
       // 3. Sync Experiences table
       await supabase.from("experiences").delete().eq("user_id", user.id);
-      if (formData.experience && formData.experience.length > 0) {
-        const expRows = formData.experience.map((ex) => ({
+      if (cleanExperience.length > 0) {
+        const expRows = cleanExperience.map((ex: any) => ({
           user_id: user.id,
           company: ex.company || "",
           position: ex.position || "",
@@ -415,8 +437,8 @@ export async function updateCandidateProfile(formData: {
 
       // 4. Sync Skills table
       await supabase.from("skills").delete().eq("user_id", user.id);
-      if (formData.skills && formData.skills.length > 0) {
-        const skillRows = formData.skills.map((s) => ({
+      if (cleanSkills.length > 0) {
+        const skillRows = cleanSkills.map((s: string) => ({
           user_id: user.id,
           name: s,
         }));
@@ -428,7 +450,7 @@ export async function updateCandidateProfile(formData: {
 
     revalidatePath("/dashboard");
     revalidatePath("/dashboard/profile");
-    return { success: true };
+    return { success: true, completenessScore: finalScore };
   } catch (err: any) {
     return { success: false, error: err.message || "Gagal menyimpan profil" };
   }
@@ -980,7 +1002,16 @@ export const getCandidateApplications = cache(async (): Promise<{ applications: 
         const appLogs = auditLogsMap[app.id] || [];
         const latestAssess = appAssessments[0];
 
-        // Check if test was scheduled in audit log
+        // Specific stage assessments (User, HR, Test)
+        const isInterviewUser = (t: string) => /interview.*user|user.*interview/i.test(t || "");
+        const isInterviewHr = (t: string) => /interview.*hr|hr.*interview/i.test(t || "");
+        const isTest = (t: string) => !isInterviewUser(t) && !isInterviewHr(t);
+
+        const userAssess = appAssessments.find((a: any) => isInterviewUser(a.type));
+        const hrAssess = appAssessments.find((a: any) => isInterviewHr(a.type));
+        const testAssess = appAssessments.find((a: any) => isTest(a.type));
+
+        // Check logs for scheduled tests or interviews
         const hasTestInLogs = appLogs.some(
           (l) =>
             l.stage_detail?.toLowerCase().includes("tes") ||
@@ -989,58 +1020,84 @@ export const getCandidateApplications = cache(async (): Promise<{ applications: 
             l.reason?.toLowerCase().includes("psikotes")
         );
 
-        const hasUserInLogs = appLogs.some((l) => l.stage_detail?.toLowerCase().includes("user"));
+        const hasHrInLogs = appLogs.some(
+          (l) =>
+            l.stage_detail?.toLowerCase().includes("interview hr") ||
+            l.reason?.toLowerCase().includes("interview hr")
+        );
 
-        // Synchronize display_status with Progress Tracking stages:
-        // Stage 1: Diajukan
-        // Stage 2: Screening HR
-        // Stage 3: Assessment / Tes
-        // Stage 4: Interview HR
-        // Stage 5: Interview User
-        // Stage 6: Diterima (Hired)
-        // Ditolak
-        let displayStatus = app.status;
+        const hasUserInLogs = appLogs.some(
+          (l) =>
+            l.stage_detail?.toLowerCase().includes("user") ||
+            l.reason?.toLowerCase().includes("interview user")
+        );
+
+        const hasTestScheduled = Boolean(testAssess) || hasTestInLogs;
+        const hasUserInterview = Boolean(userAssess) || hasUserInLogs;
+
+        // Synchronize display_status strictly with progressive stages (matching TimelineView / Lacak Progres)
+        let displayStatus = "Diajukan";
+        let activeStageIndex = 1;
         const isRejected = app.status === "Ditolak" || app.status === "Rejected";
         const isAccepted = ["Diterima", "Offered", "Hired"].includes(app.status);
 
         if (isRejected) {
           displayStatus = "Ditolak";
+          activeStageIndex = app.current_stage_index || 2;
         } else if (isAccepted) {
           displayStatus = "Diterima";
-        } else if (latestAssess) {
-          if (latestAssess.type === "Interview User") {
-            displayStatus = "Interview User";
-          } else if (latestAssess.type === "Interview HR") {
-            displayStatus = "Interview HR";
-          } else if (
-            ["Technical Test", "Psikotes", "Aptitude Test", "Personality Test"].includes(latestAssess.type)
-          ) {
+          activeStageIndex = 6;
+        } else if (app.status === "Diajukan" || app.status === "Applied") {
+          displayStatus = "Diajukan";
+          activeStageIndex = 1;
+        } else if (app.status === "Diproses" || app.status === "In Review") {
+          if (hasTestScheduled) {
             displayStatus = "Assessment / Tes";
+            activeStageIndex = 3;
+          } else {
+            displayStatus = "Screening HR";
+            activeStageIndex = 2;
           }
         } else if (app.status === "Interview") {
-          displayStatus = hasUserInLogs ? "Interview User" : "Interview HR";
-        } else if (app.status === "Diproses" || app.status === "In Review") {
-          displayStatus = hasTestInLogs ? "Assessment / Tes" : "Screening HR";
+          if (hasUserInterview) {
+            displayStatus = "Interview User";
+            activeStageIndex = 5;
+          } else {
+            displayStatus = "Interview HR";
+            activeStageIndex = 4;
+          }
         } else {
-          displayStatus = "Diajukan";
+          displayStatus = app.status;
         }
 
-        // Parse scheduled date: from latest assessment or application.interview_date or audit log reason
-        let scheduledAt = latestAssess?.scheduled_at || app.interview_date || null;
-        let evaluator = latestAssess?.evaluator_name || null;
-        let testType = latestAssess?.type || null;
+        // Active stage assessment for schedule, evaluator, and stage type matching active stage
+        let currentStageAssess = null;
+        if (activeStageIndex === 3) {
+          currentStageAssess = testAssess || latestAssess;
+        } else if (activeStageIndex === 4) {
+          currentStageAssess = hrAssess || latestAssess;
+        } else if (activeStageIndex === 5) {
+          currentStageAssess = userAssess || latestAssess;
+        } else {
+          currentStageAssess = latestAssess;
+        }
+
+        let scheduledAt = currentStageAssess?.scheduled_at || app.interview_date || null;
+        let evaluator = currentStageAssess?.evaluator_name || null;
+        let testType = currentStageAssess?.type || (activeStageIndex === 3 ? "Technical Test" : activeStageIndex === 4 ? "Interview HR" : activeStageIndex === 5 ? "Interview User" : null);
 
         // Fallback: parse from audit log if assessments table was bypass-inserted
-        if (!scheduledAt && hasTestInLogs) {
+        if (!scheduledAt && (hasTestInLogs || hasUserInLogs || hasHrInLogs)) {
           const testLog = appLogs.find(
             (l) =>
+              (hasUserInLogs && (l.stage_detail?.toLowerCase().includes("user") || l.reason?.toLowerCase().includes("interview user"))) ||
+              (hasHrInLogs && (l.stage_detail?.toLowerCase().includes("interview hr") || l.reason?.toLowerCase().includes("interview hr"))) ||
               l.stage_detail?.toLowerCase().includes("tes") ||
               l.reason?.toLowerCase().includes("technical test") ||
               l.reason?.toLowerCase().includes("psikotes")
           );
           if (testLog) {
-            testType = testLog.stage_detail?.replace("Penjadwalan ", "") || "Technical Test";
-            // Check if reason contains date: e.g. "Jadwal Technical Test ditetapkan pada 11/11/2026, 17.00.00"
+            testType = testLog.stage_detail?.replace("Penjadwalan ", "") || (hasUserInLogs ? "Interview User" : hasHrInLogs ? "Interview HR" : "Technical Test");
             if (testLog.reason) {
               const match = testLog.reason.match(/pada\s+([\d/]+,\s*[\d.:]+)/i);
               if (match && match[1]) {
@@ -1080,70 +1137,136 @@ export const getCandidateApplications = cache(async (): Promise<{ applications: 
 });
 
 /**
- * CASE 3: Fetch Single Application Detail for Candidate Self-Tracking (Internal notes & score breakdown hidden)
+ * CASE 3: Fetch Single Application Detail for Candidate Self-Tracking (High-performance parallel fetch)
  */
-export async function getApplicationById(applicationId: string): Promise<{
+export const getApplicationById = cache(async (applicationId: string): Promise<{
   application: JobApplication | null;
   assessments?: any[];
   auditLogs?: CandidateAuditLog[];
   error?: string;
-}> {
+}> => {
   try {
     const supabase = await createClient();
-    const { data: { user } } = await supabase.auth.getUser();
 
-    if (!user) {
-      return { application: null, error: "Sesi tidak ditemukan" };
-    }
-
-    const { data, error } = await supabase
-      .from("applications")
-      .select("id, candidate_id, job_id, job_title, department, job_type, location, salary, status, current_stage_index, hr_notes, interview_date, interview_link, created_at, updated_at")
-      .eq("id", applicationId)
-      .single();
-
-    if (!error && data) {
-      // 1. Fetch assessments
-      const { data: assessData } = await supabase
+    // Query application, assessments, and audit logs concurrently via Promise.all
+    const [appRes, assessRes, logsRes] = await Promise.all([
+      supabase
+        .from("applications")
+        .select("id, candidate_id, job_id, job_title, department, job_type, location, salary, status, current_stage_index, hr_notes, interview_date, interview_link, created_at, updated_at")
+        .eq("id", applicationId)
+        .maybeSingle(),
+      supabase
         .from("assessments_and_interviews")
         .select("id, application_id, type, scheduled_at, evaluator_name, score, notes, status, created_at")
         .eq("application_id", applicationId)
-        .order("scheduled_at", { ascending: false });
-
-      // 2. Fetch audit logs (still kept on server for stage deduction, but hidden in UI)
-      const { data: logs } = await supabase
+        .order("scheduled_at", { ascending: false }),
+      supabase
         .from("audit_logs")
         .select("id, old_status, new_status, stage_detail, reason, created_at")
         .eq("application_id", applicationId)
-        .order("created_at", { ascending: false });
+        .order("created_at", { ascending: false }),
+    ]);
 
-      const latestAssess = assessData?.[0];
-      const appLogs = logs || [];
+    const data = appRes.data;
 
-      // Check logs for fallback test schedule
+    if (!appRes.error && data) {
+      const assessData = assessRes.data || [];
+      const appLogs = logsRes.data || [];
+
+      // Determine active stage assessment (User > HR > Test)
+      const isInterviewUser = (t: string) => /interview.*user|user.*interview/i.test(t || "");
+      const isInterviewHr = (t: string) => /interview.*hr|hr.*interview/i.test(t || "");
+      const isTest = (t: string) => !isInterviewUser(t) && !isInterviewHr(t);
+
+      const userAssess = assessData.find((a: any) => isInterviewUser(a.type));
+      const hrAssess = assessData.find((a: any) => isInterviewHr(a.type));
+      const testAssess = assessData.find((a: any) => isTest(a.type));
+
+      // Check logs for fallback test/interview schedule
       const hasTestInLogs = appLogs.some(
-        (l) =>
+        (l: any) =>
           l.stage_detail?.toLowerCase().includes("tes") ||
           l.stage_detail?.toLowerCase().includes("assessment") ||
           l.reason?.toLowerCase().includes("technical test") ||
           l.reason?.toLowerCase().includes("psikotes")
       );
+      const hasHrInLogs = appLogs.some(
+        (l: any) =>
+          l.stage_detail?.toLowerCase().includes("interview hr") ||
+          l.reason?.toLowerCase().includes("interview hr")
+      );
+      const hasUserInLogs = appLogs.some(
+        (l: any) =>
+          l.stage_detail?.toLowerCase().includes("user") ||
+          l.reason?.toLowerCase().includes("interview user")
+      );
 
-      let scheduledAt = latestAssess?.scheduled_at || data.interview_date || null;
-      let evaluator = latestAssess?.evaluator_name || null;
-      let testType = latestAssess?.type || null;
+      // Exact linear stage matching TimelineView (Lacak Progres)
+      const hasTestScheduled = Boolean(testAssess) || hasTestInLogs;
+      const hasUserInterview = Boolean(userAssess) || hasUserInLogs;
 
-      if (!scheduledAt && hasTestInLogs) {
-        const testLog = appLogs.find(
-          (l) =>
+      let activeStageIndex = 1;
+      let displayStatus = "Diajukan";
+      const isRejected = data.status === "Ditolak" || data.status === "Rejected";
+      const isAccepted = ["Diterima", "Offered", "Hired"].includes(data.status);
+
+      if (isRejected) {
+        displayStatus = "Ditolak";
+        activeStageIndex = data.current_stage_index || 2;
+      } else if (isAccepted) {
+        displayStatus = "Diterima";
+        activeStageIndex = 6;
+      } else if (data.status === "Diajukan" || data.status === "Applied") {
+        displayStatus = "Diajukan";
+        activeStageIndex = 1;
+      } else if (data.status === "Diproses" || data.status === "In Review") {
+        if (hasTestScheduled) {
+          displayStatus = "Assessment / Tes";
+          activeStageIndex = 3;
+        } else {
+          displayStatus = "Screening HR";
+          activeStageIndex = 2;
+        }
+      } else if (data.status === "Interview") {
+        if (hasUserInterview) {
+          displayStatus = "Interview User";
+          activeStageIndex = 5;
+        } else {
+          displayStatus = "Interview HR";
+          activeStageIndex = 4;
+        }
+      } else {
+        displayStatus = data.status;
+      }
+
+      let activeAssess = null;
+      if (activeStageIndex === 3) {
+        activeAssess = testAssess || assessData[0];
+      } else if (activeStageIndex === 4) {
+        activeAssess = hrAssess || assessData[0];
+      } else if (activeStageIndex === 5) {
+        activeAssess = userAssess || assessData[0];
+      } else {
+        activeAssess = assessData[0];
+      }
+
+      let scheduledAt = activeAssess?.scheduled_at || data.interview_date || null;
+      let evaluator = activeAssess?.evaluator_name || null;
+      let testType = activeAssess?.type || (activeStageIndex === 3 ? "Technical Test" : activeStageIndex === 4 ? "Interview HR" : activeStageIndex === 5 ? "Interview User" : null);
+
+      if (!scheduledAt && (hasTestInLogs || hasUserInLogs || hasHrInLogs)) {
+        const stageLog = appLogs.find(
+          (l: any) =>
+            (hasUserInLogs && (l.stage_detail?.toLowerCase().includes("user") || l.reason?.toLowerCase().includes("interview user"))) ||
+            (hasHrInLogs && (l.stage_detail?.toLowerCase().includes("interview hr") || l.reason?.toLowerCase().includes("interview hr"))) ||
             l.stage_detail?.toLowerCase().includes("tes") ||
             l.reason?.toLowerCase().includes("technical test") ||
             l.reason?.toLowerCase().includes("psikotes")
         );
-        if (testLog) {
-          testType = testLog.stage_detail?.replace("Penjadwalan ", "") || "Technical Test";
-          if (testLog.reason) {
-            const match = testLog.reason.match(/pada\s+([\d/]+,\s*[\d.:]+)/i);
+        if (stageLog) {
+          testType = stageLog.stage_detail?.replace("Penjadwalan ", "") || (hasUserInLogs ? "Interview User" : hasHrInLogs ? "Interview HR" : "Technical Test");
+          if (stageLog.reason) {
+            const match = stageLog.reason.match(/pada\s+([\d/]+,\s*[\d.:]+)/i);
             if (match && match[1]) {
               const parts = match[1].replace(/\./g, ":");
               try {
@@ -1153,7 +1276,7 @@ export async function getApplicationById(applicationId: string): Promise<{
                 }
               } catch {}
             }
-            const evalMatch = testLog.reason.match(/Penilai:\s*([^,.\n]+)/i);
+            const evalMatch = stageLog.reason.match(/Penilai:\s*([^,.\n]+)/i);
             if (evalMatch && evalMatch[1]) {
               evaluator = evalMatch[1].trim();
             }
@@ -1161,16 +1284,45 @@ export async function getApplicationById(applicationId: string): Promise<{
         }
       }
 
+      // Extract location & Google Maps link from latest assessment notes or audit logs
+      let parsedLocation: string | null = null;
+      let parsedGmapsUrl: string | null = null;
+
+      const allNotes = [
+        activeAssess?.notes,
+        data.hr_notes,
+        ...(assessData?.map((a: any) => a.notes) || []),
+      ].filter(Boolean).join(" ");
+
+      if (allNotes) {
+        const locMatch = allNotes.match(/\[Lokasi(?:\s*\/\s*Ruangan)?:\s*([^\]]+)\]/i);
+        if (locMatch && locMatch[1]) {
+          parsedLocation = locMatch[1].trim();
+        }
+        const gmapsMatch = allNotes.match(/\[GMaps:\s*([^\]]+)\]/i);
+        if (gmapsMatch && gmapsMatch[1]) {
+          parsedGmapsUrl = gmapsMatch[1].trim();
+        }
+      }
+
+      // If location is a direct Google Maps link, also handle it
+      if (!parsedGmapsUrl && parsedLocation && (parsedLocation.includes("maps.app.goo.gl") || parsedLocation.includes("goo.gl/maps") || parsedLocation.includes("google.com/maps"))) {
+        parsedGmapsUrl = parsedLocation;
+      }
+
       return {
         application: {
           ...data,
+          display_status: displayStatus,
           assessments: assessData || [],
           latest_schedule: scheduledAt,
           latest_stage_type: testType,
           latest_evaluator: evaluator,
+          latest_location: parsedLocation,
+          latest_gmaps_url: parsedGmapsUrl,
         } as JobApplication,
         assessments: assessData || [],
-        auditLogs: (logs || []) as CandidateAuditLog[],
+        auditLogs: (appLogs || []) as CandidateAuditLog[],
       };
     }
 
@@ -1178,7 +1330,7 @@ export async function getApplicationById(applicationId: string): Promise<{
   } catch (err: any) {
     return { application: null, error: err.message };
   }
-}
+});
 
 /**
  * CASE 1: Apply for Job with strict business rules:
@@ -1225,7 +1377,7 @@ export async function applyForJob(jobId: string): Promise<{ success: boolean; ap
     // Jika kandidat memiliki lamaran yang statusnya BUKAN "Ditolak" (atau "Rejected"), blokir pengajuan baru!
     const { data: allUserApps } = await supabase
       .from("applications")
-      .select("id, job_id, job_title, status")
+      .select("id, job_id, job_title, status, created_at, updated_at")
       .eq("candidate_id", user.id);
 
     if (allUserApps && allUserApps.length > 0) {
@@ -1251,6 +1403,29 @@ export async function applyForJob(jobId: string): Promise<{ success: boolean; ap
 
     if (!targetJob) {
       return { success: false, error: "Lowongan pekerjaan tidak ditemukan." };
+    }
+
+    // Rule: Jika kandidat pernah ditolak di lowongan ini, periksa apakah lowongan sudah masuk periode baru (re-opened)
+    const existingForThisJob = (allUserApps || []).find((a) => a.job_id === jobId);
+    if (existingForThisJob) {
+      const isRejected = (existingForThisJob.status || "").toLowerCase() === "ditolak" || (existingForThisJob.status || "").toLowerCase() === "rejected";
+      if (!isRejected) {
+        return {
+          success: false,
+          error: `Anda sudah pernah mengajukan lamaran untuk posisi "${targetJob.title}".`,
+        };
+      }
+
+      // Bandingkan waktu pembukaan kembali lowongan dengan waktu penolakan lamaran
+      const jobReopenedTime = new Date(targetJob.reopened_at || targetJob.posted_date || targetJob.updated_at || targetJob.created_at).getTime();
+      const rejectionTime = new Date(existingForThisJob.updated_at || existingForThisJob.created_at).getTime();
+
+      if (jobReopenedTime <= rejectionTime) {
+        return {
+          success: false,
+          error: `Lamaran Anda untuk posisi "${targetJob.title}" telah dinyatakan gugur/ditolak pada periode seleksi saat ini. Anda baru dapat mendaftar kembali apabila lowongan ini ditutup dan dibuka kembali pada periode/batch berikutnya.`,
+        };
+      }
     }
 
     // Check if job is closed or deadline date has passed
@@ -1312,9 +1487,31 @@ export async function applyForJob(jobId: string): Promise<{ success: boolean; ap
       created_at: new Date().toISOString(),
     });
 
+    // Auto-update target job's applicant count in jobs table so public visitors immediately see accurate counts
+    try {
+      const { count: freshAppCount } = await supabase
+        .from("applications")
+        .select("id", { count: "exact", head: true })
+        .eq("job_id", targetJob.id);
+
+      const realCount = typeof freshAppCount === "number" && freshAppCount > 0 ? freshAppCount : 1;
+      const currentQuota = extractQuota(targetJob.description, targetJob.quota);
+      const cleanDesc = cleanJobDescription(targetJob.description);
+      const enrichedDesc = `[Kuota: ${currentQuota}] [Pelamar: ${realCount}] ${cleanDesc}`.trim();
+
+      await supabase
+        .from("jobs")
+        .update({ applicant_count: realCount, description: enrichedDesc })
+        .eq("id", targetJob.id);
+    } catch {
+      // non-blocking
+    }
+
     revalidatePath("/dashboard");
     revalidatePath("/dashboard/jobs");
     revalidatePath("/dashboard/applications");
+    revalidatePath("/jobs");
+    revalidatePath(`/jobs/${targetJob.id}`);
 
     return {
       success: true,

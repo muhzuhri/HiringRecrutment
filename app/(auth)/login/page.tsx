@@ -118,7 +118,7 @@ function LoginFormContent() {
               name="email"
               autoCapitalize="none"
               autoCorrect="off"
-              placeholder="nama@domain.com atau username"
+              placeholder="nama@gmail.com"
               className="form-input pl-11 transition-all"
               required
               autoComplete="username"

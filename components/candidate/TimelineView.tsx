@@ -19,6 +19,7 @@ import {
   DollarSign,
   ChevronRight,
   ShieldCheck,
+  ExternalLink,
 } from "lucide-react";
 import StatusBadge from "./StatusBadge";
 
@@ -89,6 +90,45 @@ export default function TimelineView({ application, auditLogs = [] }: TimelineVi
     latestAssess?.type ||
     (currentStageIndex === 3 ? "Technical Test" : currentStageIndex === 4 ? "Interview HR" : currentStageIndex === 5 ? "Interview User" : null);
   const evaluator = application.latest_evaluator || latestAssess?.evaluator_name;
+
+  // Extract Location and Google Maps Link
+  let locationStr = application.latest_location || null;
+  let gmapsUrl = application.latest_gmaps_url || null;
+
+  const notesToInspect = [
+    latestAssess?.notes,
+    application.hr_notes,
+    ...(application.assessments?.map((a) => a.notes) || []),
+  ].filter(Boolean).join(" ");
+
+  if (notesToInspect) {
+    if (!locationStr) {
+      const locMatch = notesToInspect.match(/\[Lokasi(?:\s*\/\s*Ruangan)?:\s*([^\]]+)\]/i);
+      if (locMatch && locMatch[1]) {
+        locationStr = locMatch[1].trim();
+      }
+    }
+    if (!gmapsUrl) {
+      const gmapsMatch = notesToInspect.match(/\[GMaps:\s*([^\]]+)\]/i);
+      if (gmapsMatch && gmapsMatch[1]) {
+        gmapsUrl = gmapsMatch[1].trim();
+      }
+    }
+  }
+
+  // Fallback: If locationStr looks like a direct link, treat it as gmapsUrl
+  if (!gmapsUrl && locationStr && (locationStr.includes("maps.app.goo.gl") || locationStr.includes("goo.gl/maps") || locationStr.includes("google.com/maps"))) {
+    gmapsUrl = locationStr;
+  }
+
+  // Fallback to Default Office Maps URL if interview/test is offline and not online
+  const DEFAULT_GMAPS_URL = "https://maps.app.goo.gl/DgmJZPBgV4SQ8Cq36";
+  if (!gmapsUrl && (!locationStr || (!locationStr.toLowerCase().includes("online") && !locationStr.toLowerCase().includes("meet")))) {
+    gmapsUrl = DEFAULT_GMAPS_URL;
+  }
+  if (!locationStr && gmapsUrl) {
+    locationStr = "Kantor Pusat Nexora Digital (Ruang Asesmen & Interview)";
+  }
 
   const formatIDFullDate = (dateStr: string) => {
     try {
@@ -379,29 +419,50 @@ export default function TimelineView({ application, auditLogs = [] }: TimelineVi
               </p>
             </div>
 
-            {/* Video Interview Link if provided */}
-            {application.interview_link && (
-              <div className="md:col-span-2 bg-teal-50 dark:bg-teal-950/60 border border-teal-200 dark:border-slate-800/50 rounded-xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                <div className="flex items-center gap-2.5">
-                  <Video className="w-5 h-5 text-teal-600 dark:text-teal-400 shrink-0" />
+            {/* Box 3: Lokasi Pelaksanaan & Link Google Maps Navigasi */}
+            {(locationStr || gmapsUrl) && (
+              <div className="md:col-span-2 bg-gradient-to-r from-teal-50/90 to-emerald-50/90 dark:from-teal-950/60 dark:to-emerald-950/50 border border-teal-200 dark:border-teal-800/80 rounded-xl p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div className="flex items-start sm:items-center gap-3.5">
+                  <div className="w-10 h-10 rounded-xl bg-teal-600/10 dark:bg-teal-900/60 border border-teal-300 dark:border-teal-700 flex items-center justify-center shrink-0">
+                    <MapPin className="w-5 h-5 text-teal-600 dark:text-teal-400" />
+                  </div>
                   <div>
-                    <p className="text-xs font-bold text-teal-900 dark:text-teal-200">
-                      Tautan Pertemuan Video Sesi Interview
+                    <span className="text-[10px] uppercase font-bold text-teal-800 dark:text-teal-300 tracking-wider">
+                      Lokasi / Ruangan Pelaksanaan
+                    </span>
+                    <p className="text-sm font-bold text-slate-900 dark:text-white mt-0.5">
+                      {locationStr || "Lokasi Seleksi Ditentukan Tim HR"}
                     </p>
-                    <p className="text-[11px] text-teal-700 dark:text-teal-300">
-                      Klik tombol untuk langsung bergabung ke Google Meet pada waktu yang ditentukan.
+                    <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                      Klik tombol navigasi di sebelah kanan untuk melihat rute dan lokasi presisi di Google Maps.
                     </p>
                   </div>
                 </div>
-                <a
-                  href={application.interview_link}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl bg-teal-600 hover:bg-teal-500 text-white font-bold text-xs transition-colors shadow-sm shrink-0"
-                >
-                  <span>Buka Google Meet</span>
-                  <Video className="w-3.5 h-3.5" />
-                </a>
+
+                {/* Google Maps Button */}
+                {gmapsUrl ? (
+                  <a
+                    href={gmapsUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-[#0F766E] hover:bg-[#0d6962] text-white font-bold text-xs transition-colors shadow-sm shrink-0 cursor-pointer"
+                  >
+                    <MapPin className="w-4 h-4 text-white" />
+                    <span>Buka di Google Maps</span>
+                    <ExternalLink className="w-3.5 h-3.5 text-white/80" />
+                  </a>
+                ) : locationStr ? (
+                  <a
+                    href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(locationStr)}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-[#0F766E] hover:bg-[#0d6962] text-white font-bold text-xs transition-colors shadow-sm shrink-0 cursor-pointer"
+                  >
+                    <MapPin className="w-4 h-4 text-white" />
+                    <span>Cari di Google Maps</span>
+                    <ExternalLink className="w-3.5 h-3.5 text-white/80" />
+                  </a>
+                ) : null}
               </div>
             )}
           </div>

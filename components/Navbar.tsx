@@ -34,15 +34,15 @@ export default function Navbar() {
           </Link>
 
           {/* Desktop Nav Pills */}
-          <div className="hidden md:flex items-center gap-1 bg-[#0B132B] p-1.5 rounded-2xl border border-emerald-900/50">
+          <div className="hidden md:flex items-center gap-1 bg-[#0B132B] p-1.5 rounded-2xl border border-teal-900/50">
             {navLinks.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
                 className={`px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-200 ${
                   pathname === link.href
-                    ? "bg-emerald-600 text-white shadow-md shadow-emerald-900/30"
-                    : "text-slate-300 hover:text-white hover:bg-emerald-900/40"
+                    ? "bg-[#0d9488] text-white shadow-md shadow-teal-950/40"
+                    : "text-slate-300 hover:text-white hover:bg-white/10"
                 }`}
               >
                 {link.label}
@@ -54,7 +54,8 @@ export default function Navbar() {
           <div className="hidden md:flex items-center gap-3">
             <Link
               href="/login"
-              className="px-4 py-2 text-slate-200 hover:text-white text-sm font-semibold hover:bg-emerald-900/40 rounded-xl transition-all bg-emerald-600 "             >
+              className="px-4 py-2 text-white text-sm font-semibold hover:bg-[#0f766e] rounded-xl transition-all bg-[#0d9488] shadow-sm shadow-teal-950/30"
+            >
               Masuk
             </Link>
 
@@ -89,14 +90,14 @@ export default function Navbar() {
                   href={link.href}
                   onClick={() => setMobileOpen(false)}
                   className={`px-3 py-2.5 rounded-lg text-sm font-semibold transition-colors ${
-                    pathname === link.href ? "bg-emerald-600 text-white" : "text-slate-300 hover:bg-emerald-900/40"
+                    pathname === link.href ? "bg-[#0d9488] text-white" : "text-slate-300 hover:bg-white/10"
                   }`}
                 >
                   {link.label}
                 </Link>
               ))}
-              <div className="flex flex-col gap-2 pt-3 border-t border-emerald-900/60 mt-2">
-                <Link href="/login" className="py-2.5 text-center text-sm font-semibold text-slate-200 border border-emerald-700/50 rounded-lg">
+              <div className="flex flex-col gap-2 pt-3 border-t border-slate-700/60 mt-2">
+                <Link href="/login" className="py-2.5 text-center text-sm font-semibold text-white bg-[#0d9488] hover:bg-[#0f766e] rounded-lg">
                   Masuk
                 </Link>
               </div>

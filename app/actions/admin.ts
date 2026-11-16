@@ -12,6 +12,13 @@ import {
   AssessmentReviewRow,
 } from "@/types/admin";
 import { ApplicationStatus, CandidateProfile, AssessmentItem, AssessmentType } from "@/types/candidate";
+import {
+  sendCandidateStageNotification,
+  sendAssessorAssignmentNotification,
+  sendCandidateRejectedNotification,
+  sendCandidateHiredNotification,
+} from "@/lib/mail";
+import { extractQuota, extractApplicantCount, cleanJobDescription } from "@/data/jobs";
 
 /**
  * Helper function to calculate time-to-hire difference in days
@@ -112,6 +119,22 @@ export async function getHRAnalytics(): Promise<{ analytics: HRAnalyticsSummary 
         avg_time_to_hire_text: overallTimeToHireText,
         applicants_per_job: applicantsPerJob,
         monthly_trend: [],
+        raw_applications: (apps || []).map((a) => ({
+          id: a.id,
+          job_id: a.job_id,
+          job_title: a.job_title || "Lowongan Pekerjaan",
+          department: a.department || "Divisi HR",
+          status: a.status,
+          created_at: a.created_at,
+          hired_at: a.hired_at,
+        })),
+        all_jobs: (jobs || []).map((j) => ({
+          id: j.id,
+          title: j.title,
+          dept: j.dept,
+          status: j.status,
+          deadline_date: j.deadline_date,
+        })),
       },
     };
   } catch (err: any) {
@@ -124,6 +147,8 @@ export async function getHRAnalytics(): Promise<{ analytics: HRAnalyticsSummary 
         avg_time_to_hire_text: "Belum tersedia",
         applicants_per_job: [],
         monthly_trend: [],
+        raw_applications: [],
+        all_jobs: [],
       },
     };
   }
@@ -349,6 +374,87 @@ export async function updateApplicantStatus(
       created_at: new Date().toISOString(),
     });
 
+    // Trigger Automated Email & In-App Notification saat kandidat Ditolak atau Diterima
+    try {
+      if (newStatus === "Ditolak" || newStatus === "Rejected") {
+        const { data: appData } = await supabase
+          .from("applications")
+          .select("candidate_id, job_title")
+          .eq("id", applicationId)
+          .single();
+
+        if (appData?.candidate_id) {
+          const { data: candProfile } = await supabase
+            .from("profiles")
+            .select("email, full_name")
+            .eq("id", appData.candidate_id)
+            .single();
+
+          if (candProfile?.email) {
+            try {
+              await sendCandidateRejectedNotification({
+                candidateEmail: candProfile.email,
+                candidateName: candProfile.full_name || candProfile.email,
+                jobTitle: appData.job_title || "Lowongan Pekerjaan",
+                reason,
+              });
+            } catch (err) {
+              console.error("Email rejection error:", err);
+            }
+
+            await supabase.from("notifications").insert({
+              user_id: appData.candidate_id,
+              title: `Pemberitahuan Hasil Seleksi - ${appData.job_title || "Lamaran"}`,
+              message: `Terima kasih atas partisipasi Anda. Saat ini lamaran Anda untuk posisi ${appData.job_title || "tersebut"} belum dapat dilanjutkan ke tahap berikutnya pada periode seleksi ini.`,
+              type: "application_update",
+              link: `/dashboard/applications/${applicationId}`,
+              is_read: false,
+              created_at: new Date().toISOString(),
+            });
+          }
+        }
+      } else if (newStatus === "Diterima" || newStatus === "Hired" || newStatus === "Offered") {
+        const { data: appData } = await supabase
+          .from("applications")
+          .select("candidate_id, job_title")
+          .eq("id", applicationId)
+          .single();
+
+        if (appData?.candidate_id) {
+          const { data: candProfile } = await supabase
+            .from("profiles")
+            .select("email, full_name")
+            .eq("id", appData.candidate_id)
+            .single();
+
+          if (candProfile?.email) {
+            try {
+              await sendCandidateHiredNotification({
+                candidateEmail: candProfile.email,
+                candidateName: candProfile.full_name || candProfile.email,
+                jobTitle: appData.job_title || "Lowongan Pekerjaan",
+                notes: reason,
+              });
+            } catch (err) {
+              console.error("Email hired error:", err);
+            }
+
+            await supabase.from("notifications").insert({
+              user_id: appData.candidate_id,
+              title: `Selamat! Anda Diterima (Hired) - ${appData.job_title || "Nexora Digital"}`,
+              message: `Selamat, Anda dinyatakan DITERIMA untuk posisi ${appData.job_title || "tersebut"}! Tim HR akan segera menghubungi Anda untuk tahap penawaran kerja resmi (offering letter) & onboarding.`,
+              type: "success",
+              link: `/dashboard/applications/${applicationId}`,
+              is_read: false,
+              created_at: new Date().toISOString(),
+            });
+          }
+        }
+      }
+    } catch (notifErr) {
+      console.warn("Status change notification warning:", notifErr);
+    }
+
     revalidatePath("/admin");
     revalidatePath("/admin/kanban");
     revalidatePath(`/admin/candidates/${applicationId}`);
@@ -406,15 +512,17 @@ export async function scheduleAssessmentOrInterview(data: {
   scheduled_at: string;
   evaluator_name: string;
   location?: string;
+  gmaps_url?: string;
   notes?: string;
-}): Promise<{ success: boolean; error?: string }> {
+}): Promise<{ success: boolean; error?: string; emailMessage?: string }> {
   try {
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
     const authorName = user?.user_metadata?.full_name || user?.email || "Admin HR";
 
     const formattedNotes = [
-      data.location ? `[Lokasi / Ruangan: ${data.location}]` : null,
+      data.location ? `[Lokasi / Ruangan: ${data.location.trim()}]` : null,
+      data.gmaps_url ? `[GMaps: ${data.gmaps_url.trim()}]` : null,
       data.notes ? data.notes.trim() : null,
     ].filter(Boolean).join(" ");
 
@@ -476,12 +584,147 @@ export async function scheduleAssessmentOrInterview(data: {
       created_at: new Date().toISOString(),
     });
 
+    // 4. Trigger Automated Email & In-App Notification to Candidate & Assigned Assessor
+    let emailStatusInfo = "Email notifikasi otomatis telah dikirim.";
+    try {
+      const { data: appData, error: appDataErr } = await supabase
+        .from("applications")
+        .select("candidate_id, job_title")
+        .eq("id", data.application_id)
+        .single();
+
+      if (appDataErr) {
+        console.warn("Notice fetching application for notification:", appDataErr.message);
+      }
+
+      let candidateEmail = "";
+      let candidateName = "Kandidat";
+
+      if (appData?.candidate_id) {
+        const { data: candProfile, error: candProfErr } = await supabase
+          .from("profiles")
+          .select("email, full_name")
+          .eq("id", appData.candidate_id)
+          .single();
+
+        if (candProfErr) {
+          console.warn("Notice fetching candidate profile for email:", candProfErr.message);
+        }
+
+        if (candProfile) {
+          candidateEmail = candProfile.email;
+          candidateName = candProfile.full_name || candProfile.email;
+        }
+
+        // Simpan notifikasi ke portal kandidat (dibungkus try-catch tersendiri agar error RLS DB tidak memblokir email)
+        try {
+          await supabase.from("notifications").insert({
+            user_id: appData.candidate_id,
+            title: `Undangan ${data.type}: ${appData.job_title || "Lowongan"}`,
+            message: `Selamat! Anda dijadwalkan mengikuti ${data.type} pada ${new Date(data.scheduled_at).toLocaleDateString("id-ID", { weekday: "long", day: "numeric", month: "long", year: "numeric" })} pukul ${new Date(data.scheduled_at).toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" })} WIB di ${data.location || "Kantor Pusat Nexora Digital"}.`,
+            type: "application_update",
+            link: `/dashboard/applications/${data.application_id}`,
+            is_read: false,
+            created_at: new Date().toISOString(),
+          });
+        } catch (notifInsertErr) {
+          console.warn("In-app notification insert notice:", notifInsertErr);
+        }
+      }
+
+      // Cari email penilai yang ditugaskan
+      const cleanEvalName = data.evaluator_name.replace(/\s*\(.*?\)\s*/g, "").trim().toLowerCase();
+      const { data: staffList } = await supabase
+        .from("profiles")
+        .select("id, full_name, email, role")
+        .in("role", ["interviewer", "penilai", "admin", "hr"]);
+
+      const matchedStaff = (staffList || []).find((s) => {
+        const sName = (s.full_name || "").toLowerCase();
+        const sEmail = (s.email || "").toLowerCase();
+        return (
+          sName.includes(cleanEvalName) ||
+          cleanEvalName.includes(sName) ||
+          sEmail.includes(cleanEvalName)
+        );
+      });
+
+      const assessorEmail = matchedStaff?.email;
+      const assessorName = matchedStaff?.full_name || data.evaluator_name;
+
+      // Hitung total kandidat yang dijadwalkan dalam antrean penilai ini
+      const { count: queueCount } = await supabase
+        .from("assessments_and_interviews")
+        .select("id", { count: "exact", head: true })
+        .ilike("evaluator_name", `%${cleanEvalName}%`)
+        .eq("status", "Scheduled");
+
+      // Kirim email notifikasi ke kandidat
+      if (candidateEmail) {
+        try {
+          console.log(`\n📨 [DISPATCH] Memproses pengiriman email ${data.type} ke kandidat: ${candidateEmail}...`);
+          const mailRes = await sendCandidateStageNotification({
+            candidateEmail,
+            candidateName,
+            jobTitle: appData?.job_title || "Lowongan Pekerjaan",
+            stageName: data.type,
+            scheduledAt: data.scheduled_at,
+            location: data.location,
+            gmapsUrl: data.gmaps_url,
+            notes: data.notes,
+            evaluatorName: data.evaluator_name,
+          });
+
+          if (mailRes.success && !mailRes.simulated) {
+            console.log(`✅ [DISPATCH SUKSES] Email terkirim ke ${candidateEmail} | ID: ${mailRes.messageId}`);
+            emailStatusInfo = `Email notifikasi seleksi berhasil dikirim ke ${candidateEmail}.`;
+          } else if (mailRes.simulated) {
+            console.warn(`⚠️ [DISPATCH SIMULASI] Transporter SMTP belum membaca kredensial, email disimulasikan.`);
+            emailStatusInfo = `Email disimulasikan (periksa konfigurasi SMTP).`;
+          } else {
+            console.error(`❌ [DISPATCH GAGAL] ${mailRes.error}`);
+            emailStatusInfo = `Gagal mengirim email: ${mailRes.error}`;
+          }
+        } catch (err: any) {
+          console.error("❌ Email candidate error:", err.message);
+          emailStatusInfo = `Gagal mengirim email: ${err.message}`;
+        }
+      } else {
+        console.warn(`⚠️ [DISPATCH] Email kandidat tidak ditemukan pada database profiles.`);
+        emailStatusInfo = `Email kandidat tidak ditemukan.`;
+      }
+
+      // Kirim email notifikasi ke penilai bertugas (hanya jika email penilai valid terdaftar)
+      if (assessorEmail) {
+        try {
+          console.log(`📨 [DISPATCH] Memproses email penugasan ke penilai: ${assessorEmail}...`);
+          await sendAssessorAssignmentNotification({
+            assessorEmail,
+            assessorName,
+            candidateName,
+            candidateEmail: candidateEmail || "Email kandidat belum tersedia",
+            jobTitle: appData?.job_title || "Lowongan Pekerjaan",
+            stageName: data.type,
+            scheduledAt: data.scheduled_at,
+            location: data.location,
+            gmapsUrl: data.gmaps_url,
+            notes: data.notes,
+            totalCandidateQueue: (queueCount || 0) + 1,
+          });
+        } catch (err: any) {
+          console.error("Email assessor error:", err.message);
+        }
+      }
+    } catch (notifErr: any) {
+      console.warn("Notification dispatcher warning:", notifErr.message);
+    }
+
     revalidatePath(`/admin/kanban`);
     revalidatePath(`/admin`);
     revalidatePath(`/admin/candidates/${data.application_id}`);
     revalidatePath("/admin/evaluations");
     revalidatePath(`/dashboard/applications/${data.application_id}`);
-    return { success: true };
+    return { success: true, emailMessage: emailStatusInfo };
   } catch (err: any) {
     return { success: false, error: err.message || "Gagal menjadwalkan tes/interview." };
   }
@@ -575,7 +818,7 @@ export async function submitAssessmentEvaluation(data: {
   score: number | null; // 0 is a valid score of 0, null is unscored
   notes: string;
   evaluator_name?: string;
-}): Promise<{ success: boolean; error?: string }> {
+}): Promise<{ success: boolean; error?: string; emailMessage?: string }> {
   try {
     const supabase = await createClient();
 
@@ -615,7 +858,7 @@ export async function submitDirectStageScore(data: {
   score: number;
   notes?: string;
   evaluator_name?: string;
-}): Promise<{ success: boolean; error?: string }> {
+}): Promise<{ success: boolean; error?: string; emailMessage?: string }> {
   try {
     const supabase = await createClient();
 
@@ -704,16 +947,38 @@ export async function getAllAssessmentsWithCandidateInfo(): Promise<{ assessment
     const appMap = new Map((dbApps || []).map((a) => [a.id, a]));
     const profileMap = new Map((dbProfiles || []).map((p) => [p.id, p]));
 
-    const results: AssessmentReviewRow[] = dbAssessments.map((asm) => {
-      const app = appMap.get(asm.application_id);
+    // Kelompokkan asesmen per application_id agar 1 kandidat hanya muncul 1 baris
+    const assessmentsByApp = new Map<string, any[]>();
+    (dbAssessments || []).forEach((asm) => {
+      const arr = assessmentsByApp.get(asm.application_id) || [];
+      arr.push(asm);
+      assessmentsByApp.set(asm.application_id, arr);
+    });
+
+    const results: AssessmentReviewRow[] = [];
+
+    assessmentsByApp.forEach((appAsms, applicationId) => {
+      const app = appMap.get(applicationId);
       const prof = app ? profileMap.get(app.candidate_id) : undefined;
       const eduList = prof?.education && Array.isArray(prof.education) ? prof.education : [];
       const firstEdu = eduList[0] || {};
       const eduStr = firstEdu.school ? `${firstEdu.level || "S1"} ${firstEdu.major ? "- " + firstEdu.major : ""} (${firstEdu.school})` : undefined;
 
-      return {
-        id: asm.id,
-        application_id: asm.application_id,
+      // Temukan masing-masing tahapan asesmen untuk kandidat ini
+      const isInterview = (t: string) => /interview|wawancara/i.test(t || "");
+      const isHr = (t: string) => /hr/i.test(t || "") && isInterview(t);
+      const isUser = (t: string) => /user/i.test(t || "") && isInterview(t);
+
+      const testAsm = appAsms.find((a) => !isInterview(a.type));
+      const hrAsm = appAsms.find((a) => isHr(a.type));
+      const userAsm = appAsms.find((a) => isUser(a.type));
+
+      // Tahap utama / aktif saat ini (paling mutakhir)
+      const primaryAsm = userAsm || hrAsm || testAsm || appAsms[0];
+
+      results.push({
+        id: primaryAsm.id,
+        application_id: applicationId,
         candidate_id: app?.candidate_id,
         candidate_name: prof?.full_name || "Kandidat Pelamar",
         candidate_email: prof?.email || "-",
@@ -735,14 +1000,33 @@ export async function getAllAssessmentsWithCandidateInfo(): Promise<{ assessment
         candidate_resume_name: prof?.resume_name || "CV_Kandidat.pdf",
         job_title: app?.job_title || "Lowongan Terkait",
         department: app?.department || "Internal Company",
-        type: asm.type,
-        scheduled_at: asm.scheduled_at,
-        evaluator_name: asm.evaluator_name,
-        score: asm.score,
-        notes: asm.notes || "",
-        status: asm.status || "Scheduled",
-        created_at: asm.created_at,
-      };
+        type: primaryAsm.type,
+        scheduled_at: primaryAsm.scheduled_at,
+        evaluator_name: primaryAsm.evaluator_name,
+        score: primaryAsm.score,
+        notes: primaryAsm.notes || "",
+        status: primaryAsm.status || "Scheduled",
+        created_at: primaryAsm.created_at,
+
+        // Rekap Lengkap Seluruh Nilai Tahapan
+        test_score: testAsm?.score ?? null,
+        test_evaluator: testAsm?.evaluator_name || "Tim Penilai",
+        test_status: testAsm?.status,
+        test_notes: testAsm?.notes,
+        test_id: testAsm?.id,
+
+        hr_interview_score: hrAsm?.score ?? null,
+        hr_interview_evaluator: hrAsm?.evaluator_name || "Tim HR",
+        hr_interview_status: hrAsm?.status,
+        hr_interview_notes: hrAsm?.notes,
+        hr_interview_id: hrAsm?.id,
+
+        user_interview_score: userAsm?.score ?? null,
+        user_interview_evaluator: userAsm?.evaluator_name || "Calon Atasan (User)",
+        user_interview_status: userAsm?.status,
+        user_interview_notes: userAsm?.notes,
+        user_interview_id: userAsm?.id,
+      });
     });
 
     return { assessments: results };
@@ -995,9 +1279,31 @@ export async function getJobPostings(): Promise<{ jobs: JobPosting[] }> {
         const avg = Math.round(hiredDaysMap[job.id].reduce((a, b) => a + b, 0) / hiredDaysMap[job.id].length);
         tth = `${avg} Hari`;
       }
+
+      const realCount = appCounts[job.id] || 0;
+      const currentQuota = extractQuota(job.description, job.quota);
+      const cleanDesc = cleanJobDescription(job.description);
+      const enrichedDesc = `[Kuota: ${currentQuota}] [Pelamar: ${realCount}] ${cleanDesc}`.trim();
+
+      // Auto-sync applicant count to jobs table so public visitors immediately see accurate counts
+      const storedCount = extractApplicantCount(job.description, job.applicant_count);
+      if (storedCount !== realCount || !job.description?.includes(`[Pelamar: ${realCount}]`)) {
+        supabase
+          .from("jobs")
+          .update({ applicant_count: realCount, description: enrichedDesc })
+          .eq("id", job.id)
+          .then(({ error: syncErr }) => {
+            if (syncErr) {
+              supabase.from("jobs").update({ description: enrichedDesc }).eq("id", job.id);
+            }
+          });
+      }
+
       return {
         ...job,
-        applicant_count: appCounts[job.id] || 0,
+        quota: currentQuota,
+        description: cleanDesc,
+        applicant_count: realCount,
         time_to_hire: tth,
       };
     });
@@ -1017,38 +1323,72 @@ export async function createJobPosting(formData: {
   description: string;
   min_education: "SMA" | "D3" | "S1" | "S2" | "S3";
   required_skills: string[];
+  quota?: number;
   deadline_date?: string;
   status?: "Active" | "Closed";
 }): Promise<{ success: boolean; job?: JobPosting; error?: string }> {
   try {
     const supabase = await createClient();
+    const quotaVal = formData.quota && formData.quota > 0 ? formData.quota : 5;
+    const cleanDesc = cleanJobDescription(formData.description);
+    const existingCount = extractApplicantCount(formData.description);
+    const enrichedDesc = existingCount > 0
+      ? `[Kuota: ${quotaVal}] [Pelamar: ${existingCount}] ${cleanDesc}`.trim()
+      : `[Kuota: ${quotaVal}] ${cleanDesc}`.trim();
 
-    const { data: inserted, error } = await supabase
+    const basePayload = {
+      title: formData.title,
+      dept: formData.dept,
+      type: formData.type || "Hybrid",
+      location: formData.location,
+      salary: formData.salary,
+      status: formData.status || "Active",
+      description: enrichedDesc,
+      min_education: formData.min_education,
+      required_skills: formData.required_skills,
+      deadline_date: formData.deadline_date || null,
+    };
+
+    let inserted: any = null;
+    let insertErr: any = null;
+
+    // Try with quota column if it exists, fallback to base payload
+    const resWithQuota = await supabase
       .from("jobs")
-      .insert({
-        title: formData.title,
-        dept: formData.dept,
-        type: formData.type || "Hybrid",
-        location: formData.location,
-        salary: formData.salary,
-        status: formData.status || "Active",
-        description: formData.description,
-        min_education: formData.min_education,
-        required_skills: formData.required_skills,
-        deadline_date: formData.deadline_date || null,
-      })
+      .insert({ ...basePayload, quota: quotaVal })
       .select("*")
       .single();
 
-    if (error) {
-      return { success: false, error: error.message };
+    if (resWithQuota.error) {
+      const resFallback = await supabase
+        .from("jobs")
+        .insert(basePayload)
+        .select("*")
+        .single();
+      inserted = resFallback.data;
+      insertErr = resFallback.error;
+    } else {
+      inserted = resWithQuota.data;
+    }
+
+    if (insertErr || !inserted) {
+      return { success: false, error: insertErr?.message || "Gagal membuat lowongan pekerjaan baru." };
     }
 
     revalidatePath("/admin/jobs");
     revalidatePath("/dashboard/jobs");
     revalidatePath("/jobs");
 
-    return { success: true, job: { ...inserted, applicant_count: 0, time_to_hire: "Belum tersedia" } };
+    return {
+      success: true,
+      job: {
+        ...inserted,
+        quota: quotaVal,
+        description: cleanDesc,
+        applicant_count: 0,
+        time_to_hire: "Belum tersedia",
+      },
+    };
   } catch (err: any) {
     return { success: false, error: err.message || "Gagal membuat lowongan pekerjaan baru." };
   }
@@ -1065,30 +1405,43 @@ export async function updateJobPosting(
     description: string;
     min_education: "SMA" | "D3" | "S1" | "S2" | "S3";
     required_skills: string[];
+    quota?: number;
     deadline_date?: string;
     status?: "Active" | "Closed";
   }
 ): Promise<{ success: boolean; error?: string }> {
   try {
     const supabase = await createClient();
+    const quotaVal = formData.quota && formData.quota > 0 ? formData.quota : 5;
+    const cleanDesc = cleanJobDescription(formData.description);
+    const existingCount = extractApplicantCount(formData.description);
+    const enrichedDesc = existingCount > 0
+      ? `[Kuota: ${quotaVal}] [Pelamar: ${existingCount}] ${cleanDesc}`.trim()
+      : `[Kuota: ${quotaVal}] ${cleanDesc}`.trim();
 
-    const payload = {
+    const basePayload: any = {
       title: formData.title,
       dept: formData.dept,
       type: formData.type,
       location: formData.location,
       salary: formData.salary,
-      description: formData.description,
+      description: enrichedDesc,
       min_education: formData.min_education,
       required_skills: formData.required_skills,
       deadline_date: formData.deadline_date || null,
       ...(formData.status ? { status: formData.status } : {}),
     };
 
-    const { error } = await supabase.from("jobs").update(payload).eq("id", jobId);
-    if (error) {
-      console.error("Supabase update job error:", error.message);
-      return { success: false, error: `Gagal memperbarui lowongan: ${error.message}` };
+    if (formData.status === "Active") {
+      basePayload.posted_date = new Date().toISOString();
+    }
+
+    const resWithQuota = await supabase.from("jobs").update({ ...basePayload, quota: quotaVal }).eq("id", jobId);
+    if (resWithQuota.error) {
+      const resFallback = await supabase.from("jobs").update(basePayload).eq("id", jobId);
+      if (resFallback.error) {
+        return { success: false, error: `Gagal memperbarui lowongan: ${resFallback.error.message}` };
+      }
     }
 
     revalidatePath("/admin/jobs");
@@ -1134,10 +1487,15 @@ export async function toggleJobStatus(jobId: string): Promise<{ success: boolean
     }
 
     const newStatus = existing.status === "Active" ? "Closed" : "Active";
+    const updatePayload: Record<string, any> = { status: newStatus };
+    if (newStatus === "Active") {
+      // Membuka kembali lowongan: perbarui posted_date untuk menandai periode/batch baru
+      updatePayload.posted_date = new Date().toISOString();
+    }
 
     const { error } = await supabase
       .from("jobs")
-      .update({ status: newStatus })
+      .update(updatePayload)
       .eq("id", jobId);
 
     if (error) {
@@ -1242,7 +1600,7 @@ export async function createStaffAccount(data: {
   email: string;
   password?: string;
   role: "admin" | "hr" | "interviewer" | "penilai";
-}): Promise<{ success: boolean; error?: string }> {
+}): Promise<{ success: boolean; error?: string; emailMessage?: string }> {
   try {
     const supabase = await createClient();
     const cleanEmail = data.email.trim().toLowerCase();
@@ -1360,7 +1718,7 @@ export async function updateStaffSelfProfile(data: {
   phone?: string;
   avatar_url?: string;
   password?: string;
-}): Promise<{ success: boolean; error?: string }> {
+}): Promise<{ success: boolean; error?: string; emailMessage?: string }> {
   try {
     const supabase = await createClient();
     const {
@@ -1370,6 +1728,16 @@ export async function updateStaffSelfProfile(data: {
     if (!user) {
       return { success: false, error: "Sesi login Anda telah berakhir." };
     }
+
+    // 1. Ambil nama lama dan role sebelum update
+    const { data: currentProf } = await supabase
+      .from("profiles")
+      .select("full_name, role")
+      .eq("id", user.id)
+      .single();
+
+    const oldName = currentProf?.full_name?.trim();
+    const newName = data.full_name.trim();
 
     if (data.password && data.password.trim().length >= 6) {
       const { error: pwdErr } = await supabase.auth.updateUser({
@@ -1383,7 +1751,7 @@ export async function updateStaffSelfProfile(data: {
     const { error: profErr } = await supabase
       .from("profiles")
       .update({
-        full_name: data.full_name.trim(),
+        full_name: newName,
         phone: data.phone?.trim() || null,
         avatar_url: data.avatar_url?.trim() || null,
         updated_at: new Date().toISOString(),
@@ -1394,7 +1762,36 @@ export async function updateStaffSelfProfile(data: {
       return { success: false, error: profErr.message };
     }
 
+    // 2. SINKRONISASI EVALUATOR DI DATABASE:
+    // Jika nama diubah, perbarui penugasan asesmen agar data kandidat tidak hilang
+    if (oldName && oldName !== newName) {
+      try {
+        await supabase
+          .from("assessments_and_interviews")
+          .update({ evaluator_name: newName })
+          .eq("evaluator_name", oldName);
+      } catch (syncErr) {
+        console.warn("Failed to sync evaluator_name in assessments:", syncErr);
+      }
+    }
+
+    // Khusus akun penilai: sinkronkan jika ada asesmen bertuliskan 'Dr. Bambang'
+    if (currentProf?.role === "interviewer" || currentProf?.role === "penilai") {
+      try {
+        await supabase
+          .from("assessments_and_interviews")
+          .update({ evaluator_name: newName })
+          .ilike("evaluator_name", "%Dr. Bambang%");
+      } catch (bambangErr) {
+        console.warn("Failed to sync Dr. Bambang evaluator_name:", bambangErr);
+      }
+    }
+
+    revalidatePath("/penilai");
+    revalidatePath("/penilai/profile");
     revalidatePath("/admin/profile");
+    revalidatePath("/admin/evaluations");
+    revalidatePath("/admin/kanban");
     revalidatePath("/admin");
     return { success: true };
   } catch (err: any) {

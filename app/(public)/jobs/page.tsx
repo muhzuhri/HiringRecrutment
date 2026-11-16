@@ -50,9 +50,7 @@ export default function JobsPage() {
       <section className="pb-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="relative max-w-2xl mx-auto mb-8">
-            <svg className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-            </svg>
+           
             <input
               id="job-search-input"
               type="text"
@@ -135,7 +133,15 @@ export default function JobsPage() {
                     </svg>
                     {job.location}
                   </div>
-                  <div className="mt-4 pt-4 border-t border-gray-100 flex items-center text-emerald-800 text-sm font-semibold">
+                  <div className="flex items-center justify-between text-xs text-gray-500 mt-3 pt-3 border-t border-gray-100">
+                    <span className="flex items-center gap-1 font-medium text-gray-600">
+                      👥 Pelamar: <strong className="text-gray-900 font-bold">{job.applicant_count || 0}</strong> orang
+                    </span>
+                    <span className="px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-800 border border-emerald-200 font-bold text-[11px]">
+                      Kuota: {job.quota || 5} Posisi
+                    </span>
+                  </div>
+                  <div className="mt-3 flex items-center text-emerald-800 text-sm font-semibold">
                     Lihat Detail & Lamar
                     <svg className="w-4 h-4 ml-1.5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />

@@ -37,7 +37,12 @@ import {
   Check,
   Building2,
   Lock,
+  MapPin,
+  ExternalLink,
 } from "lucide-react";
+
+const DEFAULT_GMAPS_URL = "https://maps.app.goo.gl/DgmJZPBgV4SQ8Cq36";
+const DEFAULT_OFFICE_LOCATION = "Kantor Pusat Nexora Digital (Ruang Asesmen & Interview)";
 
 interface KanbanBoardProps {
   initialApplicants: CandidateApplicantCard[];
@@ -138,6 +143,7 @@ export default function KanbanBoard({
   const [isSchedCustom, setIsSchedCustom] = useState<boolean>(false);
   const [customSchedEvaluator, setCustomSchedEvaluator] = useState<string>("");
   const [schedLocation, setSchedLocation] = useState<string>("");
+  const [schedGmapsUrl, setSchedGmapsUrl] = useState<string>("");
   const [schedNotes, setSchedNotes] = useState<string>("");
   const [loadingSched, setLoadingSched] = useState<boolean>(false);
   const [toastMsg, setToastMsg] = useState<string | null>(null);
@@ -276,7 +282,8 @@ export default function KanbanBoard({
     setScheduleTargetApp(applicant);
     setScheduleModalMode(mode);
     setSchedDateTime("");
-    setSchedLocation("");
+    setSchedLocation(DEFAULT_OFFICE_LOCATION);
+    setSchedGmapsUrl(DEFAULT_GMAPS_URL);
     setSchedNotes("");
 
     if (mode === "test") {
@@ -335,6 +342,7 @@ export default function KanbanBoard({
       scheduled_at: new Date(schedDateTime).toISOString(),
       evaluator_name: finalEvaluator,
       location: schedLocation.trim(),
+      gmaps_url: schedGmapsUrl.trim() || undefined,
       notes: schedNotes.trim() || undefined,
     });
     setLoadingSched(false);
@@ -369,9 +377,15 @@ export default function KanbanBoard({
         })
       );
 
-      setToastMsg(`Jadwal ${schedType} untuk ${scheduleTargetApp.candidate_name} berhasil disimpan!`);
+      const toastNotification = res.emailMessage
+        ? `Jadwal ${schedType} disimpan. ${res.emailMessage}`
+        : `Jadwal ${schedType} untuk ${scheduleTargetApp.candidate_name} berhasil disimpan!`;
+      setToastMsg(toastNotification);
       setScheduleTargetApp(null);
       setSchedDateTime("");
+      setSchedLocation("");
+      setSchedGmapsUrl("");
+      setSchedNotes("");
       setTimeout(() => setToastMsg(null), 4000);
     } else {
       alert(res.error || "Gagal menjadwalkan seleksi.");
@@ -1079,7 +1093,7 @@ export default function KanbanBoard({
                   <th className="px-3 py-3">Tahapan Seleksi</th>
                   <th className="px-3 py-3">Jadwal & Penilai</th>
                   <th className="px-3 py-3">Skor Evaluasi</th>
-                  <th className="px-4 py-3 text-center">Aksi HR</th>
+                  <th className="px-4 py-3 text-center min-w-[170px]">Aksi HR</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-200 dark:divide-emerald-900/60">
@@ -1161,15 +1175,74 @@ export default function KanbanBoard({
                       </td>
                       <td className="px-4 py-3 text-center">
                         <div className="flex items-center justify-center gap-1.5 flex-wrap">
+                          {/* 1. Review Detail & Berkas (KTP/CV) */}
                           <button
                             type="button"
                             onClick={() => handleOpenReviewModal(app)}
                             className="p-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-700 transition-colors cursor-pointer"
-                            title="Review kandidat"
+                            title="Review detail kandidat & berkas KTP/CV"
                           >
                             <Eye className="w-3.5 h-3.5 text-[#0F766E] dark:text-teal-400" />
                           </button>
 
+                          {/* 2. Tombol Kembalikan Tahap (Revert) */}
+                          {app.kanban_stage === "screening" && (
+                            <button
+                              type="button"
+                              disabled={updatingId === app.id}
+                              onClick={() => handleRevertStage(app.id, "diajukan")}
+                              className="p-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-[#132238] dark:hover:bg-teal-900 text-slate-600 dark:text-slate-300 border border-slate-300 dark:border-slate-700 transition-colors cursor-pointer"
+                              title="Kembalikan ke tahap Diajukan"
+                            >
+                              <ChevronLeft className="w-3.5 h-3.5" />
+                            </button>
+                          )}
+                          {app.kanban_stage === "assessment" && (
+                            <button
+                              type="button"
+                              disabled={updatingId === app.id}
+                              onClick={() => handleRevertStage(app.id, "screening")}
+                              className="p-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-[#132238] dark:hover:bg-teal-900 text-slate-600 dark:text-slate-300 border border-slate-300 dark:border-slate-700 transition-colors cursor-pointer"
+                              title="Kembalikan ke tahap Screening HR"
+                            >
+                              <ChevronLeft className="w-3.5 h-3.5" />
+                            </button>
+                          )}
+                          {app.kanban_stage === "interview_hr" && (
+                            <button
+                              type="button"
+                              disabled={updatingId === app.id}
+                              onClick={() => handleRevertStage(app.id, "assessment")}
+                              className="p-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-[#132238] dark:hover:bg-teal-900 text-slate-600 dark:text-slate-300 border border-slate-300 dark:border-slate-700 transition-colors cursor-pointer"
+                              title="Kembalikan ke tahap Assessment / Tes"
+                            >
+                              <ChevronLeft className="w-3.5 h-3.5" />
+                            </button>
+                          )}
+                          {app.kanban_stage === "interview_user" && (
+                            <button
+                              type="button"
+                              disabled={updatingId === app.id}
+                              onClick={() => handleRevertStage(app.id, "interview_hr")}
+                              className="p-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-[#132238] dark:hover:bg-teal-900 text-slate-600 dark:text-slate-300 border border-slate-300 dark:border-slate-700 transition-colors cursor-pointer"
+                              title="Kembalikan ke tahap Interview HR"
+                            >
+                              <ChevronLeft className="w-3.5 h-3.5" />
+                            </button>
+                          )}
+                          {app.kanban_stage === "diterima" && (
+                            <button
+                              type="button"
+                              disabled={updatingId === app.id}
+                              onClick={() => handleRevertStage(app.id, "interview_user")}
+                              className="p-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-[#132238] dark:hover:bg-teal-900 text-slate-600 dark:text-slate-300 border border-slate-300 dark:border-slate-700 transition-colors cursor-pointer"
+                              title="Batalkan Penerimaan & Kembalikan ke Interview User"
+                            >
+                              <ChevronLeft className="w-3.5 h-3.5" />
+                            </button>
+                          )}
+
+                          {/* 3. Aksi Progresi / Jadwalkan / Beri Nilai */}
                           {app.kanban_stage === "diajukan" && (
                             <button
                               type="button"
@@ -1183,7 +1256,7 @@ export default function KanbanBoard({
                                 )
                               }
                               className="p-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 dark:bg-teal-600 dark:hover:bg-teal-500 text-white transition-colors cursor-pointer"
-                              title="Screening CV"
+                              title="Mulai Screening CV"
                             >
                               <ChevronRight className="w-3.5 h-3.5" />
                             </button>
@@ -1194,7 +1267,7 @@ export default function KanbanBoard({
                               type="button"
                               onClick={() => openScheduleModal(app, "test")}
                               className="p-1.5 rounded-lg bg-teal-600 hover:bg-teal-700 text-white transition-colors cursor-pointer"
-                              title="Jadwalkan Tes"
+                              title="Jadwalkan Tes Teknis & Psikotes"
                             >
                               <Calendar className="w-3.5 h-3.5" />
                             </button>
@@ -1229,12 +1302,12 @@ export default function KanbanBoard({
                                   type="button"
                                   onClick={() => openDirectGradeModal(app, "interview_hr")}
                                   className="p-1.5 rounded-lg bg-amber-500 hover:bg-amber-600 text-white transition-colors cursor-pointer animate-pulse"
-                                  title="Beri Nilai HR"
+                                  title="Beri Nilai Interview HR"
                                 >
                                   <Award className="w-3.5 h-3.5" />
                                 </button>
                               ) : (
-                                <div className="flex items-center gap-1">
+                                <>
                                   <button
                                     type="button"
                                     onClick={() => openDirectGradeModal(app, "interview_hr")}
@@ -1247,11 +1320,11 @@ export default function KanbanBoard({
                                     type="button"
                                     onClick={() => openScheduleModal(app, "interview_user")}
                                     className="p-1.5 rounded-lg bg-[#0F766E] hover:bg-[#0d6962] text-white transition-colors cursor-pointer"
-                                    title="Jadwalkan Interview User"
+                                    title="Jadwalkan Interview Calon Atasan (User)"
                                   >
                                     <Calendar className="w-3.5 h-3.5" />
                                   </button>
-                                </div>
+                                </>
                               )}
                             </>
                           )}
@@ -1263,12 +1336,12 @@ export default function KanbanBoard({
                                   type="button"
                                   onClick={() => openDirectGradeModal(app, "interview_user")}
                                   className="p-1.5 rounded-lg bg-amber-500 hover:bg-amber-600 text-white transition-colors cursor-pointer animate-pulse"
-                                  title="Beri Nilai User"
+                                  title="Beri Nilai Interview User"
                                 >
                                   <Award className="w-3.5 h-3.5" />
                                 </button>
                               ) : (
-                                <div className="flex items-center gap-1">
+                                <>
                                   <button
                                     type="button"
                                     onClick={() => openDirectGradeModal(app, "interview_user")}
@@ -1289,25 +1362,46 @@ export default function KanbanBoard({
                                       )
                                     }
                                     className="p-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white transition-colors cursor-pointer"
-                                    title="Terima Kandidat"
+                                    title="Terima Kandidat & Berikan Penawaran"
                                   >
                                     <Check className="w-3.5 h-3.5" />
                                   </button>
-                                </div>
+                                </>
                               )}
                             </>
                           )}
 
                           {app.kanban_stage === "diterima" && (
-                            <span className="text-emerald-600 dark:text-teal-400 font-bold text-[11px]">
-                              ✓ Lolos Seleksi
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-slate-900 text-emerald-700 dark:text-teal-300 border border-emerald-200 dark:border-slate-800 text-[10px] font-bold">
+                              <Check className="w-3 h-3 text-emerald-600 dark:text-teal-400" />
+                              <span>Lolos</span>
                             </span>
                           )}
 
+                          {/* 4. Pulihkan untuk tahap Ditolak */}
                           {app.kanban_stage === "ditolak" && (
-                            <span className="text-rose-600 dark:text-rose-400 font-medium text-[11px]">
-                              Ditolak
-                            </span>
+                            <button
+                              type="button"
+                              disabled={updatingId === app.id}
+                              onClick={() => handleRevertStage(app.id, "screening")}
+                              className="p-1.5 rounded-lg bg-amber-50 hover:bg-amber-100 dark:bg-amber-950 dark:hover:bg-amber-900 text-amber-700 dark:text-amber-200 border border-amber-300 dark:border-amber-800 transition-colors cursor-pointer"
+                              title="Pulihkan lamaran ke tahap Screening"
+                            >
+                              <RotateCcw className="w-3.5 h-3.5" />
+                            </button>
+                          )}
+
+                          {/* 5. Tolak Lamaran untuk semua tahap aktif */}
+                          {app.kanban_stage !== "diterima" && app.kanban_stage !== "ditolak" && (
+                            <button
+                              type="button"
+                              disabled={updatingId === app.id}
+                              onClick={() => handleRejectApplicant(app.id)}
+                              className="p-1.5 rounded-lg bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/80 dark:hover:bg-rose-900 text-rose-600 dark:text-rose-300 border border-rose-200 dark:border-rose-800 transition-colors cursor-pointer"
+                              title="Tolak Lamaran"
+                            >
+                              <XCircle className="w-3.5 h-3.5" />
+                            </button>
                           )}
                         </div>
                       </td>
@@ -1401,10 +1495,25 @@ export default function KanbanBoard({
               />
 
               {/* Lokasi / Gedung / Ruangan / Link Meeting */}
+              {/* Lokasi / Gedung / Ruangan */}
               <div>
-                <label className="block font-bold text-slate-700 dark:text-teal-300 uppercase tracking-wider mb-1">
-                  Lokasi / Ruangan / Link Pertemuan *
-                </label>
+                <div className="flex items-center justify-between mb-1">
+                  <label className="font-bold text-slate-700 dark:text-teal-300 uppercase tracking-wider text-[11px]">
+                    Lokasi / Ruangan / Tempat Pelaksanaan *
+                  </label>
+                  {schedLocation !== DEFAULT_OFFICE_LOCATION && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setSchedLocation(DEFAULT_OFFICE_LOCATION);
+                        setSchedGmapsUrl(DEFAULT_GMAPS_URL);
+                      }}
+                      className="text-[10px] text-[#0F766E] dark:text-teal-400 font-bold hover:underline cursor-pointer"
+                    >
+                      Reset ke Default Gedung Kantor
+                    </button>
+                  )}
+                </div>
                 <div className="relative">
                   <Building2 className="w-4 h-4 text-slate-400 absolute left-3 top-3 pointer-events-none" />
                   <input
@@ -1412,13 +1521,49 @@ export default function KanbanBoard({
                     required
                     value={schedLocation}
                     onChange={(e) => setSchedLocation(e.target.value)}
-                    placeholder={
-                      scheduleModalMode === "test"
-                        ? "Misal: Lab Komputer Gd. B Lt. 2 atau Link Google Meet"
-                        : "Misal: Ruang Rapat HR Lt. 3 atau Link Google Meet"
-                    }
+                    placeholder="Misal: Kantor Pusat Nexora Digital / Ruang Rapat HR"
                     className="w-full pl-9 pr-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-[#0B132B] border border-slate-300 dark:border-slate-800 text-slate-900 dark:text-white focus:outline-none focus:border-slate-800 dark:focus:border-emerald-500 text-xs"
                   />
+                </div>
+              </div>
+
+              {/* Link Google Maps Lokasi (Opsional) */}
+              <div>
+                <div className="flex items-center justify-between mb-1">
+                  <label className="font-bold text-slate-700 dark:text-teal-300 uppercase tracking-wider text-[11px]">
+                    Link Google Maps Lokasi
+                  </label>
+                  {schedGmapsUrl !== DEFAULT_GMAPS_URL && (
+                    <button
+                      type="button"
+                      onClick={() => setSchedGmapsUrl(DEFAULT_GMAPS_URL)}
+                      className="text-[10px] text-[#0F766E] dark:text-teal-400 font-bold hover:underline cursor-pointer flex items-center gap-1"
+                    >
+                      <span>Pakai Link Default Gedung</span>
+                    </button>
+                  )}
+                </div>
+                <div className="relative">
+                  <MapPin className="w-4 h-4 text-slate-400 absolute left-3 top-3 pointer-events-none" />
+                  <input
+                    type="url"
+                    value={schedGmapsUrl}
+                    onChange={(e) => setSchedGmapsUrl(e.target.value)}
+                    placeholder="Misal: https://maps.app.goo.gl/... atau https://goo.gl/maps/..."
+                    className="w-full pl-9 pr-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-[#0B132B] border border-slate-300 dark:border-slate-800 text-slate-900 dark:text-white focus:outline-none focus:border-slate-800 dark:focus:border-emerald-500 text-xs"
+                  />
+                </div>
+                <div className="text-[10px] text-slate-500 dark:text-slate-400 mt-1 flex items-center justify-between">
+                  <span>Default link kantor: <strong>maps.app.goo.gl/DgmJZPBgV4SQ8Cq36</strong></span>
+                  {schedGmapsUrl && (
+                    <button
+                      type="button"
+                      onClick={() => setSchedGmapsUrl("")}
+                      className="text-[10px] text-rose-500 hover:underline cursor-pointer"
+                    >
+                      Hapus Link
+                    </button>
+                  )}
                 </div>
               </div>
 

@@ -14,6 +14,7 @@ export interface JobPosting {
   posted_date: string;
   deadline_date?: string;
   created_at?: string;
+  quota?: number;
   applicant_count?: number;
   time_to_hire?: string; // e.g. "12 Hari" or "Belum tersedia"
 }
@@ -145,6 +146,22 @@ export interface HRAnalyticsSummary {
     applications: number;
     hires: number;
   }[];
+  raw_applications?: {
+    id: string;
+    job_id: string;
+    job_title: string;
+    department: string;
+    status: string;
+    created_at: string;
+    hired_at?: string | null;
+  }[];
+  all_jobs?: {
+    id: string;
+    title: string;
+    dept: string;
+    status: string;
+    deadline_date?: string;
+  }[];
 }
 
 export interface AssessmentReviewRow {
@@ -178,5 +195,22 @@ export interface AssessmentReviewRow {
   notes?: string;
   status: string; // Scheduled | Completed | Cancelled
   created_at?: string;
+
+  // Multi-stage evaluation breakdowns
+  test_score?: number | null;
+  test_evaluator?: string;
+  test_status?: string;
+  test_notes?: string;
+  test_id?: string;
+  hr_interview_score?: number | null;
+  hr_interview_evaluator?: string;
+  hr_interview_status?: string;
+  hr_interview_notes?: string;
+  hr_interview_id?: string;
+  user_interview_score?: number | null;
+  user_interview_evaluator?: string;
+  user_interview_status?: string;
+  user_interview_notes?: string;
+  user_interview_id?: string;
 }
 

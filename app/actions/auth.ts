@@ -371,11 +371,12 @@ export async function adminSignInAction(
       };
     }
 
-    const targetPath = userRole === "interviewer" ? "/admin/evaluations" : "/admin";
+    const isPenilaiRole = userRole === "interviewer" || userRole === "penilai";
+    const targetPath = isPenilaiRole ? "/penilai" : "/admin";
 
     return {
       success: true,
-      message: `Login berhasil sebagai ${userRole === "interviewer" ? "Penilai Seleksi" : "HR Admin"}! Mengalihkan...`,
+      message: `Login berhasil sebagai ${isPenilaiRole ? "Penilai Seleksi" : "HR Admin"}! Mengalihkan...`,
       redirectTo: targetPath,
     };
   } catch (err: unknown) {

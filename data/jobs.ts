@@ -15,6 +15,47 @@ export interface Job {
   responsibilities: string[];
   qualifications: string[];
   niceToHave?: string[];
+  quota?: number;
+  applicant_count?: number;
+  created_at?: string;
+  updated_at?: string;
+  reopened_at?: string;
+  posted_date?: string;
+  deadline_date?: string;
+}
+
+export function extractQuota(description?: string, dbQuota?: number | null): number {
+  if (typeof dbQuota === "number" && !isNaN(dbQuota) && dbQuota > 0) {
+    return dbQuota;
+  }
+  if (!description) return 5;
+  const match = description.match(/\[Kuota:\s*(\d+)\s*(?:orang|kandidat)?\]/i);
+  if (match && match[1]) {
+    const val = parseInt(match[1], 10);
+    if (!isNaN(val) && val > 0) return val;
+  }
+  return 5;
+}
+
+export function extractApplicantCount(description?: string, appCount?: number | null): number {
+  if (typeof appCount === "number" && !isNaN(appCount) && appCount > 0) {
+    return appCount;
+  }
+  if (!description) return 0;
+  const match = description.match(/\[Pelamar:\s*(\d+)\]/i);
+  if (match && match[1]) {
+    const val = parseInt(match[1], 10);
+    if (!isNaN(val)) return val;
+  }
+  return 0;
+}
+
+export function cleanJobDescription(description?: string): string {
+  if (!description) return "";
+  return description
+    .replace(/\[Kuota:\s*\d+\s*(?:orang|kandidat)?\]/gi, "")
+    .replace(/\[Pelamar:\s*\d+\]/gi, "")
+    .trim();
 }
 
 /**

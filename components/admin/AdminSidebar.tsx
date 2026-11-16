@@ -37,8 +37,8 @@ export default function AdminSidebar({
 
   const NAV_ITEMS = isInterviewer
     ? [
-        { href: "/admin/evaluations", label: "Penilaian Seleksi", icon: ClipboardCheck },
-        { href: "/admin/profile", label: "Profil Saya", icon: User },
+        { href: "/penilai", label: "Penilaian Seleksi", icon: ClipboardCheck },
+        { href: "/penilai/profile", label: "Profil Saya", icon: User },
       ]
     : [
         { href: "/admin", label: "Dashboard & Analitik", icon: LayoutDashboard },
@@ -67,7 +67,7 @@ export default function AdminSidebar({
         {/* Brand Logo & Mobile Close Button */}
         <div className="flex items-center justify-between px-1">
           <Link
-            href={isInterviewer ? "/admin/evaluations" : "/admin"}
+            href={isInterviewer ? "/penilai" : "/admin"}
             prefetch={true}
             className="flex items-center gap-2.5 group"
           >

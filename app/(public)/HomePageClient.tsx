@@ -307,13 +307,13 @@ export default function HomePageClient({ jobs = [] }: HomePageClientProps) {
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link
                 href="/register"
-                className="inline-flex items-center justify-center gap-2 px-8 py-3.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl font-bold text-base transition-all shadow-lg shadow-emerald-950/50"
+                className="inline-flex items-center justify-center gap-2 px-8 py-3.5 bg-[#0d9488] hover:bg-[#0f766e] text-white rounded-xl font-bold text-base transition-all shadow-lg shadow-teal-950/40"
               >
                 Daftar Gratis Sekarang
               </Link>
               <Link
                 href="/jobs"
-                className="inline-flex items-center justify-center gap-2 px-8 py-3.5 border-2 border-emerald-700/60 text-slate-100 rounded-xl font-semibold text-base hover:bg-emerald-900/40 transition-all"
+                className="inline-flex items-center justify-center gap-2 px-8 py-3.5 border-2 border-teal-700/60 text-slate-100 rounded-xl font-semibold text-base hover:bg-teal-900/40 transition-all"
               >
                 Jelajahi Lowongan
               </Link>

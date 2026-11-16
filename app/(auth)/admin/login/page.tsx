@@ -3,6 +3,7 @@
 import React, { useState, useTransition, useEffect } from "react";
 import Link from "next/link";
 import { adminSignInAction, AuthActionResult } from "@/app/actions/auth";
+import { createClient } from "@/lib/supabase/client";
 import {
   ShieldCheck,
   Lock,
@@ -13,8 +14,9 @@ import {
   ClipboardCheck,
   Briefcase,
   CheckCircle2,
-  Sparkles,
   User,
+  Eye,
+  EyeOff,
 } from "lucide-react";
 
 export default function AdminLoginPage() {
@@ -22,6 +24,17 @@ export default function AdminLoginPage() {
   const [state, setState] = useState<AuthActionResult | null>(null);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+
+  // Pastikan sesi login sebelumnya dibersihkan saat masuk ke halaman ini agar staf wajib login ulang
+  useEffect(() => {
+    try {
+      const supabase = createClient();
+      supabase.auth.signOut();
+    } catch {
+      // ignore
+    }
+  }, []);
 
   // Instant redirect listener when login succeeds
   useEffect(() => {
@@ -51,68 +64,71 @@ export default function AdminLoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0B132B] text-slate-100 flex flex-col justify-center items-center p-4 sm:p-6 relative overflow-hidden font-sans">
-      {/* Decorative background glow */}
-      <div className="absolute top-1/4 -left-32 w-96 h-96 bg-emerald-600/10 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute bottom-1/4 -right-32 w-96 h-96 bg-teal-500/10 rounded-full blur-3xl pointer-events-none" />
+    <div className="min-h-screen bg-grid-pattern flex items-center justify-center px-4 py-12 relative overflow-hidden font-sans">
+      {/* Decorative Floating Cubes matching Candidate Login */}
+      <div
+        className="geo-cube animate-float w-32 h-32 top-16 right-[8%] opacity-30 fixed pointer-events-none"
+        style={{ borderColor: "rgba(21, 128, 61, 0.25)" }}
+      />
+      <div
+        className="geo-cube animate-float-2 w-24 h-24 bottom-16 left-[6%] opacity-25 fixed pointer-events-none"
+        style={{ borderColor: "rgba(12, 43, 41, 0.3)" }}
+      />
 
-      <div className="max-w-md w-full space-y-6 relative z-10">
+      <div className="w-full max-w-md relative z-10 my-6 space-y-6">
         {/* Brand Header */}
-        <div className="text-center space-y-3">
-          <div className="flex justify-center mb-1">
-            <div className="h-14 w-14 rounded-2xl overflow-hidden bg-white p-1.5 border border-slate-700 shadow-xl flex items-center justify-center">
+        <div className="text-center mb-6">
+          <Link href="/" className="inline-flex items-center gap-3 mb-4 group">
+            <div className="h-12 w-12 rounded-2xl overflow-hidden bg-white p-1 border border-slate-700/40 shadow-md transition-transform group-hover:scale-105 flex items-center justify-center">
               <img
                 src="/nexora-icon-trans.png"
                 alt="Nexora Digital"
                 className="w-full h-full object-contain"
               />
             </div>
-          </div>
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#132238] border border-emerald-700/60 shadow-lg">
-            <ShieldCheck className="w-4 h-4 text-teal-400" />
-            <span className="text-xs font-bold text-teal-300 uppercase tracking-wider">
-              Nexora Digital · Portal Staf
+            <span
+              className="text-2xl font-extrabold tracking-tight"
+              style={{ fontFamily: "var(--font-display, sans-serif)", color: "#132238" }}
+            >
+              Nexora<span style={{ color: "#0F766E" }}> Digital</span>
             </span>
-          </div>
+          </Link>
 
-          <h1 className="text-3xl font-extrabold text-white tracking-tight">
-            Masuk Portal HR & Penilai
-          </h1>
+          
 
-          <p className="text-xs sm:text-sm text-slate-300 max-w-sm mx-auto leading-relaxed">
-            Khusus Recruiter, HR Admin, dan Tim Penilai untuk evaluasi seleksi internal.
-          </p>
+        
         </div>
 
         {/* Login Card */}
-        <div className="bg-[#132238] border border-emerald-800/60 rounded-3xl p-6 sm:p-8 shadow-2xl space-y-6">
+        <div className="bg-white/95 backdrop-blur-md rounded-2xl p-7 sm:p-8 border border-emerald-900/10 shadow-xl shadow-emerald-950/5 space-y-5">
+          {/* Notification Banners */}
           {state && !state.success && (
-            <div className="p-4 rounded-xl bg-rose-950/80 border border-rose-500/50 text-rose-200 text-xs flex items-start gap-3 animate-shake">
-              <AlertCircle className="w-5 h-5 text-rose-400 shrink-0 mt-0.5" />
+            <div className="p-4 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-sm flex items-start gap-3 animate-fade-in-up">
+              <AlertCircle className="w-5 h-5 text-rose-500 shrink-0 mt-0.5" />
               <div>
-                <p className="font-semibold text-rose-100">Gagal Masuk</p>
-                <p className="mt-0.5">{state.message}</p>
+                <p className="font-semibold text-rose-800">Gagal Masuk</p>
+                <p className="mt-0.5 text-xs text-rose-700">{state.message}</p>
               </div>
             </div>
           )}
 
           {state && state.success && (
-            <div className="p-4 rounded-xl bg-emerald-950/90 border border-emerald-500/60 text-emerald-200 text-xs flex items-center gap-3 animate-pulse">
-              <Loader2 className="w-5 h-5 text-emerald-400 animate-spin shrink-0" />
+            <div className="p-4 rounded-xl bg-emerald-50 border border-emerald-300 text-emerald-800 text-sm flex items-start gap-3 animate-fade-in-up">
+              <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0 mt-0.5" />
               <div>
-                <p className="font-bold text-emerald-100">Autentikasi Berhasil!</p>
-                <p className="mt-0.5 text-emerald-300">{state.message}</p>
+                <p className="font-semibold text-emerald-950">Autentikasi Berhasil!</p>
+                <p className="mt-0.5 text-xs text-emerald-800">Mengalihkan ke portal Anda...</p>
               </div>
             </div>
           )}
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-xs font-bold text-emerald-300 uppercase tracking-wider mb-2">
-                Alamat Email atau Username Staf
+              <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
+                Alamat Email 
               </label>
-              <div className="relative">
-                <UserCheck className="w-4 h-4 text-emerald-400 absolute left-4 top-3.5" />
+              <div className="relative flex items-center">
+                {/* <UserCheck className="w-4 h-4 text-slate-400 absolute left-4 z-10" /> */}
                 <input
                   type="text"
                   name="email"
@@ -121,55 +137,63 @@ export default function AdminLoginPage() {
                   autoCorrect="off"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="muhzhrii atau penilai@talenthub.com"
-                  className="w-full pl-11 pr-4 py-3 rounded-xl bg-[#0B132B] border border-emerald-800 text-white placeholder-slate-500 text-sm focus:outline-none focus:border-emerald-500 transition-colors"
+                  placeholder="admin@gmail.com"
+                  className="form-input pl-11 transition-all"
                 />
               </div>
-              <p className="text-[11px] text-slate-400 mt-1">
-                Bisa menggunakan username Anda (<strong>muhzhrii</strong>) atau alamat email resmi.
-              </p>
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-emerald-300 uppercase tracking-wider mb-2">
-                Kata Sandi
-              </label>
-              <div className="relative">
-                <Lock className="w-4 h-4 text-emerald-400 absolute left-4 top-3.5" />
+              <div className="flex items-center justify-between mb-1.5">
+                <label className="block text-xs font-bold uppercase tracking-wider text-slate-700">
+                  Kata Sandi
+                </label>
+              </div>
+              <div className="relative flex items-center">
+                {/* <Lock className="w-4 h-4 text-slate-400 absolute left-4 z-10" /> */}
                 <input
-                  type="password"
+                  type={showPassword ? "text" : "password"}
                   name="password"
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
-                  className="w-full pl-11 pr-4 py-3 rounded-xl bg-[#0B132B] border border-emerald-800 text-white placeholder-slate-500 text-sm focus:outline-none focus:border-emerald-500 transition-colors"
+                  className="form-input pl-11 pr-11 transition-all"
                 />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 text-slate-400 hover:text-emerald-700 p-1 rounded-md transition-colors"
+                  aria-label="Toggle password visibility"
+                >
+                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
               </div>
             </div>
 
             <button
               type="submit"
-              disabled={isPending || (state?.success === true)}
-              className="w-full mt-2 py-3.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-sm transition-all shadow-lg shadow-emerald-950/60 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60"
+              disabled={isPending || state?.success === true}
+              className="btn-primary w-full py-3.5 text-base shadow-lg shadow-emerald-900/20 disabled:opacity-60 disabled:cursor-not-allowed transition-all cursor-pointer mt-1"
+              style={{ background: "#132238" }}
             >
               {isPending || state?.success ? (
-                <>
-                  <Loader2 className="w-4 h-4 animate-spin" />
+                <span className="flex items-center justify-center gap-2">
+                  <Loader2 className="w-4 h-4 animate-spin text-white" />
                   <span>{state?.success ? "Mengalihkan ke Portal..." : "Memverifikasi Akun..."}</span>
-                </>
+                </span>
               ) : (
-                <>
+                <span className="flex items-center justify-center gap-2">
                   <span>Masuk ke Sistem Staf</span>
                   <ArrowRight className="w-4 h-4" />
-                </>
+                </span>
               )}
             </button>
           </form>
 
           {/* Quick Demo Credentials Switcher */}
-          <div className="border-t border-emerald-800/60 pt-4 space-y-2.5">
-            <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider text-center">
+          <div className="border-t border-slate-200/80 pt-4 space-y-2.5">
+            <p className="text-[11px] font-bold text-slate-500 uppercase tracking-wider text-center">
               Pilihan Akun Uji Coba Cepat:
             </p>
 
@@ -177,50 +201,58 @@ export default function AdminLoginPage() {
               <button
                 type="button"
                 onClick={() => handleFillCredentials("muhzhrii", "")}
-                className="p-2 rounded-xl bg-[#0B132B] hover:bg-emerald-900/40 border border-emerald-700/60 text-left transition-colors flex flex-col justify-between"
+                className="p-2.5 rounded-xl bg-slate-50 hover:bg-amber-50/70 border border-slate-200 hover:border-amber-300 text-left transition-all flex flex-col justify-between group cursor-pointer"
               >
-                <div className="flex items-center gap-1 text-amber-300 font-bold text-[10px]">
+                <div className="flex items-center gap-1 text-amber-700 font-bold text-[10px]">
                   <User className="w-3 h-3 shrink-0" />
                   <span className="truncate">Akun Anda</span>
                 </div>
-                <p className="text-[10px] text-slate-300 font-semibold mt-1 truncate">muhzhrii</p>
-                <span className="text-[9px] text-amber-400 font-semibold">Admin HR</span>
+                <p className="text-[11px] text-slate-800 font-semibold mt-1 truncate">muhzhrii</p>
+                <span className="text-[9px] text-amber-600 font-bold">Admin HR</span>
               </button>
 
               <button
                 type="button"
                 onClick={() => handleFillCredentials("penilai@talenthub.com", "Penilai123!")}
-                className="p-2 rounded-xl bg-[#0B132B] hover:bg-emerald-900/40 border border-emerald-700/60 text-left transition-colors flex flex-col justify-between"
+                className="p-2.5 rounded-xl bg-slate-50 hover:bg-teal-50/70 border border-slate-200 hover:border-teal-300 text-left transition-all flex flex-col justify-between group cursor-pointer"
               >
-                <div className="flex items-center gap-1 text-emerald-300 font-bold text-[10px]">
+                <div className="flex items-center gap-1 text-teal-700 font-bold text-[10px]">
                   <ClipboardCheck className="w-3 h-3 shrink-0" />
                   <span className="truncate">Akun Penilai</span>
                 </div>
-                <p className="text-[10px] text-slate-300 font-semibold mt-1 truncate">penilai@talenthub</p>
-                <span className="text-[9px] text-emerald-400 font-semibold">Interviewer</span>
+                <p className="text-[11px] text-slate-800 font-semibold mt-1 truncate">penilai@talenthub</p>
+                <span className="text-[9px] text-teal-600 font-bold">Interviewer</span>
               </button>
 
               <button
                 type="button"
                 onClick={() => handleFillCredentials("admin@talenthub.com", "Admin123!")}
-                className="p-2 rounded-xl bg-[#0B132B] hover:bg-emerald-900/40 border border-emerald-700/60 text-left transition-colors flex flex-col justify-between"
+                className="p-2.5 rounded-xl bg-slate-50 hover:bg-emerald-50/70 border border-slate-200 hover:border-emerald-300 text-left transition-all flex flex-col justify-between group cursor-pointer"
               >
-                <div className="flex items-center gap-1 text-teal-300 font-bold text-[10px]">
+                <div className="flex items-center gap-1 text-emerald-700 font-bold text-[10px]">
                   <Briefcase className="w-3 h-3 shrink-0" />
                   <span className="truncate">HR Admin</span>
                 </div>
-                <p className="text-[10px] text-slate-300 font-semibold mt-1 truncate">admin@talenthub</p>
-                <span className="text-[9px] text-teal-400 font-semibold">Recruiter</span>
+                <p className="text-[11px] text-slate-800 font-semibold mt-1 truncate">admin@talenthub</p>
+                <span className="text-[9px] text-emerald-600 font-bold">Recruiter</span>
               </button>
             </div>
           </div>
         </div>
 
-        {/* Link to Candidate Portal */}
-        <div className="text-center text-xs text-slate-400 space-y-1">
-          <p>
+        {/* Security & Link to Candidate Portal */}
+        <div className="text-center space-y-2">
+          <p className="text-center text-xs text-slate-500 flex items-center justify-center gap-1.5 font-medium">
+            <ShieldCheck className="w-4 h-4 text-emerald-700" />
+            Sesi Otentikasi Staf Terenkripsi SSL 256-bit
+          </p>
+
+          <p className="text-xs text-slate-600 font-medium">
             Bukan staf HR atau Penilai?{" "}
-            <Link href="/login" className="font-bold text-emerald-400 hover:text-emerald-300 underline underline-offset-2">
+            <Link
+              href="/login"
+              className="font-bold text-teal-800 hover:text-teal-950 underline underline-offset-2"
+            >
               Masuk melalui Portal Pelamar di sini
             </Link>
           </p>

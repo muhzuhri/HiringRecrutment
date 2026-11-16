@@ -149,6 +149,8 @@ export interface JobApplication {
   latest_schedule?: string | null;
   latest_stage_type?: string | null;
   latest_evaluator?: string | null;
+  latest_location?: string | null;
+  latest_gmaps_url?: string | null;
   created_at: string;
   updated_at: string;
 }

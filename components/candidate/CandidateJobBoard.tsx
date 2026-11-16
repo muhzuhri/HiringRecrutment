@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import { Job, allJobs, departments } from "@/data/jobs";
 import { CandidateProfile, JobApplication } from "@/types/candidate";
 import QuickApplyModal from "./QuickApplyModal";
-import { Search, Filter, Briefcase, MapPin, DollarSign, Clock, Zap, CheckCircle2, ArrowRight, Sparkles, Eye, AlertCircle, Lock } from "lucide-react";
+import { Search, Filter, Briefcase, MapPin, DollarSign, Clock, Zap, CheckCircle2, ArrowRight, Sparkles, Eye, AlertCircle, Lock, XCircle, X, Users } from "lucide-react";
 import Link from "next/link";
 
 interface CandidateJobBoardProps {
@@ -19,6 +19,7 @@ export default function CandidateJobBoard({ profile, existingApplications, jobsL
   const [selectedType, setSelectedType] = useState("Semua");
 
   const [selectedJobForModal, setSelectedJobForModal] = useState<Job | null>(null);
+  const [selectedJobAlert, setSelectedJobAlert] = useState<Job | null>(null);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   // Set of job IDs candidate has applied to
@@ -225,8 +226,22 @@ export default function CandidateJobBoard({ profile, existingApplications, jobsL
           </div>
         ) : (
           filteredJobs.map((job) => {
-            const hasApplied = appliedJobIds.has(job.id);
             const appliedRecord = existingApplications.find((a) => a.job_id === job.id);
+            const isApplied = Boolean(appliedRecord);
+            const isRejected =
+              appliedRecord &&
+              ((appliedRecord.status || "").toLowerCase() === "ditolak" ||
+                (appliedRecord.status || "").toLowerCase() === "rejected");
+
+            // Check if job was reopened/refreshed after candidate was rejected
+            const jobReopenedTime = new Date(job.reopened_at || job.posted_date || job.updated_at || job.posted || 0).getTime();
+            const rejectionTime = appliedRecord ? new Date(appliedRecord.updated_at || appliedRecord.created_at || 0).getTime() : 0;
+            const isNewPeriod = isRejected && jobReopenedTime > rejectionTime;
+
+            // Candidate is rejected in the CURRENT period if rejected and NOT in a new period yet
+            const isRejectedCurrentPeriod = isRejected && !isNewPeriod;
+            // Only considered actively applied if applied and not rejected
+            const hasApplied = isApplied && !isRejected;
 
             return (
               <div
@@ -264,12 +279,62 @@ export default function CandidateJobBoard({ profile, existingApplications, jobsL
                       <Clock className="w-3.5 h-3.5 text-slate-400 dark:text-teal-400" />
                       <span>Batas Akhir: {job.deadline}</span>
                     </div>
+
+                    <div className="flex items-center justify-between text-xs pt-2.5 mt-2 border-t border-slate-100 dark:border-slate-800/80">
+                      <span className="flex items-center gap-1.5 font-medium text-slate-600 dark:text-slate-300">
+                        <Users className="w-3.5 h-3.5 text-[#0F766E] dark:text-teal-400" />
+                        <span>Pelamar: <strong className="text-slate-900 dark:text-white font-extrabold">{job.applicant_count || 0}</strong> orang</span>
+                      </span>
+                      <span className="px-2 py-0.5 rounded-md bg-teal-50 dark:bg-teal-950/60 text-[#0F766E] dark:text-teal-300 border border-teal-200 dark:border-teal-800/80 font-bold text-[11px]">
+                        Kuota: {job.quota || 5} Posisi
+                      </span>
+                    </div>
                   </div>
                 </div>
 
                 {/* Bottom Actions */}
                 <div className="pt-4 border-t border-slate-100 dark:border-slate-800/80">
-                  {hasApplied ? (
+                  {isRejectedCurrentPeriod ? (
+                    <div className="space-y-3 w-full">
+                      {/* Action buttons (Detail Lowongan & Riwayat Lamaran) */}
+                      <div className="flex items-center justify-between gap-2">
+                        <Link
+                          href={`/dashboard/jobs/${job.id}`}
+                          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-[#0B132B] dark:hover:bg-slate-800/80 text-slate-700 hover:text-slate-900 dark:text-teal-300 dark:hover:text-white border border-slate-200 dark:border-slate-800/80 font-bold text-xs transition-colors"
+                        >
+                          <Eye className="w-3.5 h-3.5" />
+                          <span>Detail Lowongan</span>
+                        </Link>
+                        {appliedRecord && (
+                          <Link
+                            href={`/dashboard/applications/${appliedRecord.id}`}
+                            className="inline-flex items-center gap-1 text-xs font-bold text-rose-600 dark:text-rose-400 hover:underline transition-colors"
+                          >
+                            <span>Riwayat Lamaran</span>
+                            <ArrowRight className="w-3.5 h-3.5" />
+                          </Link>
+                        )}
+                      </div>
+
+                      {/* Tombol Ditolak Periode Ini dengan icon AlertCircle (!) yang memunculkan pop-up */}
+                      <div className="pt-2 border-t border-slate-100 dark:border-slate-800/30">
+                        <button
+                          type="button"
+                          onClick={() => setSelectedJobAlert(job)}
+                          className="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl bg-rose-50 hover:bg-rose-100/90 dark:bg-rose-950/40 dark:hover:bg-rose-900/60 text-rose-700 dark:text-rose-300 border border-rose-300 dark:border-rose-800/80 text-xs font-bold shadow-xs transition-all cursor-pointer group"
+                          title="Klik untuk melihat informasi penolakan periode ini"
+                        >
+                          <span className="flex items-center gap-2">
+                            <XCircle className="w-4 h-4 text-rose-600 dark:text-rose-400 shrink-0" />
+                            <span>Ditolak pada Periode Ini</span>
+                          </span>
+                          <span className="w-5 h-5 rounded-full bg-rose-200 dark:bg-rose-900/80 flex items-center justify-center text-rose-800 dark:text-rose-200 text-xs font-black shadow-2xs group-hover:scale-110 transition-transform">
+                            !
+                          </span>
+                        </button>
+                      </div>
+                    </div>
+                  ) : hasApplied ? (
                     <div className="space-y-3 w-full">
                       {/* Action buttons (Detail Lowongan & Lacak Progress) */}
                       <div className="flex items-center justify-between gap-2">
@@ -373,6 +438,72 @@ export default function CandidateJobBoard({ profile, existingApplications, jobsL
           onClose={() => setSelectedJobForModal(null)}
           onSuccess={handleApplySuccess}
         />
+      )}
+
+      {/* Alert Modal: Ditolak pada Periode Ini */}
+      {selectedJobAlert && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/60 backdrop-blur-xs animate-fade-in">
+          <div className="bg-white dark:bg-[#132238] border border-slate-200 dark:border-slate-800 rounded-2xl p-4 sm:p-5 max-w-sm sm:max-w-md w-full shadow-2xl relative space-y-3 text-center animate-scale-up max-h-[90vh] overflow-y-auto">
+            <button
+              type="button"
+              onClick={() => setSelectedJobAlert(null)}
+              className="absolute top-3.5 right-3.5 p-1.5 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+              title="Tutup"
+            >
+              <X className="w-4 h-4" />
+            </button>
+
+            <div className="w-10 h-10 rounded-xl bg-rose-100 dark:bg-rose-950/60 border border-rose-300 dark:border-rose-800/80 flex items-center justify-center mx-auto text-rose-600 dark:text-rose-400 shadow-2xs">
+              <AlertCircle className="w-5 h-5" />
+            </div>
+
+            <div className="space-y-1">
+              <span className="inline-block px-2.5 py-0.5 rounded-full bg-rose-50 dark:bg-rose-950/80 border border-rose-200 dark:border-rose-800/80 text-[10px] font-bold text-rose-700 dark:text-rose-300">
+                Informasi Periode Seleksi
+              </span>
+              <h3 className="text-base sm:text-lg font-black text-slate-900 dark:text-white leading-snug">
+                {selectedJobAlert.title}
+              </h3>
+              <p className="text-[11px] font-semibold text-slate-500 dark:text-slate-400">
+                {selectedJobAlert.dept} • {selectedJobAlert.location}
+              </p>
+            </div>
+
+            <div className="p-3 rounded-xl bg-rose-50/70 dark:bg-rose-950/30 border border-rose-200 dark:border-rose-800/50 text-left space-y-2">
+              <p className="text-xs font-semibold text-rose-900 dark:text-rose-200 leading-snug">
+                Lamaran Anda untuk posisi ini telah dinyatakan <strong>Gugur / Ditolak</strong> pada periode seleksi saat ini.
+              </p>
+              <p className="text-[11px] text-slate-600 dark:text-slate-300 leading-relaxed">
+                Sesuai ketentuan rekrutmen, kandidat <strong>tidak dapat melamar kembali</strong> pada posisi yang sama selama periode ini masih berjalan.
+              </p>
+              <div className="p-2.5 rounded-lg bg-white/90 dark:bg-[#0B132B]/90 border border-rose-200/70 dark:border-rose-900/60 text-[11px] text-slate-700 dark:text-slate-300 space-y-0.5">
+                <p className="font-bold text-rose-700 dark:text-rose-300 flex items-center gap-1">
+                  <span>💡</span>
+                  <span>Kapan bisa mendaftar lagi?</span>
+                </p>
+                <p className="leading-relaxed text-slate-600 dark:text-slate-400">
+                  Anda dapat mendaftar kembali apabila lowongan ini telah <strong>ditutup / expired</strong> dan <strong>dibuka kembali</strong> oleh HR pada batch berikutnya.
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2 pt-1">
+              <Link
+                href="/dashboard/applications"
+                className="flex-1 py-2 px-3 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-[#0B132B] dark:hover:bg-slate-800 text-slate-800 dark:text-white font-bold text-xs transition-colors text-center"
+              >
+                Riwayat Lamaran
+              </Link>
+              <button
+                type="button"
+                onClick={() => setSelectedJobAlert(null)}
+                className="flex-1 py-2 px-3 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs transition-colors shadow-xs"
+              >
+                Saya Mengerti
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

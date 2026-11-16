@@ -82,10 +82,35 @@ export async function updateSession(request: NextRequest) {
       return makeRedirect(url);
     }
 
-    // If role is interviewer (Penilai), redirect to /admin/evaluations if they visit /admin dashboard or jobs
-    if (userRole === "interviewer" && (pathname === "/admin" || pathname === "/admin/jobs")) {
+    // If role is interviewer or penilai, redirect to /penilai if they visit /admin dashboard or jobs
+    if ((userRole === "interviewer" || userRole === "penilai") && (pathname === "/admin" || pathname === "/admin/jobs" || pathname === "/admin/users")) {
       const url = request.nextUrl.clone();
-      url.pathname = "/admin/evaluations";
+      url.pathname = "/penilai";
+      return makeRedirect(url);
+    }
+  }
+
+  // 2b. Route protection: Protect /penilai routes
+  if (pathname.startsWith("/penilai")) {
+    if (!user) {
+      const url = request.nextUrl.clone();
+      url.pathname = "/admin/login";
+      url.searchParams.set("redirect", pathname);
+      return makeRedirect(url);
+    }
+
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("role")
+      .eq("id", user.id)
+      .single();
+
+    const userRole = profile?.role || user.user_metadata?.role || "candidate";
+
+    if (userRole === "candidate") {
+      const url = request.nextUrl.clone();
+      url.pathname = "/dashboard";
+      url.searchParams.set("error", "unauthorized_penilai_access");
       return makeRedirect(url);
     }
   }
@@ -93,8 +118,8 @@ export async function updateSession(request: NextRequest) {
   // 3. Smart Redirect for Auth Pages:
   // - On candidate login (/login, /register): only redirect if already logged in AS CANDIDATE.
   //   If currently logged in as admin/interviewer, do NOT redirect — allow logging in with candidate account.
-  // - On staff login (/admin/login): only redirect if already logged in AS STAFF (admin/interviewer).
-  //   If currently logged in as candidate, do NOT redirect — allow logging in with staff account.
+  // - On staff login (/admin/login): DO NOT auto-redirect. Always allow the staff login form to display
+  //   so staff/admin can log in or switch accounts with credentials.
   if (user) {
     if (pathname === "/login" || pathname === "/register") {
       const { data: profile } = await supabase
@@ -108,23 +133,6 @@ export async function updateSession(request: NextRequest) {
       if (userRole === "candidate") {
         const url = request.nextUrl.clone();
         url.pathname = "/dashboard";
-        return makeRedirect(url);
-      }
-    }
-
-    if (pathname === "/admin/login") {
-      const { data: profile } = await supabase
-        .from("profiles")
-        .select("role")
-        .eq("id", user.id)
-        .single();
-
-      const userRole = profile?.role || user.user_metadata?.role || "candidate";
-      // Only redirect if already a staff member
-      if (userRole === "admin" || userRole === "recruiter" || userRole === "interviewer") {
-        const targetPath = userRole === "interviewer" ? "/admin/evaluations" : "/admin";
-        const url = request.nextUrl.clone();
-        url.pathname = targetPath;
         return makeRedirect(url);
       }
     }

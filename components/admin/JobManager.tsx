@@ -52,6 +52,7 @@ export default function JobManager({ initialJobs }: JobManagerProps) {
   const [requiredSkillsInput, setRequiredSkillsInput] = useState("React.js, Next.js, TypeScript, PostgreSQL");
   const [deadlineDate, setDeadlineDate] = useState("2026-11-30T23:59");
   const [statusOption, setStatusOption] = useState<"Active" | "Closed">("Active");
+  const [quota, setQuota] = useState<number>(5);
 
   // Reset form fields
   const resetForm = () => {
@@ -65,6 +66,7 @@ export default function JobManager({ initialJobs }: JobManagerProps) {
     setRequiredSkillsInput("React.js, Next.js, TypeScript, PostgreSQL");
     setDeadlineDate("2026-11-30T23:59");
     setStatusOption("Active");
+    setQuota(5);
   };
 
   // Open Edit Modal with Pre-filled Data
@@ -78,6 +80,7 @@ export default function JobManager({ initialJobs }: JobManagerProps) {
     setDescription(job.description || "");
     setMinEducation(job.min_education || "S1");
     setRequiredSkillsInput((job.required_skills || []).join(", "));
+    setQuota(job.quota || 5);
 
     if (job.deadline_date) {
       const d = new Date(job.deadline_date);
@@ -110,6 +113,7 @@ export default function JobManager({ initialJobs }: JobManagerProps) {
       description,
       min_education: minEducation,
       required_skills: skillsArray,
+      quota,
       deadline_date: deadlineDate ? new Date(deadlineDate).toISOString() : undefined,
       status: statusOption,
     });
@@ -118,7 +122,7 @@ export default function JobManager({ initialJobs }: JobManagerProps) {
 
     if (res.success) {
       const newJobItem: JobPosting = {
-        id: `job-${Date.now()}`,
+        id: res.job?.id || `job-${Date.now()}`,
         title,
         dept,
         type,
@@ -130,6 +134,7 @@ export default function JobManager({ initialJobs }: JobManagerProps) {
         posted_date: new Date().toISOString(),
         deadline_date: deadlineDate ? new Date(deadlineDate).toISOString() : undefined,
         status: statusOption,
+        quota,
         applicant_count: 0,
         time_to_hire: "Belum tersedia",
       };
@@ -167,6 +172,7 @@ export default function JobManager({ initialJobs }: JobManagerProps) {
       description,
       min_education: minEducation,
       required_skills: skillsArray,
+      quota,
       deadline_date: deadlineDate ? new Date(deadlineDate).toISOString() : undefined,
       status: statusOption,
     });
@@ -187,6 +193,7 @@ export default function JobManager({ initialJobs }: JobManagerProps) {
                 description,
                 min_education: minEducation,
                 required_skills: skillsArray,
+                quota,
                 deadline_date: deadlineDate ? new Date(deadlineDate).toISOString() : undefined,
                 status: statusOption,
               }
@@ -353,11 +360,16 @@ export default function JobManager({ initialJobs }: JobManagerProps) {
                           <span className="text-slate-400">-</span>
                         )}
                       </td>
-                      <td className="px-3 py-3 font-extrabold text-slate-800 dark:text-white text-xs">
-                        <span className="inline-flex items-center gap-1">
-                          <Users className="w-3.5 h-3.5 text-slate-400 dark:text-teal-400" />
-                          {job.applicant_count ?? 0} Pelamar
-                        </span>
+                      <td className="px-3 py-3 text-xs">
+                        <div className="flex flex-col gap-0.5">
+                          <span className="font-extrabold text-slate-800 dark:text-white inline-flex items-center gap-1">
+                            <Users className="w-3.5 h-3.5 text-slate-400 dark:text-teal-400" />
+                            {job.applicant_count ?? 0} Pelamar
+                          </span>
+                          <span className="text-[10px] text-teal-700 dark:text-teal-400 font-semibold">
+                            Kuota: {job.quota || 5} Orang
+                          </span>
+                        </div>
                       </td>
                       <td className="px-3 py-3">
                         {isActive ? (
@@ -634,7 +646,21 @@ export default function JobManager({ initialJobs }: JobManagerProps) {
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div>
+                  <label className="block font-bold text-slate-700 dark:text-teal-300 uppercase mb-1">Kuota Pelamar *</label>
+                  <input
+                    type="number"
+                    min={1}
+                    max={1000}
+                    required
+                    value={quota}
+                    onChange={(e) => setQuota(Math.max(1, parseInt(e.target.value) || 1))}
+                    className="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-[#0B132B] border border-slate-300 dark:border-slate-800/80 text-slate-900 dark:text-white focus:outline-none focus:border-slate-800 dark:focus:border-emerald-500"
+                    placeholder="Contoh: 5"
+                  />
+                </div>
+
                 <div>
                   <label className="block font-bold text-slate-700 dark:text-teal-300 uppercase mb-1">Batas Akhir (Deadline)</label>
                   <input

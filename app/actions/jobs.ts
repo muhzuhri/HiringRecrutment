@@ -1,7 +1,7 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
-import { Job } from "@/data/jobs";
+import { Job, extractQuota, extractApplicantCount, cleanJobDescription } from "@/data/jobs";
 
 /**
  * Fetch all job postings strictly from Supabase 'jobs' table.
@@ -23,11 +23,19 @@ export async function getJobsFromSupabase(
       query = query.eq("dept", deptFilter);
     }
 
-    const { data, error } = await query;
+    const [{ data, error }, { data: appRows }] = await Promise.all([
+      query,
+      supabase.from("applications").select("job_id"),
+    ]);
 
     if (error || !data || data.length === 0) {
       return { jobs: [] };
     }
+
+    const appCountMap: Record<string, number> = {};
+    (appRows || []).forEach((a) => {
+      appCountMap[a.job_id] = (appCountMap[a.job_id] || 0) + 1;
+    });
 
     // Filter out closed and expired jobs (pass deadline date)
     const activeData = data.filter((row: any) => {
@@ -61,7 +69,9 @@ export async function getJobsFromSupabase(
           })
         : "Sesuai Kebijakan HR",
       deptColor: getDeptColor(row.dept),
-      description: row.description || "Posisi lowongan pekerjaan internal perusahaan.",
+      quota: extractQuota(row.description, row.quota),
+      applicant_count: extractApplicantCount(row.description, appCountMap[String(row.id)] || row.applicant_count),
+      description: cleanJobDescription(row.description) || "Posisi lowongan pekerjaan internal perusahaan.",
       responsibilities: row.responsibilities || [
         "Merancang dan mengimplementasikan solusi teknis berkualitas tinggi",
         "Berkolaborasi dengan tim lintas divisi untuk memenuhi target proyek",
@@ -75,6 +85,11 @@ export async function getJobsFromSupabase(
               "Pengalaman kerja relevan di bidangnya",
               "Kemampuan komunikasi dan kerjasama tim yang baik",
             ],
+      created_at: row.created_at,
+      updated_at: row.updated_at,
+      reopened_at: row.reopened_at || row.updated_at,
+      posted_date: row.posted_date || row.created_at,
+      deadline_date: row.deadline_date,
     }));
 
     if (searchQuery) {
@@ -104,11 +119,10 @@ export async function getJobByIdFromSupabase(
   try {
     const supabase = await createClient();
 
-    const { data, error } = await supabase
-      .from("jobs")
-      .select("*")
-      .eq("id", jobId)
-      .single();
+    const [{ data, error }, { count: applicantCount }] = await Promise.all([
+      supabase.from("jobs").select("*").eq("id", jobId).single(),
+      supabase.from("applications").select("id", { count: "exact", head: true }).eq("job_id", jobId),
+    ]);
 
     if (!error && data) {
       const mappedJob: Job = {
@@ -131,7 +145,9 @@ export async function getJobByIdFromSupabase(
             })
           : "Sesuai Kebijakan HR",
         deptColor: getDeptColor(data.dept),
-        description: data.description || "Posisi lowongan pekerjaan internal perusahaan.",
+        quota: extractQuota(data.description, data.quota),
+        applicant_count: extractApplicantCount(data.description, applicantCount || data.applicant_count),
+        description: cleanJobDescription(data.description) || "Posisi lowongan pekerjaan internal perusahaan.",
         responsibilities: data.responsibilities || [
           "Merancang dan mengimplementasikan solusi teknis berkualitas tinggi",
           "Berkolaborasi dengan tim lintas divisi untuk memenuhi target proyek",
@@ -145,6 +161,11 @@ export async function getJobByIdFromSupabase(
                 "Pengalaman kerja relevan di bidangnya",
                 "Kemampuan pemecahan masalah yang baik",
               ],
+        created_at: data.created_at,
+        updated_at: data.updated_at,
+        reopened_at: data.reopened_at || data.updated_at,
+        posted_date: data.posted_date || data.created_at,
+        deadline_date: data.deadline_date,
       };
 
       return { job: mappedJob };

@@ -69,10 +69,12 @@ export interface CandidateDetailData {
 interface CandidateDetailModalProps {
   data: CandidateDetailData | null;
   onClose: () => void;
+  viewerRole?: string;
 }
 
-export default function CandidateDetailModal({ data, onClose }: CandidateDetailModalProps) {
+export default function CandidateDetailModal({ data, onClose, viewerRole = "hr" }: CandidateDetailModalProps) {
   if (!data) return null;
+  const isPenilai = viewerRole === "penilai" || viewerRole === "interviewer";
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in">
@@ -260,31 +262,42 @@ export default function CandidateDetailModal({ data, onClose }: CandidateDetailM
               <Award className="w-3.5 h-3.5 text-[#0F766E] dark:text-teal-400" />
               Rekapitulasi Nilai Seleksi
             </h4>
-            <div className="grid grid-cols-3 gap-2 text-center">
-              <div className="p-2.5 rounded-xl bg-white dark:bg-[#132238] border border-slate-200 dark:border-slate-800/80">
-                <p className="text-[10px] text-slate-500 font-semibold uppercase">1. Asesmen/Tes</p>
-                <p className="text-base font-black text-purple-600 dark:text-purple-400 mt-0.5">
-                  {data.test_score !== null && data.test_score !== undefined ? `${data.test_score}/100` : "-"}
-                </p>
-                <p className="text-[9px] text-slate-400 truncate">{data.test_evaluator || "Penilai"}</p>
-              </div>
 
-              <div className="p-2.5 rounded-xl bg-white dark:bg-[#132238] border border-slate-200 dark:border-slate-800/80">
-                <p className="text-[10px] text-slate-500 font-semibold uppercase">2. Interview HR</p>
-                <p className="text-base font-black text-indigo-600 dark:text-indigo-400 mt-0.5">
-                  {data.hr_interview_score !== null && data.hr_interview_score !== undefined ? `${data.hr_interview_score}/100` : "-"}
+            {isPenilai ? (
+              <div className="p-3 rounded-xl bg-white dark:bg-[#132238] border border-slate-200 dark:border-slate-800/80 text-center max-w-xs mx-auto">
+                <p className="text-[10px] text-slate-500 font-semibold uppercase">Nilai Asesmen / Tes Teknis</p>
+                <p className="text-xl font-black text-purple-600 dark:text-purple-400 mt-0.5">
+                  {data.test_score !== null && data.test_score !== undefined ? `${data.test_score}/100` : "Belum Dinilai"}
                 </p>
-                <p className="text-[9px] text-slate-400 truncate">{data.hr_interview_evaluator || "HR"}</p>
+                <p className="text-[10px] text-slate-400 mt-0.5 truncate">{data.test_evaluator || "Tim Penilai"}</p>
               </div>
+            ) : (
+              <div className="grid grid-cols-3 gap-2 text-center">
+                <div className="p-2.5 rounded-xl bg-white dark:bg-[#132238] border border-slate-200 dark:border-slate-800/80">
+                  <p className="text-[10px] text-slate-500 font-semibold uppercase">1. Asesmen/Tes</p>
+                  <p className="text-base font-black text-purple-600 dark:text-purple-400 mt-0.5">
+                    {data.test_score !== null && data.test_score !== undefined ? `${data.test_score}/100` : "-"}
+                  </p>
+                  <p className="text-[9px] text-slate-400 truncate">{data.test_evaluator || "Penilai"}</p>
+                </div>
 
-              <div className="p-2.5 rounded-xl bg-white dark:bg-[#132238] border border-slate-200 dark:border-slate-800/80">
-                <p className="text-[10px] text-slate-500 font-semibold uppercase">3. Interview User</p>
-                <p className="text-base font-black text-cyan-600 dark:text-cyan-400 mt-0.5">
-                  {data.user_interview_score !== null && data.user_interview_score !== undefined ? `${data.user_interview_score}/100` : "-"}
-                </p>
-                <p className="text-[9px] text-slate-400 truncate">{data.user_interview_evaluator || "User"}</p>
+                <div className="p-2.5 rounded-xl bg-white dark:bg-[#132238] border border-slate-200 dark:border-slate-800/80">
+                  <p className="text-[10px] text-slate-500 font-semibold uppercase">2. Interview HR</p>
+                  <p className="text-base font-black text-indigo-600 dark:text-indigo-400 mt-0.5">
+                    {data.hr_interview_score !== null && data.hr_interview_score !== undefined ? `${data.hr_interview_score}/100` : "-"}
+                  </p>
+                  <p className="text-[9px] text-slate-400 truncate">{data.hr_interview_evaluator || "HR"}</p>
+                </div>
+
+                <div className="p-2.5 rounded-xl bg-white dark:bg-[#132238] border border-slate-200 dark:border-slate-800/80">
+                  <p className="text-[10px] text-slate-500 font-semibold uppercase">3. Interview User</p>
+                  <p className="text-base font-black text-cyan-600 dark:text-cyan-400 mt-0.5">
+                    {data.user_interview_score !== null && data.user_interview_score !== undefined ? `${data.user_interview_score}/100` : "-"}
+                  </p>
+                  <p className="text-[9px] text-slate-400 truncate">{data.user_interview_evaluator || "User"}</p>
+                </div>
               </div>
-            </div>
+            )}
           </div>
 
           {/* 6. Dokumen CV PDF */}
@@ -317,13 +330,17 @@ export default function CandidateDetailModal({ data, onClose }: CandidateDetailM
 
         {/* Footer Actions */}
         <div className="pt-2 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between gap-3">
-          <Link
-            href={`/admin/candidates/${data.id}`}
-            className="inline-flex items-center gap-1.5 text-xs font-bold text-[#0F766E] hover:underline dark:text-teal-300"
-          >
-            <span>Buka Halaman Screening & Catatan HR</span>
-            <ExternalLink className="w-3.5 h-3.5" />
-          </Link>
+          {!isPenilai ? (
+            <Link
+              href={`/admin/candidates/${data.id}`}
+              className="inline-flex items-center gap-1.5 text-xs font-bold text-[#0F766E] hover:underline dark:text-teal-300"
+            >
+              <span>Buka Halaman Screening & Catatan HR</span>
+              <ExternalLink className="w-3.5 h-3.5" />
+            </Link>
+          ) : (
+            <div />
+          )}
 
           <button
             type="button"
